@@ -1,0 +1,26 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>All Posts - </title>
+        <link>http://example.org/posts/</link>
+        <description>All Posts | </description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><managingEditor>mm225012@gmail.com (pbh)</managingEditor>
+            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Mon, 25 May 2020 00:30:53 &#43;0900</lastBuildDate><atom:link href="http://example.org/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>Webpack 기본 설정 정리</title>
+    <link>http://example.org/webpack-%EA%B8%B0%EB%B3%B8-%EC%84%A4%EC%A0%95-%EC%A0%95%EB%A6%AC/</link>
+    <pubDate>Mon, 25 May 2020 00:30:53 &#43;0900</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/webpack-%EA%B8%B0%EB%B3%B8-%EC%84%A4%EC%A0%95-%EC%A0%95%EB%A6%AC/</guid>
+    <description><![CDATA[webpack   웹팩이란 웹 애플리케이션 개발단계에서 발생하는 자원들을 각각의 모듈로 정의하고 병합된 하나의 결과물로 만드는 빌드 도구이다.
+  환경구성 nodejs LTS version npm
+  프로젝트 루트경로에서 명령어실행.
+1  $ npm init -y   생성된 package.json
+1 2 3 4 5 6 7 8 9 10 11 12  { &#34;name&#34;: &#34;demo&#34;, &#34;version&#34;: &#34;1.0.0&#34;, &#34;description&#34;: &#34;&#34;, &#34;main&#34;: &#34;index.js&#34;, &#34;scripts&#34;: { &#34;test&#34;: &#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34; }, &#34;keywords&#34;: [], &#34;author&#34;: &#34;&#34;, &#34;license&#34;: &#34;ISC&#34; }   entry  entry속성에서는 웹자원을 변환하기 위한 js,css 등 파일의 기본설정을 할 수 있다.]]></description>
+</item><item>
+    <title>Git 계정 설정</title>
+    <link>http://example.org/git-%EA%B3%84%EC%A0%95-%EC%84%A4%EC%A0%95/</link>
+    <pubDate>Mon, 25 May 2020 00:28:01 &#43;0900</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/git-%EA%B3%84%EC%A0%95-%EC%84%A4%EC%A0%95/</guid>
+    <description><![CDATA[git 계정 설정. 1 2  $ git config --global user.name &#34;name&#34; $ git config --global user.email name@example.com    &lsquo;&ndash;global&rsquo; 은 전역 설정 &lsquo;&ndash;local&rsquo; 은 프로젝트내 설정  git 설정 내용 보기. 1  $ git config --list   참고 : git book]]></description>
+</item></channel>
+</rss>
