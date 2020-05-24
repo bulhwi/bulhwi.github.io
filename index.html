@@ -11,7 +11,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://example.org/" />
 <meta property="og:image" content="http://example.org/logo.png"/>
-<meta property="og:updated_time" content="2020-05-25T00:30:53+09:00" />
+<meta property="og:updated_time" content="2020-05-25T01:23:21+09:00" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://example.org/logo.png"/>
 
@@ -103,6 +103,24 @@
         alt="Posts"
         title="Posts" /></a></div><h2 class="home-subtitle"><div id="id-1" class="typeit"></div></h2><div class="links"><a href="https://github.com/bulhwi" title="GitHub" target="_blank" rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href="mailto:mm225012@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw"></i></a></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/">VueJS에서 제공하는 단계적영역</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">VueJS에서 제공하는 단계적 영역. VueJS는 다음과 같은 단계적인 영역의 기능을 제공한다. 각 단계의 기능들이 어떻게 제공되는지 정리. 기본적으로 VueJS에서 설명하는 단계적 영역.  선언적 렌더링 컴포넌트 시스템 클라이언트 사이드 렌더링 대규모 어플리케이션 상태관리 빌드 시스템 데이터 퍼시스턴스  선언적 렌더링 HTML 템플릿에 렌더링 대상을 선언적으로 기술해 데이터가 변경될 때마다 DOM을 반응적으로 렌더링하고 사용자 입력 데이터를 동기화 할 수 있다.
+컴포넌트 시스템 UI를 모듈화하여 재사용할 수 있게 해준다.
+클라이언트 사이드 라우팅 단일 페이지 어플리케이션이 동작하기 위해 필요한 영역으로 URL설계, 지시와 같이 Vue Router를 사용하여 구현할 수 있다.</div><div class="post-footer">
+        <a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/springboot-vuejs-%EC%97%B0%EB%8F%99/">SpringBoot VueJS 연동</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">Spring Boot + VueJS 연동하기. Spring boot와 VueJS를 사용하여 프로젝트를 진행할때 기본 구성방법을 정리한다.
+Spring boot 프로젝트 생성 IDE를 이용하여 springBoot 프로젝트를 생성하여 준다. 기본값인 Maven + SpringBoot로 생성하였다.
+VueJS 프로젝트 구성하기.  프로젝트 루트경로에 &lsquo;frontend&rsquo; 폴더를 생성하고 그하위에 vueJS 프로젝트를 구성할것이다. vue-cli3, vuex, vue-router까지 진행.  1 2 3 4  $ mkdir frontend $ cd forntend $ npm install -g @vue/cli $ vue create ui --no-git   springBoot 프로젝트의 루트경로에서 frontend 디렉토리를 만들고, frontend 디렉토리에서 vue-cli를 install 받은 후 vue 프로젝트를 생성한다.</div><div class="post-footer">
+        <a href="/springboot-vuejs-%EC%97%B0%EB%8F%99/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/jetbrains-%EC%9B%B9%EC%8A%A4%ED%86%B0-npm-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Jetbrains 웹스톰 NPM 연동하기</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">웹스톰에서 NPM 연동하기. 프론트엔드 개발 툴로 사용중인 웹스톰에서 NPM을 연동하여 &lsquo;ctrl + shift + f10&rsquo; 단축기로 간단하게 실행 할수있다.
+1. package.json 설정. 1 2 3 4 5 6  &#34;scripts&#34;: { &#34;build&#34;: &#34;hexo generate --deploy&#34;, &#34;clean&#34;: &#34;hexo clean&#34;, &#34;deploy&#34;: &#34;hexo deploy&#34;, &#34;server&#34;: &#34;hexo server&#34; },   &lsquo;npm run ***&lsquo;으로 위에서 정의된 명령어를 사용할 수 있다. hexo에서 사용가능한 명령어를 설정하였다.
+2. Add Configuration 클릭. 이미지에서 처럼 &lsquo;package.json&rsquo;파일의 경로를 잡아주고 Scripts항목에 &lsquo;package.</div><div class="post-footer">
+        <a href="/jetbrains-%EC%9B%B9%EC%8A%A4%ED%86%B0-npm-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/webpack-%EA%B8%B0%EB%B3%B8-%EC%84%A4%EC%A0%95-%EC%A0%95%EB%A6%AC/">Webpack 기본 설정 정리</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">webpack   웹팩이란 웹 애플리케이션 개발단계에서 발생하는 자원들을 각각의 모듈로 정의하고 병합된 하나의 결과물로 만드는 빌드 도구이다.
   환경구성 nodejs LTS version npm

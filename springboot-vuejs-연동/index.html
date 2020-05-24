@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>SpringBoot VueJS 연동 - </title><meta name="Description" content="This is My New Hugo Site"><meta property="og:title" content="SpringBoot VueJS 연동" />
+<meta property="og:description" content="Spring Boot &#43; VueJS 연동하기. Spring boot와 VueJS를 사용하여 프로젝트를 진행할때 기본 구성방법을 정리한다.
+Spring boot 프로젝트 생성 IDE를 이용하여 springBoot 프로젝트를 생성하여 준다. 기본값인 Maven &#43; SpringBoot로 생성하였다.
+VueJS 프로젝트 구성하기.  프로젝트 루트경로에 &lsquo;frontend&rsquo; 폴더를 생성하고 그하위에 vueJS 프로젝트를 구성할것이다. vue-cli3, vuex, vue-router까지 진행.  1 2 3 4  $ mkdir frontend $ cd forntend $ npm install -g @vue/cli $ vue create ui --no-git   springBoot 프로젝트의 루트경로에서 frontend 디렉토리를 만들고, frontend 디렉토리에서 vue-cli를 install 받은 후 vue 프로젝트를 생성한다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" />
+<meta property="og:image" content="http://example.org/logo.png"/>
+<meta property="article:published_time" content="2020-05-25T01:10:05+09:00" />
+<meta property="article:modified_time" content="2020-05-25T01:10:05+09:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/logo.png"/>
+
+<meta name="twitter:title" content="SpringBoot VueJS 연동"/>
+<meta name="twitter:description" content="Spring Boot &#43; VueJS 연동하기. Spring boot와 VueJS를 사용하여 프로젝트를 진행할때 기본 구성방법을 정리한다.
+Spring boot 프로젝트 생성 IDE를 이용하여 springBoot 프로젝트를 생성하여 준다. 기본값인 Maven &#43; SpringBoot로 생성하였다.
+VueJS 프로젝트 구성하기.  프로젝트 루트경로에 &lsquo;frontend&rsquo; 폴더를 생성하고 그하위에 vueJS 프로젝트를 구성할것이다. vue-cli3, vuex, vue-router까지 진행.  1 2 3 4  $ mkdir frontend $ cd forntend $ npm install -g @vue/cli $ vue create ui --no-git   springBoot 프로젝트의 루트경로에서 frontend 디렉토리를 만들고, frontend 디렉토리에서 vue-cli를 install 받은 후 vue 프로젝트를 생성한다."/>
+<meta name="application-name" content="LoveIt">
+<meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" /><link rel="prev" href="http://example.org/jetbrains-%EC%9B%B9%EC%8A%A4%ED%86%B0-npm-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/" /><link rel="next" href="http://example.org/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "SpringBoot VueJS 연동",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/example.org\/springboot-vuejs-%EC%97%B0%EB%8F%99\/"
+        },"image": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/cover.png",
+                "width":  800 ,
+                "height":  600 
+            },"genre": "posts","wordcount":  225 ,
+        "url": "http:\/\/example.org\/springboot-vuejs-%EC%97%B0%EB%8F%99\/","datePublished": "2020-05-25T01:10:05+09:00","dateModified": "2020-05-25T01:10:05+09:00","publisher": {
+                "@type": "Organization",
+                "name": "xxxx",
+                "logo": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/logo.png",
+                "width":  127 ,
+                "height":  40 
+                }
+            },"author": {
+                "@type": "Person",
+                "name": "pbh"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">bulhwi.github.io</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">bulhwi.github.io</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">SpringBoot VueJS 연동</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-05-25">2020-05-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;225 words&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#spring-boot-프로젝트-생성">Spring boot 프로젝트 생성</a></li>
+    <li><a href="#vuejs-프로젝트-구성하기">VueJS 프로젝트 구성하기.</a></li>
+    <li><a href="#vue-router-vuex-추가">vue-router, vuex 추가</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="spring-boot--vuejs-연동하기">Spring Boot + VueJS 연동하기.</h1>
+<p>Spring boot와 VueJS를 사용하여 프로젝트를 진행할때 기본 구성방법을 정리한다.</p>
+<h2 id="spring-boot-프로젝트-생성">Spring boot 프로젝트 생성</h2>
+<p>IDE를 이용하여 springBoot 프로젝트를 생성하여 준다.
+기본값인 Maven + SpringBoot로 생성하였다.</p>
+<h2 id="vuejs-프로젝트-구성하기">VueJS 프로젝트 구성하기.</h2>
+<ul>
+<li>프로젝트 루트경로에 &lsquo;frontend&rsquo; 폴더를 생성하고 그하위에  vueJS 프로젝트를 구성할것이다.
+vue-cli3, vuex, vue-router까지 진행.</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">    $ mkdir frontend
+    $ <span class="nb">cd</span> forntend
+    $ npm install -g @vue/cli
+    $ vue create ui --no-git
+</code></pre></td></tr></table>
+</div>
+</div><p>springBoot 프로젝트의 루트경로에서 frontend 디렉토리를 만들고, frontend 디렉토리에서 vue-cli를 install 받은 후
+vue 프로젝트를 생성한다. 처음엔 그냥 기본값으로 install을 진행한다.
+frontend 디렉토리 하위에 ui폴더가 생성되면서 vue 프로젝트가 생성된다.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading/small.min.svg"
+        data-src="/images/createVue.PNG"
+        data-srcset="/images/createVue.PNG, /images/createVue.PNG 1.5x, /images/createVue.PNG 2x"
+        data-sizes="auto"
+        alt="Example image"
+        title="Example image" /></p>
+<p>정상적으로 생성되었을때의 프로젝트 구조이다. ui하위에 vue.config.js파일을 생성하여 npm build시에 결과파일들의 경로 설정을 해주어야 한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript">   <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+       <span class="nx">outputDir</span><span class="o">:</span> <span class="s2">&#34;../../src/main/resources/static&#34;</span><span class="p">,</span>
+       <span class="nx">indexPath</span><span class="o">:</span> <span class="s2">&#34;../static/index.html&#34;</span><span class="p">,</span>
+       <span class="nx">devServer</span><span class="o">:</span> <span class="p">{</span>
+           <span class="nx">proxy</span><span class="o">:</span> <span class="s2">&#34;http://localhost:8080&#34;</span>
+       <span class="p">}</span>
+   <span class="p">};</span> 
+</code></pre></td></tr></table>
+</div>
+</div><p>js, css, html 등 build이후에 결과파일들은 스프링부트 &lsquo;src/main/resources/static&rsquo; 하위로 생성되게 하기위한 설정이다.
+ui 폴더 루트경로에서 &lsquo;npm run build&rsquo; 명령어를 실행하여 &lsquo;src/main/resources/static&rsquo;하위에 forntend 소스들이 정상적으로 빌드되어 생성는지 확인할 수 있다.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading/small.min.svg"
+        data-src="/images/npmbuild.PNG"
+        data-srcset="/images/npmbuild.PNG, /images/npmbuild.PNG 1.5x, /images/npmbuild.PNG 2x"
+        data-sizes="auto"
+        alt="Example image"
+        title="Example image" /></p>
+<p>spring boot 를 실행하여 브라우저에서도 확인한다.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading/small.min.svg"
+        data-src="/images/browser.PNG"
+        data-srcset="/images/browser.PNG, /images/browser.PNG 1.5x, /images/browser.PNG 2x"
+        data-sizes="auto"
+        alt="Example image"
+        title="Example image" /></p>
+<h2 id="vue-router-vuex-추가">vue-router, vuex 추가</h2>
+<p>브라우저에서 정상적으로 동작하는것을 확인했으니 vue-router와 vuex를 추가한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">   $ vue add router 
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">    $ vue add vuex
+</code></pre></td></tr></table>
+</div>
+</div><p>ui 루트경로에서 &lsquo;vue add ***&rsquo; 명령으로 vur-router와 vuex를 추가연동한다.
+정상적으로 추가가 되었다면 ui디렉토리에 &lsquo;router&rsquo;폴더와 &lsquo;store&rsquo;폴더를 확인할 수 있다.
+브라우저에서도 &lsquo;npm run build&rsquo;를 다시 실행하여, &lsquo;vue-router&rsquo;플러그인이 반영된 샘플 화면으로 바뀐것을 확인할 수 있다.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading/small.min.svg"
+        data-src="/images/addRouterVuex.PNG"
+        data-srcset="/images/addRouterVuex.PNG, /images/addRouterVuex.PNG 1.5x, /images/addRouterVuex.PNG 2x"
+        data-sizes="auto"
+        alt="Example image"
+        title="Example image" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading/small.min.svg"
+        data-src="/images/browser2.PNG"
+        data-srcset="/images/browser2.PNG, /images/browser2.PNG 1.5x, /images/browser2.PNG 2x"
+        data-sizes="auto"
+        alt="Example image"
+        title="Example image" /></p>
+<p>war로 spring boot프로젝트를 빌드한 후 배포하였을때도 정상적으로 동작하는것을 확인할 수 있다.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2020-05-25</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/springboot-vuejs-%EC%97%B0%EB%8F%99/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on WhatsApp" data-sharer="whatsapp" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동"><i class="fab fa-weibo fa-fw"></i></a><a href="javascript:void(0);" title="Share on Myspace" data-sharer="myspace" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="javascript:void(0);" title="Share on Blogger" data-sharer="blogger" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="javascript:void(0);" title="Share on Evernote" data-sharer="evernote" data-url="http://example.org/springboot-vuejs-%EC%97%B0%EB%8F%99/" data-title="SpringBoot VueJS 연동"><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/jetbrains-%EC%9B%B9%EC%8A%A4%ED%86%B0-npm-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/" class="prev" rel="prev" title="Jetbrains 웹스톰 NPM 연동하기"><i class="fas fa-angle-left fa-fw"></i>Jetbrains 웹스톰 NPM 연동하기</a>
+            <a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/" class="next" rel="next" title="VueJS에서 제공하는 단계적영역">VueJS에서 제공하는 단계적영역<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.71.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2020</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">pbh</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"Got it!","link":"Learn more","message":"This website uses Cookies to improve your experience."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
