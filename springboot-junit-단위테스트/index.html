@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>SpringBoot &#43; JUnit 단위테스트 - </title><meta name="Description" content="This is My New Hugo Site"><meta property="og:title" content="SpringBoot &#43; JUnit 단위테스트" />
+<meta property="og:description" content="Spring Boot &#43; JUnit 단위테스트 환경  intelliJ springBoot(devtools, web-starter, lombok)  프로젝트를 생성하면 pom.xml에 기본적으로 &lsquo;spring-boot-starter-test&rsquo;의존성이 추가된 것을 확인할 수 있다.
+1 2 3 4 5  &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;   기본 테스트 클래스 &lsquo;src/test/java&rsquo; 경로에 기본적인 테스트 클래스가 제공된다.
+ @RunWith(SpringRunner.class) - Junit에서 기본으로 제공하는 러너가 아닌 스프링 러너를 사용하기 위해 추가. @SpringBootTest - 테스트케이스가 실행될 때 테스트에 필요한 설정과 빈들을 자동으로 초기화하는 역할을 수행.  목객체로 테스트 케이스 만들기 @WebMvcTest 사용." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" />
+<meta property="og:image" content="http://example.org/logo.png"/>
+<meta property="article:published_time" content="2020-05-31T22:15:11+09:00" />
+<meta property="article:modified_time" content="2020-05-31T22:15:11+09:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/logo.png"/>
+
+<meta name="twitter:title" content="SpringBoot &#43; JUnit 단위테스트"/>
+<meta name="twitter:description" content="Spring Boot &#43; JUnit 단위테스트 환경  intelliJ springBoot(devtools, web-starter, lombok)  프로젝트를 생성하면 pom.xml에 기본적으로 &lsquo;spring-boot-starter-test&rsquo;의존성이 추가된 것을 확인할 수 있다.
+1 2 3 4 5  &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;   기본 테스트 클래스 &lsquo;src/test/java&rsquo; 경로에 기본적인 테스트 클래스가 제공된다.
+ @RunWith(SpringRunner.class) - Junit에서 기본으로 제공하는 러너가 아닌 스프링 러너를 사용하기 위해 추가. @SpringBootTest - 테스트케이스가 실행될 때 테스트에 필요한 설정과 빈들을 자동으로 초기화하는 역할을 수행.  목객체로 테스트 케이스 만들기 @WebMvcTest 사용."/>
+<meta name="application-name" content="LoveIt">
+<meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" /><link rel="prev" href="http://example.org/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "SpringBoot + JUnit 단위테스트",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/example.org\/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8\/"
+        },"image": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/cover.png",
+                "width":  800 ,
+                "height":  600 
+            },"genre": "posts","wordcount":  950 ,
+        "url": "http:\/\/example.org\/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8\/","datePublished": "2020-05-31T22:15:11+09:00","dateModified": "2020-05-31T22:15:11+09:00","publisher": {
+                "@type": "Organization",
+                "name": "xxxx",
+                "logo": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/logo.png",
+                "width":  127 ,
+                "height":  40 
+                }
+            },"author": {
+                "@type": "Person",
+                "name": "pbh"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">bulhwi.github.io</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">bulhwi.github.io</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">SpringBoot &#43; JUnit 단위테스트</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-05-31">2020-05-31</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;950 words&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#spring-boot--junit-단위테스트">Spring Boot + JUnit 단위테스트</a>
+      <ul>
+        <li><a href="#환경">환경</a></li>
+        <li><a href="#기본-테스트-클래스">기본 테스트 클래스</a></li>
+        <li><a href="#목객체로-테스트-케이스-만들기">목객체로 테스트 케이스 만들기</a>
+          <ul>
+            <li><a href="#webmvctest-사용">@WebMvcTest 사용.</a></li>
+            <li><a href="#autoconfiguremockmvc-사용">@AutoConfigureMockMvc 사용.</a></li>
+            <li><a href="#mockmvc-정리">MockMvc 정리</a></li>
+            <li><a href="#내장톰캣으로-테스트">내장톰캣으로 테스트.</a></li>
+            <li><a href="#서비스-계층을-연동하는-컨트롤러-테스트">서비스 계층을 연동하는 컨트롤러 테스트</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="spring-boot--junit-단위테스트">Spring Boot + JUnit 단위테스트</h2>
+<h3 id="환경">환경</h3>
+<ul>
+<li>intelliJ</li>
+<li>springBoot(devtools, web-starter, lombok)</li>
+</ul>
+<p>프로젝트를 생성하면 pom.xml에 기본적으로 &lsquo;spring-boot-starter-test&rsquo;의존성이 추가된 것을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-xml" data-lang="xml">    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="기본-테스트-클래스">기본 테스트 클래스</h3>
+<p>&lsquo;src/test/java&rsquo; 경로에 기본적인 테스트 클래스가 제공된다.</p>
+<ul>
+<li><strong>@RunWith(SpringRunner.class)</strong> - Junit에서 기본으로 제공하는 러너가 아닌 스프링 러너를 사용하기 위해 추가.</li>
+<li><strong>@SpringBootTest</strong> - 테스트케이스가 실행될 때 테스트에 필요한 설정과 빈들을 자동으로 초기화하는 역할을 수행.</li>
+</ul>
+<h3 id="목객체로-테스트-케이스-만들기">목객체로 테스트 케이스 만들기</h3>
+<h4 id="webmvctest-사용">@WebMvcTest 사용.</h4>
+<p>웹어플리케이션에서 Controller를 테스트할 때, @WebMvcTest를 사용하거나, @AutoConfigureMockMvc를 사용한다.
+두개의 어노테이션의 차이점은 <strong>@WebMvcTest</strong>은 @Controller, @RestController가 설정된 클래스를 찾아 메모리에 생성하고,
+@Service, @repository가 붙은 클래스는 생성되지 않는다. 반대로 <strong>@AutoConfigureMockMvc</strong>는 Controller뿐만 아니라 service, repository 모두 메모리에 올린다.</p>
+<p>JUnit 기반의 테스트를 진행해 보기 위해 간단한 Controller와 Vo를 만든다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">//src/controller/BoardController.java
+</span><span class="c1"></span>    <span class="nd">@RestController</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardController</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="nf">BoardController</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;=====&gt;&gt;  board controller 생성&#34;</span><span class="o">);</span>
+            <span class="o">}</span>
+        
+            <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">)</span>
+            <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="s">&#34;Hello : &#34;</span> <span class="o">+</span> <span class="n">name</span><span class="o">;</span>
+            <span class="o">}</span>
+        
+            <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/getBoard&#34;</span><span class="o">)</span>
+            <span class="kd">public</span> <span class="n">BoardVo</span> <span class="nf">getBoard</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">BoardVo</span> <span class="n">boardVo</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BoardVo</span><span class="o">();</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setSeq</span><span class="o">(</span><span class="n">1</span><span class="o">);</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&#34;title&#34;</span><span class="o">);</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setWriter</span><span class="o">(</span><span class="s">&#34;tester&#34;</span><span class="o">);</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="s">&#34;테스트 내용&#34;</span><span class="o">);</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setCreateDate</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+                <span class="n">boardVo</span><span class="o">.</span><span class="na">setCnt</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+                <span class="k">return</span> <span class="n">boardVo</span><span class="o">;</span>
+            <span class="o">}</span>
+        
+            <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/getBoardList&#34;</span><span class="o">)</span>
+            <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="nf">getBoardList</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="n">boardVoList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+                <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                    <span class="n">BoardVo</span> <span class="n">boardVo</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BoardVo</span><span class="o">();</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setSeq</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&#34;title&#34;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setWriter</span><span class="o">(</span><span class="s">&#34;tester&#34;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="s">&#34;테스트 내용&#34;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setCreateDate</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+                    <span class="n">boardVo</span><span class="o">.</span><span class="na">setCnt</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+                    <span class="n">boardVoList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">boardVo</span><span class="o">);</span>
+                <span class="o">}</span>
+                <span class="k">return</span> <span class="n">boardVoList</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">//src/domain/BoardVo.java
+</span><span class="c1"></span>    <span class="nd">@Getter</span>
+    <span class="nd">@Setter</span>
+    <span class="nd">@ToString</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardVo</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="kt">int</span> <span class="n">seq</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">writer</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="n">Date</span> <span class="n">createDate</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Date</span><span class="o">();</span>
+        <span class="kd">private</span> <span class="kt">int</span> <span class="n">cnt</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">// src/test/java/BoardController.java
+</span><span class="c1"></span>    <span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="nd">@WebMvcTest</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardControllerTest</span> <span class="o">{</span>
+        <span class="nd">@Autowired</span>
+        <span class="kd">private</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+    
+        <span class="nd">@Test</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testHello</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">mockMvc</span><span class="o">.</span><span class="na">perform</span><span class="o">(</span><span class="n">get</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">).</span><span class="na">param</span><span class="o">(</span><span class="s">&#34;name&#34;</span><span class="o">,</span> <span class="s">&#34;이름&#34;</span><span class="o">))</span>
+                    <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">status</span><span class="o">().</span><span class="na">isOk</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">content</span><span class="o">().</span><span class="na">string</span><span class="o">(</span><span class="s">&#34;Hello : 이름&#34;</span><span class="o">))</span>
+                    <span class="o">.</span><span class="na">andDo</span><span class="o">(</span><span class="n">print</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="autoconfiguremockmvc-사용">@AutoConfigureMockMvc 사용.</h4>
+<p>@SpringBootTest에는 웹어플리케이션 테스트를 지원하는 webEnvironment속성이 있다.
+이속성을 생략하면 기본 값으로 WebEnvironment.MOCK이 설정되는데, 테스트 케이스 실행시 서블릿컨테이너가 구동되지 않는다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">//@AutoConfigureMockMvc 사용.
+</span><span class="c1"></span>    <span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">webEnvironment</span> <span class="o">=</span> <span class="n">SpringBootTest</span><span class="o">.</span><span class="na">WebEnvironment</span><span class="o">.</span><span class="na">MOCK</span><span class="o">)</span>
+    <span class="nd">@AutoConfigureMockMvc</span> <span class="c1">//클래스위에 추가되어야 한다.
+</span><span class="c1"></span>    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardControllerTest</span> <span class="o">{</span>
+        <span class="nd">@Autowired</span>
+        <span class="kd">private</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+    
+        <span class="nd">@Test</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testHello</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">mockMvc</span><span class="o">.</span><span class="na">perform</span><span class="o">(</span><span class="n">get</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">).</span><span class="na">param</span><span class="o">(</span><span class="s">&#34;name&#34;</span><span class="o">,</span> <span class="s">&#34;이름&#34;</span><span class="o">))</span>
+                    <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">status</span><span class="o">().</span><span class="na">isOk</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">content</span><span class="o">().</span><span class="na">string</span><span class="o">(</span><span class="s">&#34;Hello : 이름&#34;</span><span class="o">))</span>
+                    <span class="o">.</span><span class="na">andDo</span><span class="o">(</span><span class="n">print</span><span class="o">());</span> <span class="c1">// 요청/응답 메시지를 모두 출력.
+</span><span class="c1"></span>        <span class="o">}</span>
+    <span class="o">}</span> 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="mockmvc-정리">MockMvc 정리</h4>
+<p>MockMvc에서 제공하는 perform() 메서드를 사용하면 브라우저에서 URL요청을 하듯 controller를 실행할 수 있다.
+andExpect() 메서드를 사용하여 서버의 응답결과도 검증이 가능하다.</p>
+<ul>
+<li>perform() - org.springframework.test.web.servlet.request.MockMvcRequestBuilders의 static 메서드를 사용하여 request의 method type을 정할 수 있다.
+get, post, put, delete 등을 제공한다. 추가로 param(), header(), cookie() 등에 메서드로 파라미터, 헤더 쿠키등을 설정할 수 있다.
+perform() 메서드는 ResultActions객체를 리턴하고 ResultActions는 응답결과를 검증할 수 있는 andExpect() 메서드를 제공한다.</li>
+<li>andExpect() - 파라미터로 org.springframework.test.web.servlet.result.MockMvcResultMatchers에서 결과검증을 위한 다양한 static 메서드를 제공받아 테스트결과 검증에 사용할 수 있다..
+<ul>
+<li>isOk() - http code 200인지 확인.</li>
+<li>isNotFound() - 404 Not Found인지 확인.</li>
+<li>isMethodNotAllowed() - 메서드불일치 405인지 확인.</li>
+<li>isInternalServerError() - http code 500인지 확인.</li>
+<li>is(int status) - 설정한 응답코드인지 확인.</li>
+</ul>
+</li>
+</ul>
+<h4 id="내장톰캣으로-테스트">내장톰캣으로 테스트.</h4>
+<p>MockMvc객체는 톰캣서버를 사용하지않고 테스트를 진행한다. 정상적으로 톰캣을 구동하여 테스트를 진행할때는, @SpringBootTest에서 webEnvironment속성값을 RANDOM_PORT나 DEFINED_PORT로 변경하여 진행한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-JAVA" data-lang="JAVA">    <span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="c1">//랜덤한 포트번호로 톰캣이 구동된다.
+</span><span class="c1"></span>    <span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">webEnvironment</span> <span class="o">=</span> <span class="n">SpringBootTest</span><span class="o">.</span><span class="na">WebEnvironment</span><span class="o">.</span><span class="na">RANDOM_PORT</span><span class="o">)</span> 
+    <span class="nd">@AutoConfigureMockMvc</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardControllerTest</span> <span class="o">{</span>
+        <span class="nd">@Autowired</span>
+        <span class="kd">private</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+    
+        <span class="nd">@Autowired</span>
+        <span class="kd">private</span> <span class="n">TestRestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+    
+        <span class="nd">@Test</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testHello</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">result</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="s">&#34;/hello?name=이름&#34;</span><span class="o">,</span> <span class="n">String</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="n">assertEquals</span><span class="o">(</span><span class="s">&#34;Hello : 이름&#34;</span><span class="o">,</span> <span class="n">result</span><span class="o">);</span>
+        <span class="o">}</span>
+    
+        <span class="nd">@Test</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testGetBoard</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">BoardVo</span> <span class="n">boardVo</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="s">&#34;/getBoard&#34;</span><span class="o">,</span> <span class="n">BoardVo</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="n">assertEquals</span><span class="o">(</span><span class="s">&#34;tester&#34;</span><span class="o">,</span> <span class="n">boardVo</span><span class="o">.</span><span class="na">getWriter</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>TestRestTemplate 객체를 사용하여 URL로 서버에 요청을 전달하고 assertEquals메서드로 응답결과를 확인.</p>
+<ul>
+<li>WebEnvironment 속성
+<ul>
+<li>MOCK - 내장톰캣 구동 X. AutoConfigureMockMvc어노테이션으로 MockMvc 객체를 주입받아 테스트에 사용.</li>
+<li>RANDOM_POTRT - 랜덤한 포트로 내장톰캣 구동.</li>
+<li>DEFINED_PORT - application.properties파일에 설정된 포트를 사용.</li>
+<li>NONE - 서블릿기반 환경 자체를 구성하지 않음.</li>
+</ul>
+</li>
+</ul>
+<h4 id="서비스-계층을-연동하는-컨트롤러-테스트">서비스 계층을 연동하는 컨트롤러 테스트</h4>
+<p>단순히 컨트롤러 테스트뿐만 아니라 실제 비즈니스 로직이 들어가게 되는 서비스계층을 연동하여 테스트.
+BoardService, BoardServiceImpl 추가.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">// src/service/BoardService.java 
+</span><span class="c1"></span>    <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">BoardService</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="nf">hello</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+        <span class="n">BoardVo</span> <span class="nf">getBoard</span><span class="o">();</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="nf">getBoardList</span><span class="o">();</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">// src/service/BoardServiceImpl.java
+</span><span class="c1"></span>    <span class="nd">@Service</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardServiceImpl</span> <span class="kd">implements</span> <span class="n">BoardService</span><span class="o">{</span>
+    
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&#34;Hello : &#34;</span> <span class="o">+</span> <span class="n">name</span><span class="o">;</span>
+        <span class="o">}</span>
+    
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">BoardVo</span> <span class="nf">getBoard</span><span class="o">()</span> <span class="o">{</span>
+            <span class="n">BoardVo</span> <span class="n">board</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BoardVo</span><span class="o">();</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setSeq</span><span class="o">(</span><span class="n">1</span><span class="o">);</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&#34;test title&#34;</span><span class="o">);</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setWriter</span><span class="o">(</span><span class="s">&#34;tester&#34;</span><span class="o">);</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="s">&#34;test content&#34;</span><span class="o">);</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setCreateDate</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+            <span class="n">board</span><span class="o">.</span><span class="na">setCnt</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">board</span><span class="o">;</span>
+        <span class="o">}</span>
+    
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="nf">getBoardList</span><span class="o">()</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="n">boardList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+            <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="n">BoardVo</span> <span class="n">board</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BoardVo</span><span class="o">();</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setSeq</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&#34;test title&#34;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setWriter</span><span class="o">(</span><span class="s">&#34;tester&#34;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#34;번 test content&#34;</span><span class="o">);</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setCreateDate</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+                <span class="n">board</span><span class="o">.</span><span class="na">setCnt</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+                <span class="n">boardList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">board</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">boardList</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">    <span class="c1">// 추가된 service와 연동을 위해 controller코드 수정. 
+</span><span class="c1"></span>    <span class="nd">@RestController</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardController</span> <span class="o">{</span>
+        <span class="nd">@Autowired</span>
+        <span class="kd">private</span> <span class="n">BoardService</span> <span class="n">boardService</span><span class="o">;</span>
+    
+        <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">)</span>
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">boardService</span><span class="o">.</span><span class="na">hello</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+        <span class="o">}</span>
+    
+        <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/getBoard&#34;</span><span class="o">)</span>
+        <span class="kd">public</span> <span class="n">BoardVo</span> <span class="nf">getBoard</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">boardService</span><span class="o">.</span><span class="na">getBoard</span><span class="o">();</span>
+        <span class="o">}</span>
+    
+        <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/getBoardList&#34;</span><span class="o">)</span>
+        <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BoardVo</span><span class="o">&gt;</span> <span class="nf">getBoardList</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">boardService</span><span class="o">.</span><span class="na">getBoardList</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// test code 수정.
+</span><span class="c1"></span><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">webEnvironment</span> <span class="o">=</span> <span class="n">SpringBootTest</span><span class="o">.</span><span class="na">WebEnvironment</span><span class="o">.</span><span class="na">MOCK</span><span class="o">)</span>
+<span class="nd">@AutoConfigureMockMvc</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BoardControllerTest</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+
+    <span class="nd">@MockBean</span>
+    <span class="kd">private</span> <span class="n">BoardService</span> <span class="n">boardService</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testHello</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">when</span><span class="o">(</span><span class="n">boardService</span><span class="o">.</span><span class="na">hello</span><span class="o">(</span><span class="s">&#34;이름&#34;</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="s">&#34;Hello : 이름&#34;</span><span class="o">);</span>
+
+        <span class="n">mockMvc</span><span class="o">.</span><span class="na">perform</span><span class="o">(</span><span class="n">get</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">).</span><span class="na">param</span><span class="o">(</span><span class="s">&#34;name&#34;</span><span class="o">,</span> <span class="s">&#34;이름&#34;</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">status</span><span class="o">().</span><span class="na">isOk</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">content</span><span class="o">().</span><span class="na">string</span><span class="o">(</span><span class="s">&#34;Hello : 이름&#34;</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">andDo</span><span class="o">(</span><span class="n">print</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>스프링부트 퀵스타트 (저자 채규태)</strong> 일부 내용을 정리함.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2020-05-31</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on WhatsApp" data-sharer="whatsapp" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트"><i class="fab fa-weibo fa-fw"></i></a><a href="javascript:void(0);" title="Share on Myspace" data-sharer="myspace" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="javascript:void(0);" title="Share on Blogger" data-sharer="blogger" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="javascript:void(0);" title="Share on Evernote" data-sharer="evernote" data-url="http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" data-title="SpringBoot &#43; JUnit 단위테스트"><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/" class="prev" rel="prev" title="VueJS에서 제공하는 단계적영역"><i class="fas fa-angle-left fa-fw"></i>VueJS에서 제공하는 단계적영역</a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.71.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2020</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">pbh</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"Got it!","link":"Learn more","message":"This website uses Cookies to improve your experience."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -11,7 +11,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://example.org/" />
 <meta property="og:image" content="http://example.org/logo.png"/>
-<meta property="og:updated_time" content="2020-05-25T01:23:21+09:00" />
+<meta property="og:updated_time" content="2020-05-31T22:15:11+09:00" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://example.org/logo.png"/>
 
@@ -103,6 +103,12 @@
         alt="Posts"
         title="Posts" /></a></div><h2 class="home-subtitle"><div id="id-1" class="typeit"></div></h2><div class="links"><a href="https://github.com/bulhwi" title="GitHub" target="_blank" rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href="mailto:mm225012@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw"></i></a></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/">SpringBoot &#43; JUnit 단위테스트</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-31">2020-05-31</time></span></div><div class="content">Spring Boot + JUnit 단위테스트 환경  intelliJ springBoot(devtools, web-starter, lombok)  프로젝트를 생성하면 pom.xml에 기본적으로 &lsquo;spring-boot-starter-test&rsquo;의존성이 추가된 것을 확인할 수 있다.
+1 2 3 4 5  &lt;dependency&gt; &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt; &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;   기본 테스트 클래스 &lsquo;src/test/java&rsquo; 경로에 기본적인 테스트 클래스가 제공된다.
+ @RunWith(SpringRunner.class) - Junit에서 기본으로 제공하는 러너가 아닌 스프링 러너를 사용하기 위해 추가. @SpringBootTest - 테스트케이스가 실행될 때 테스트에 필요한 설정과 빈들을 자동으로 초기화하는 역할을 수행.  목객체로 테스트 케이스 만들기 @WebMvcTest 사용.</div><div class="post-footer">
+        <a href="/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/">VueJS에서 제공하는 단계적영역</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">VueJS에서 제공하는 단계적 영역. VueJS는 다음과 같은 단계적인 영역의 기능을 제공한다. 각 단계의 기능들이 어떻게 제공되는지 정리. 기본적으로 VueJS에서 설명하는 단계적 영역.  선언적 렌더링 컴포넌트 시스템 클라이언트 사이드 렌더링 대규모 어플리케이션 상태관리 빌드 시스템 데이터 퍼시스턴스  선언적 렌더링 HTML 템플릿에 렌더링 대상을 선언적으로 기술해 데이터가 변경될 때마다 DOM을 반응적으로 렌더링하고 사용자 입력 데이터를 동기화 할 수 있다.
 컴포넌트 시스템 UI를 모듈화하여 재사용할 수 있게 해준다.
