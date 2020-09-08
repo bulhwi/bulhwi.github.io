@@ -4,7 +4,15 @@
         <link>http://example.org/posts/</link>
         <description>All Posts | </description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><managingEditor>mm225012@gmail.com (pbh)</managingEditor>
-            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Sun, 31 May 2020 22:15:11 &#43;0900</lastBuildDate><atom:link href="http://example.org/posts/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Fri, 04 Sep 2020 00:41:24 &#43;0900</lastBuildDate><atom:link href="http://example.org/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>우아한테크러닝 3기 : React&amp;TypeScript 1주차.</title>
+    <link>http://example.org/reacttypescript/</link>
+    <pubDate>Fri, 04 Sep 2020 00:41:24 &#43;0900</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/reacttypescript/</guid>
+    <description><![CDATA[운좋게 참여하게 된 우아한테크러닝3기 강의 내용 무차별 정리. 1일차 교육내용/목표 설명.  React&amp;TypeScript 기반 웹 앱개발 교육 웹앱을 개발하는데 중요한 컴포넌트와 상태관리에 대한 이해 아키텍처 설계  TypeScript 데이터 타입명시 데이터타입에 느슨한 &lsquo;JavaScript&rsquo;보다 엄격하게 타입을 선언하여 에러를 방지할 수 있다.
+1 2  let num: Number; num = &#39;string&#39;; //error   1 2 3 4 5 6 7  // Type Alias로 타입을 공통으로 관리할 수도 있다. type Num: Number; type Str: String; let height: Num = 180; let weight: Num = 75; let name: Str = &#39;name&#39;;   참고 : TypeScript Basic Types]]></description>
+</item><item>
     <title>SpringBoot &#43; JUnit 단위테스트</title>
     <link>http://example.org/springboot-junit-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/</link>
     <pubDate>Sun, 31 May 2020 22:15:11 &#43;0900</pubDate>
