@@ -4,15 +4,23 @@
         <link>http://example.org/</link>
         <description>This is My New Hugo Site</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><managingEditor>mm225012@gmail.com (pbh)</managingEditor>
-            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Fri, 04 Sep 2020 00:41:24 &#43;0900</lastBuildDate>
+            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Wed, 09 Sep 2020 00:15:11 &#43;0900</lastBuildDate>
             <atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>우아한테크러닝 3기 : React&amp;TypeScript 2주차.</title>
+    <link>http://example.org/reacttypescript_2/</link>
+    <pubDate>Wed, 09 Sep 2020 00:15:11 &#43;0900</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/reacttypescript_2/</guid>
+    <description><![CDATA[운좋게 참여하게 된 우아한테크러닝3기 강의 마구마구 기억나는데로 정리. 3일차 교육내용.  React 만들기. 리액트에서 가상돔이 만들어지고 실제 DOM으로 렌더링되는 과정을 간단하게 구현.  가상돔의 구조 예시
+1 2 3 4 5 6 7 8 9 10  const vdom = { type: &#39;ul&#39;, props: {}, children: [ { type: &#39;li&#39;, props: { className: &#34;item&#34; }, children: &#34;Hello&#34; }, { type: &#39;li&#39;, props: { className: &#34;item&#34; }, children: &#34;World&#34; }, { type: &#39;li&#39;, props: { className: &#34;item&#34; }, children: &#34;React&#34; }, // .]]></description>
+</item><item>
     <title>우아한테크러닝 3기 : React&amp;TypeScript 1주차.</title>
     <link>http://example.org/reacttypescript/</link>
     <pubDate>Fri, 04 Sep 2020 00:41:24 &#43;0900</pubDate>
     <author>Author</author>
     <guid>http://example.org/reacttypescript/</guid>
-    <description><![CDATA[운좋게 참여하게 된 우아한테크러닝3기 강의 내용 마구마구 기억나는데로 정리. 1일차 교육내용/목표 설명.  React&amp;TypeScript 기반 웹 앱개발 교육 웹앱을 개발하는데 중요한 컴포넌트와 상태관리에 대한 이해 아키텍처 설계  TypeScript 데이터 타입명시 데이터타입에 느슨한 &lsquo;JavaScript&rsquo;보다 엄격하게 타입을 선언하여 에러를 방지할 수 있다.
+    <description><![CDATA[운좋게 참여하게 된 우아한테크러닝3기 강의 마구마구 기억나는데로 정리. 1일차 교육내용/목표 설명.  React&amp;TypeScript 기반 웹 앱개발 교육 웹앱을 개발하는데 중요한 컴포넌트와 상태관리에 대한 이해 아키텍처 설계  TypeScript 데이터 타입명시 데이터타입에 느슨한 &lsquo;JavaScript&rsquo;보다 엄격하게 타입을 선언하여 에러를 방지할 수 있다.
 1 2  let num: Number; num = &#39;string&#39;; //error   1 2 3 4 5 6 7  // Type Alias로 타입을 공통으로 관리할 수도 있다. type Num: Number; type Str: String; let height: Num = 180; let weight: Num = 75; let name: Str = &#39;name&#39;;   참고 : TypeScript Basic Types]]></description>
 </item><item>
     <title>SpringBoot &#43; JUnit 단위테스트</title>
