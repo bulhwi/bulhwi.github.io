@@ -4,9 +4,16 @@
         <link>http://example.org/</link>
         <description>This is My New Hugo Site</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><managingEditor>mm225012@gmail.com (pbh)</managingEditor>
-            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Tue, 15 Sep 2020 00:31:05 &#43;0900</lastBuildDate>
+            <webMaster>mm225012@gmail.com (pbh)</webMaster><lastBuildDate>Wed, 16 Sep 2020 00:15:55 &#43;0900</lastBuildDate>
             <atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>우아한테크러닝 3기 : React&amp;TypeScript 3주차.</title>
+    <link>http://example.org/reacttypescript_3/</link>
+    <pubDate>Wed, 16 Sep 2020 00:15:55 &#43;0900</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/reacttypescript_3/</guid>
+    <description><![CDATA[운좋게 참여하게 된 우아한테크러닝3기 강의 마구마구 기억나는데로 정리. 5일차 교육내용. 커링(Currying)  커링은 N개의 인자를 받는 함수를 단일 인자를 받는 N개의 함수열로 만드는 것이다. 함수의 재사용성 측면에서 유용하게 사용이 된다.  1 2 3 4 5 6 7 8 9 10 11 12 13 14  function funcA(a,b,c){ return a + b + c; } function funcB(a) { return function func2(b) { return function func3(c) { return a + b + c; } } } console.]]></description>
+</item><item>
     <title>[ES6] Spread 연산자, Rest 파라미터, Array Like</title>
     <link>http://example.org/es6-spread-%EC%97%B0%EC%82%B0%EC%9E%90-rest-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-array-like/</link>
     <pubDate>Tue, 15 Sep 2020 00:31:05 &#43;0900</pubDate>

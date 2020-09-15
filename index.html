@@ -11,7 +11,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://example.org/" />
 <meta property="og:image" content="http://example.org/logo.png"/>
-<meta property="og:updated_time" content="2020-09-15T00:31:05+09:00" />
+<meta property="og:updated_time" content="2020-09-16T00:15:55+09:00" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://example.org/logo.png"/>
 
@@ -103,6 +103,10 @@
         alt="Posts"
         title="Posts" /></a></div><h2 class="home-subtitle"><div id="id-1" class="typeit"></div></h2><div class="links"><a href="https://github.com/bulhwi" title="GitHub" target="_blank" rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href="mailto:mm225012@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw"></i></a></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/reacttypescript_3/">우아한테크러닝 3기 : React&amp;TypeScript 3주차.</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-09-16">2020-09-16</time></span></div><div class="content">운좋게 참여하게 된 우아한테크러닝3기 강의 마구마구 기억나는데로 정리. 5일차 교육내용. 커링(Currying)  커링은 N개의 인자를 받는 함수를 단일 인자를 받는 N개의 함수열로 만드는 것이다. 함수의 재사용성 측면에서 유용하게 사용이 된다.  1 2 3 4 5 6 7 8 9 10 11 12 13 14  function funcA(a,b,c){ return a + b + c; } function funcB(a) { return function func2(b) { return function func3(c) { return a + b + c; } } } console.</div><div class="post-footer">
+        <a href="/reacttypescript_3/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/es6-spread-%EC%97%B0%EC%82%B0%EC%9E%90-rest-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-array-like/">[ES6] Spread 연산자, Rest 파라미터, Array Like</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-09-15">2020-09-15</time></span></div><div class="content">Spread 연산자.  Spread 연산자(&hellip;)는 이터러블 오브젝트의 엘리먼트를 하나씩 분리하여 전개한다. 전개한 결과를 변수에 할당하거나 호출하는 함수의 파라미터 값으로 사용할 수 있다.  1 2 3  //EX  [...iterableObject] function(...iterableObject)   1 2 3 4 5 6 7 8  let one = [11, 12]; let two = [21, 22]; let spreadObj = [51, ...one, 52, ...two]; console.log(spreadObj); //[51, 11, 12, 52, 21, 22] console.log(spreadObj.length); //6  let spreadTxt = [.</div><div class="post-footer">
         <a href="/es6-spread-%EC%97%B0%EC%82%B0%EC%9E%90-rest-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-array-like/">Read More</a></div>
@@ -128,12 +132,6 @@
 컴포넌트 시스템 UI를 모듈화하여 재사용할 수 있게 해준다.
 클라이언트 사이드 라우팅 단일 페이지 어플리케이션이 동작하기 위해 필요한 영역으로 URL설계, 지시와 같이 Vue Router를 사용하여 구현할 수 있다.</div><div class="post-footer">
         <a href="/vuejs%EC%97%90%EC%84%9C-%EC%A0%9C%EA%B3%B5%ED%95%98%EB%8A%94-%EB%8B%A8%EA%B3%84%EC%A0%81%EC%98%81%EC%97%AD/">Read More</a></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/springboot-vuejs-%EC%97%B0%EB%8F%99/">SpringBoot VueJS 연동</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span>&nbsp;<span class="post-publish">published on <time datetime="2020-05-25">2020-05-25</time></span></div><div class="content">Spring Boot + VueJS 연동하기. Spring boot와 VueJS를 사용하여 프로젝트를 진행할때 기본 구성방법을 정리한다.
-Spring boot 프로젝트 생성 IDE를 이용하여 springBoot 프로젝트를 생성하여 준다. 기본값인 Maven + SpringBoot로 생성하였다.
-VueJS 프로젝트 구성하기.  프로젝트 루트경로에 &lsquo;frontend&rsquo; 폴더를 생성하고 그하위에 vueJS 프로젝트를 구성할것이다. vue-cli3, vuex, vue-router까지 진행.  1 2 3 4  $ mkdir frontend $ cd forntend $ npm install -g @vue/cli $ vue create ui --no-git   springBoot 프로젝트의 루트경로에서 frontend 디렉토리를 만들고, frontend 디렉토리에서 vue-cli를 install 받은 후 vue 프로젝트를 생성한다.</div><div class="post-footer">
-        <a href="/springboot-vuejs-%EC%97%B0%EB%8F%99/">Read More</a></div>
 </article><ul class="pagination"><li class="page-item active">
                     <span class="page-link">
                         <a href="/">1</a>

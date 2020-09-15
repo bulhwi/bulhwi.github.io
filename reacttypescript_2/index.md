@@ -89,6 +89,6 @@ export function createElement(type, props, ...children) {
 }
 
 ```
-
+### 4일차 교육은 참여를 못함. 하하
 
 
