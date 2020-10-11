@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying) - </title><meta name="Description" content="This is My New Hugo Site"><meta property="og:title" content="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)" />
+<meta property="og:description" content="JavaScript 함수 선언 유형. 1 2 3 4 5 6 7 8 9 10 11 12 13  function foo() {} //일반적인 선언  const bar = function(){} // 함수도 객체로 취급이 되기때문에 변수에 할당이 가능하다  // 즉시 호출되는 펑션에 선언방식. // 브라우저에 의해 js가 로딩되면 최초 1번 호출되는 콜백 펑션임. (function(){ console.log(&#39;IIFE&#39;) })(); // ES6부터 지원하는 화살표 함수. const bar = (x) =&gt; x * 2; const bar = (x) =&gt; {return 0;};   JavaScript 비동기적 프로그래밍(Promise, Async, await) 콜백지옥의 단점(중첩된 중괄호, 예외처리의 어려움등등등)을 해결하려는 시도속에서 만들어진 Promise는 비교적으로 안전하고 관리하기 쉬운 코드 구조를 가지지만 번거롭다는 평가도 있었다고 한다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" />
+<meta property="og:image" content="http://example.org/logo.png"/>
+<meta property="article:published_time" content="2020-10-11T15:48:55+09:00" />
+<meta property="article:modified_time" content="2020-10-11T15:48:55+09:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/logo.png"/>
+
+<meta name="twitter:title" content="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)"/>
+<meta name="twitter:description" content="JavaScript 함수 선언 유형. 1 2 3 4 5 6 7 8 9 10 11 12 13  function foo() {} //일반적인 선언  const bar = function(){} // 함수도 객체로 취급이 되기때문에 변수에 할당이 가능하다  // 즉시 호출되는 펑션에 선언방식. // 브라우저에 의해 js가 로딩되면 최초 1번 호출되는 콜백 펑션임. (function(){ console.log(&#39;IIFE&#39;) })(); // ES6부터 지원하는 화살표 함수. const bar = (x) =&gt; x * 2; const bar = (x) =&gt; {return 0;};   JavaScript 비동기적 프로그래밍(Promise, Async, await) 콜백지옥의 단점(중첩된 중괄호, 예외처리의 어려움등등등)을 해결하려는 시도속에서 만들어진 Promise는 비교적으로 안전하고 관리하기 쉬운 코드 구조를 가지지만 번거롭다는 평가도 있었다고 한다."/>
+<meta name="application-name" content="LoveIt">
+<meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" /><link rel="prev" href="http://example.org/es6-spread-%EC%97%B0%EC%82%B0%EC%9E%90-rest-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-array-like/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/example.org\/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81\/"
+        },"image": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/cover.png",
+                "width":  800 ,
+                "height":  600 
+            },"genre": "posts","wordcount":  416 ,
+        "url": "http:\/\/example.org\/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81\/","datePublished": "2020-10-11T15:48:55+09:00","dateModified": "2020-10-11T15:48:55+09:00","publisher": {
+                "@type": "Organization",
+                "name": "xxxx",
+                "logo": {
+                "@type": "ImageObject",
+                "url": "http:\/\/example.org\/logo.png",
+                "width":  127 ,
+                "height":  40 
+                }
+            },"author": {
+                "@type": "Person",
+                "name": "pbh"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">bulhwi.github.io</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">bulhwi.github.io</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>pbh</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-10-11">2020-10-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;416 words&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#javascript-함수-선언-유형">JavaScript 함수 선언 유형.</a></li>
+    <li><a href="#javascript-비동기적-프로그래밍promise-async-await">JavaScript 비동기적 프로그래밍(Promise, Async, await)</a></li>
+    <li><a href="#클로저closure">클로저(Closure)</a></li>
+    <li><a href="#커링currying">커링(Currying)</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="javascript-함수-선언-유형">JavaScript 함수 선언 유형.</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{}</span> <span class="c1">//일반적인 선언
+</span><span class="c1"></span>
+<span class="kr">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){}</span> <span class="c1">// 함수도 객체로 취급이 되기때문에 변수에 할당이 가능하다
+</span><span class="c1"></span>
+<span class="c1">// 즉시 호출되는 펑션에 선언방식.
+</span><span class="c1">// 브라우저에 의해 js가 로딩되면 최초 1번 호출되는 콜백 펑션임.
+</span><span class="c1"></span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;IIFE&#39;</span><span class="p">)</span>
+<span class="p">})();</span>
+ 
+<span class="c1">// ES6부터 지원하는 화살표 함수.
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span><span class="k">return</span> <span class="mi">0</span><span class="p">;};</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="javascript-비동기적-프로그래밍promise-async-await">JavaScript 비동기적 프로그래밍(Promise, Async, await)</h2>
+<p>콜백지옥의 단점(중첩된 중괄호, 예외처리의 어려움등등등)을 해결하려는 시도속에서 만들어진 Promise는 비교적으로 안전하고 관리하기 쉬운 코드 구조를 가지지만 번거롭다는
+평가도 있었다고 한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;응답&#39;</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">p</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="c1">//응답
+</span><span class="c1"></span><span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">async</span> <span class="kd">function</span> <span class="nx">promiseFunc</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">p</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+    <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">err</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">promiseFunc</span><span class="p">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="클로저closure">클로저(Closure)</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="nx">bar</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="c1">// function bar를 리턴. 
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">f</span><span class="p">());</span> <span class="c1">// 10
+</span></code></pre></td></tr></table>
+</div>
+</div><p>&lsquo;console.log(foo(10))&lsquo;시점에서 x의 사이클은 끝나지만 foo의 내부 함수인 bar함수에서는 x의 참조를 유지한다.
+이러한 상황에서 갇혀있다. 닫혀있다는 표현으로 클로저라고 부름.</p>
+<p><strong>내부함수에서 외부의 스코프를 기억하고 있는 상태 또는 외부에서 선언된 변수,데이터등의 참조를 끊지 않고 가지고 있는 상태.</strong></p>
+<h2 id="커링currying">커링(Currying)</h2>
+<ul>
+<li>커링은 N개의 인자를 받는 함수를 단일 인자를 받는 N개의 함수열로 만드는 것이다.
+함수의 재사용성 측면에서 유용하게 사용이 된다.</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">funcA</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">c</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">funcB</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="nx">func2</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kd">function</span> <span class="nx">func3</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">c</span><span class="p">;</span>
+      <span class="p">}</span>       
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funcA</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">));</span> <span class="c1">// 6
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funcB</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">)(</span><span class="mi">3</span><span class="p">));</span> <span class="c1">// 6
+</span></code></pre></td></tr></table>
+</div>
+</div><p>위와 같이 funcA와 funcB는 동일하게 동작한다. <strong>funcB</strong> 함수는 함수와 인자의 클로저를 사용하여 커링 함수를 만든다.
+ES6 화살표 함수로도 작성이 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript">    <span class="kr">const</span> <span class="nx">funcC</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span><span class="k">return</span> <span class="nx">a</span><span class="o">+</span><span class="nx">b</span><span class="o">+</span><span class="nx">c</span><span class="p">};</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funcC</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">)(</span><span class="mi">3</span><span class="p">));</span> <span class="c1">//6
+</span></code></pre></td></tr></table>
+</div>
+</div><p>커링함수의 큰 장점인 재사용성 측면에서 예를 들면,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">addr</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">a</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">b</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">c</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">addr2</span> <span class="o">=</span> <span class="nx">addr</span><span class="p">(</span><span class="s1">&#39;경기도&#39;</span><span class="p">);</span>
+<span class="nx">addr2</span><span class="p">(</span><span class="s1">&#39;안양시&#39;</span><span class="p">)(</span><span class="s1">&#39;동안구&#39;</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">addr3</span> <span class="o">=</span> <span class="nx">addr2</span><span class="p">(</span><span class="s1">&#39;안양시&#39;</span><span class="p">);</span>
+<span class="nx">addr3</span><span class="p">(</span><span class="s1">&#39;만안구&#39;</span><span class="p">);</span>
+
+<span class="nx">addr3</span> <span class="o">=</span> <span class="nx">addr2</span><span class="p">(</span><span class="s1">&#39;수원시&#39;</span><span class="p">);</span>
+<span class="nx">addr3</span><span class="p">(</span><span class="s1">&#39;권선구&#39;</span><span class="p">);</span>
+<span class="nx">addr3</span><span class="p">(</span><span class="s1">&#39;팔달구&#39;</span><span class="p">);</span> 
+
+<span class="c1">// 출력
+</span><span class="c1">// 경기도 안양시 동안구 
+</span><span class="c1">// 경기도 안양시 만안구 
+</span><span class="c1">// 경기도 수원시 권선구 
+</span><span class="c1">// 경기도 수원시 팔달구 
+</span></code></pre></td></tr></table>
+</div>
+</div><p>위와 같은 형식으로 함수 인자의 연산 단계에서 호출자 또는 함수 사용자의 개입이 가능하다.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2020-10-11</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on WhatsApp" data-sharer="whatsapp" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)"><i class="fab fa-weibo fa-fw"></i></a><a href="javascript:void(0);" title="Share on Myspace" data-sharer="myspace" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="javascript:void(0);" title="Share on Blogger" data-sharer="blogger" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="javascript:void(0);" title="Share on Evernote" data-sharer="evernote" data-url="http://example.org/es6-promise-closure-%ED%95%A8%EC%88%98%EC%84%A0%EC%96%B8%EB%B0%A9%EC%8B%9D-%EC%BB%A4%EB%A7%81/" data-title="[ES6] JavaScript 함수 선언 유형, Promise, 클로저(Closure), 커링(Currying)"><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/es6-spread-%EC%97%B0%EC%82%B0%EC%9E%90-rest-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-array-like/" class="prev" rel="prev" title="[ES6] Spread 연산자, Rest 파라미터, Array Like"><i class="fas fa-angle-left fa-fw"></i>[ES6] Spread 연산자, Rest 파라미터, Array Like</a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.71.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2020</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">pbh</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"Got it!","link":"Learn more","message":"This website uses Cookies to improve your experience."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
