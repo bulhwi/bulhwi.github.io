@@ -15,10 +15,10 @@ jobs:
       - name: Install and Build 🔧
         run: |
           yarn install
-          yarn build && touch ./next
+          yarn build && touch ./out
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: .next
+          folder: out
