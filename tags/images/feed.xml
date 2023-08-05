@@ -3,10 +3,10 @@
     <channel>
       <title>bulhwi.github.io</title>
       <link>https://tailwind-nextjs-starter-blog.vercel.app/blog</link>
-      <description>A blog created with Next.js and Tailwind.css</description>
+      <description>-</description>
       <language>en-us</language>
-      <managingEditor>address@yoursite.com (Tails Azimuth)</managingEditor>
-      <webMaster>address@yoursite.com (Tails Azimuth)</webMaster>
+      <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
+      <webMaster>address@yoursite.com (bulhwi)</webMaster>
       <lastBuildDate>Sat, 15 Jul 2017 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://tailwind-nextjs-starter-blog.vercel.app/tags/images/feed.xml" rel="self" type="application/rss+xml"/>
       
@@ -16,7 +16,7 @@
     <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/pictures-of-canada</link>
     <description>The scenic lands of Canada featuring maple leaves, snow-capped mountains, turquoise lakes and Toronto. Take in the sights in this photo gallery exhibition and see how easy it is to replicate with some MDX magic and tailwind classes.</description>
     <pubDate>Sat, 15 Jul 2017 00:00:00 GMT</pubDate>
-    <author>address@yoursite.com (Tails Azimuth)</author>
+    <author>address@yoursite.com (bulhwi)</author>
     <category>holiday</category><category>canada</category><category>images</category>
   </item>
 

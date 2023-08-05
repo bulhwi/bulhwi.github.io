@@ -3,10 +3,10 @@
     <channel>
       <title>bulhwi.github.io</title>
       <link>https://tailwind-nextjs-starter-blog.vercel.app/blog</link>
-      <description>A blog created with Next.js and Tailwind.css</description>
+      <description>-</description>
       <language>en-us</language>
-      <managingEditor>address@yoursite.com (Tails Azimuth)</managingEditor>
-      <webMaster>address@yoursite.com (Tails Azimuth)</webMaster>
+      <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
+      <webMaster>address@yoursite.com (bulhwi)</webMaster>
       <lastBuildDate>Fri, 11 Oct 2019 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://tailwind-nextjs-starter-blog.vercel.app/tags/github/feed.xml" rel="self" type="application/rss+xml"/>
       
@@ -16,7 +16,7 @@
     <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/github-markdown-guide</link>
     <description>Markdown cheatsheet for all your blogging needs - headers, lists, images, tables and more! An illustrated guide based on GitHub Flavored Markdown.</description>
     <pubDate>Fri, 11 Oct 2019 00:00:00 GMT</pubDate>
-    <author>address@yoursite.com (Tails Azimuth)</author>
+    <author>address@yoursite.com (bulhwi)</author>
     <category>github</category><category>guide</category>
   </item>
 
