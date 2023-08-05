@@ -1,0 +1,303 @@
+---
+title: 'Spring Boot + JUnit 단위테스트'
+date: 2023-08-05T21:04
+lastmod: '2023-08-05'
+tags: ['Java', 'SpringBoot', 'JUnit']
+draft: false
+summary: 'JUnit 테스트'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+## Spring Boot + JUnit 단위테스트
+
+### 환경
+
+- intelliJ
+- springBoot(devtools, web-starter, lombok)
+
+프로젝트를 생성하면 pom.xml에 기본적으로 'spring-boot-starter-test'의존성이 추가된 것을 확인할 수 있다.
+
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+```
+
+### 기본 테스트 클래스
+
+'src/test/java' 경로에 기본적인 테스트 클래스가 제공된다.
+
+- **@RunWith(SpringRunner.class)** - Junit에서 기본으로 제공하는 러너가 아닌 스프링 러너를 사용하기 위해 추가.
+- **@SpringBootTest** - 테스트케이스가 실행될 때 테스트에 필요한 설정과 빈들을 자동으로 초기화하는 역할을 수행.
+
+### 목객체로 테스트 케이스 만들기
+
+#### @WebMvcTest 사용.
+
+웹어플리케이션에서 Controller를 테스트할 때, @WebMvcTest를 사용하거나, @AutoConfigureMockMvc를 사용한다.
+두개의 어노테이션의 차이점은 **@WebMvcTest**은 @Controller, @RestController가 설정된 클래스를 찾아 메모리에 생성하고,
+@Service, @repository가 붙은 클래스는 생성되지 않는다. 반대로 **@AutoConfigureMockMvc**는 Controller뿐만 아니라 service, repository 모두 메모리에 올린다.
+
+JUnit 기반의 테스트를 진행해 보기 위해 간단한 Controller와 Vo를 만든다.
+
+```java
+    //src/controller/BoardController.java
+    @RestController
+    public class BoardController {
+            public BoardController() {
+                System.out.println("=====>>  board controller 생성");
+            }
+
+            @GetMapping("/hello")
+            public String hello(String name) {
+                return "Hello : " + name;
+            }
+
+            @GetMapping("/getBoard")
+            public BoardVo getBoard() {
+                BoardVo boardVo = new BoardVo();
+                boardVo.setSeq(1);
+                boardVo.setTitle("title");
+                boardVo.setWriter("tester");
+                boardVo.setContent("테스트 내용");
+                boardVo.setCreateDate(new Date());
+                boardVo.setCnt(0);
+                return boardVo;
+            }
+
+            @GetMapping("/getBoardList")
+            public List<BoardVo> getBoardList() {
+                List<BoardVo> boardVoList = new ArrayList<>();
+                for (int i = 0; i < 10; i++) {
+                    BoardVo boardVo = new BoardVo();
+                    boardVo.setSeq(i);
+                    boardVo.setTitle("title" + i);
+                    boardVo.setWriter("tester" + i);
+                    boardVo.setContent("테스트 내용" + i);
+                    boardVo.setCreateDate(new Date());
+                    boardVo.setCnt(0);
+                    boardVoList.add(boardVo);
+                }
+                return boardVoList;
+            }
+        }
+    }
+```
+
+```java
+    //src/domain/BoardVo.java
+    @Getter
+    @Setter
+    @ToString
+    public class BoardVo {
+        private int seq;
+        private String title;
+        private String writer;
+        private String content;
+        private Date createDate = new Date();
+        private int cnt = 0;
+    }
+```
+
+```java
+    // src/test/java/BoardController.java
+    @RunWith(SpringRunner.class)
+    @WebMvcTest
+    public class BoardControllerTest {
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Test
+        public void testHello() throws Exception {
+            mockMvc.perform(get("/hello").param("name", "이름"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("Hello : 이름"))
+                    .andDo(print());
+        }
+    }
+```
+
+#### @AutoConfigureMockMvc 사용.
+
+@SpringBootTest에는 웹어플리케이션 테스트를 지원하는 webEnvironment속성이 있다.
+이속성을 생략하면 기본 값으로 WebEnvironment.MOCK이 설정되는데, 테스트 케이스 실행시 서블릿컨테이너가 구동되지 않는다.
+
+```java
+    //@AutoConfigureMockMvc 사용.
+    @RunWith(SpringRunner.class)
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+    @AutoConfigureMockMvc //클래스위에 추가되어야 한다.
+    public class BoardControllerTest {
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Test
+        public void testHello() throws Exception {
+            mockMvc.perform(get("/hello").param("name", "이름"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("Hello : 이름"))
+                    .andDo(print()); // 요청/응답 메시지를 모두 출력.
+        }
+    }
+```
+
+#### MockMvc 정리
+
+MockMvc에서 제공하는 perform() 메서드를 사용하면 브라우저에서 URL요청을 하듯 controller를 실행할 수 있다.
+andExpect() 메서드를 사용하여 서버의 응답결과도 검증이 가능하다.
+
+- perform() - org.springframework.test.web.servlet.request.MockMvcRequestBuilders의 static 메서드를 사용하여 request의 method type을 정할 수 있다.
+  get, post, put, delete 등을 제공한다. 추가로 param(), header(), cookie() 등에 메서드로 파라미터, 헤더 쿠키등을 설정할 수 있다.
+  perform() 메서드는 ResultActions객체를 리턴하고 ResultActions는 응답결과를 검증할 수 있는 andExpect() 메서드를 제공한다.
+- andExpect() - 파라미터로 org.springframework.test.web.servlet.result.MockMvcResultMatchers에서 결과검증을 위한 다양한 static 메서드를 제공받아 테스트결과 검증에 사용할 수 있다..
+- isOk() - http code 200인지 확인.
+- isNotFound() - 404 Not Found인지 확인.
+- isMethodNotAllowed() - 메서드불일치 405인지 확인.
+- isInternalServerError() - http code 500인지 확인.
+- is(int status) - 설정한 응답코드인지 확인.
+
+#### 내장톰캣으로 테스트.
+
+MockMvc객체는 톰캣서버를 사용하지않고 테스트를 진행한다. 정상적으로 톰캣을 구동하여 테스트를 진행할때는, @SpringBootTest에서 webEnvironment속성값을 RANDOM_PORT나 DEFINED_PORT로 변경하여 진행한다.
+
+```JAVA
+    @RunWith(SpringRunner.class)
+    //랜덤한 포트번호로 톰캣이 구동된다.
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @AutoConfigureMockMvc
+    public class BoardControllerTest {
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Autowired
+        private TestRestTemplate restTemplate;
+
+        @Test
+        public void testHello() throws Exception {
+            String result = restTemplate.getForObject("/hello?name=이름", String.class);
+            assertEquals("Hello : 이름", result);
+        }
+
+        @Test
+        public void testGetBoard() throws Exception {
+            BoardVo boardVo = restTemplate.getForObject("/getBoard", BoardVo.class);
+            assertEquals("tester", boardVo.getWriter());
+        }
+    }
+```
+
+TestRestTemplate 객체를 사용하여 URL로 서버에 요청을 전달하고 assertEquals메서드로 응답결과를 확인.
+
+- WebEnvironment 속성
+  - MOCK - 내장톰캣 구동 X. AutoConfigureMockMvc어노테이션으로 MockMvc 객체를 주입받아 테스트에 사용.
+  - RANDOM_POTRT - 랜덤한 포트로 내장톰캣 구동.
+  - DEFINED_PORT - application.properties파일에 설정된 포트를 사용.
+  - NONE - 서블릿기반 환경 자체를 구성하지 않음.
+
+#### 서비스 계층을 연동하는 컨트롤러 테스트
+
+단순히 컨트롤러 테스트뿐만 아니라 실제 비즈니스 로직이 들어가게 되는 서비스계층을 연동하여 테스트.
+BoardService, BoardServiceImpl 추가.
+
+```java
+    // src/service/BoardService.java
+    public interface BoardService {
+        String hello(String name);
+        BoardVo getBoard();
+        List<BoardVo> getBoardList();
+    }
+```
+
+```java
+    // src/service/BoardServiceImpl.java
+    @Service
+    public class BoardServiceImpl implements BoardService{
+
+        @Override
+        public String hello(String name) {
+            return "Hello : " + name;
+        }
+
+        @Override
+        public BoardVo getBoard() {
+            BoardVo board = new BoardVo();
+            board.setSeq(1);
+            board.setTitle("test title");
+            board.setWriter("tester");
+            board.setContent("test content");
+            board.setCreateDate(new Date());
+            board.setCnt(0);
+            return board;
+        }
+
+        @Override
+        public List<BoardVo> getBoardList() {
+            List<BoardVo> boardList = new ArrayList<>();
+            for(int i = 0; i<10; i++) {
+                BoardVo board = new BoardVo();
+                board.setSeq(i);
+                board.setTitle("test title" + i);
+                board.setWriter("tester" + i);
+                board.setContent(i + "번 test content");
+                board.setCreateDate(new Date());
+                board.setCnt(0);
+                boardList.add(board);
+            }
+            return boardList;
+        }
+    }
+```
+
+```java
+    // 추가된 service와 연동을 위해 controller코드 수정.
+    @RestController
+    public class BoardController {
+        @Autowired
+        private BoardService boardService;
+
+        @GetMapping("/hello")
+        public String hello(String name) {
+            return boardService.hello(name);
+        }
+
+        @GetMapping("/getBoard")
+        public BoardVo getBoard() {
+            return boardService.getBoard();
+        }
+
+        @GetMapping("/getBoardList")
+        public List<BoardVo> getBoardList() {
+            return boardService.getBoardList();
+        }
+    }
+```
+
+```java
+// test code 수정.
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+public class BoardControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private BoardService boardService;
+
+    @Test
+    public void testHello() throws Exception {
+        when(boardService.hello("이름")).thenReturn("Hello : 이름");
+
+        mockMvc.perform(get("/hello").param("name", "이름"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hello : 이름"))
+                .andDo(print());
+    }
+}
+```
+
+**스프링부트 퀵스타트 (저자 채규태)** 일부 내용을 정리함.
