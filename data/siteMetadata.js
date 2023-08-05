@@ -1,8 +1,8 @@
 const siteMetadata = {
   title: 'bulhwi.github.io',
-  author: 'Tails Azimuth',
+  author: 'bulhwi',
   headerTitle: 'bulhwi.github.io',
-  description: 'A blog created with Next.js and Tailwind.css',
+  description: '-',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
@@ -11,7 +11,7 @@ const siteMetadata = {
   image: '/static/images/avatar.png',
   socialBanner: '/static/images/twitter-card.png',
   email: 'address@yoursite.com',
-  github: 'https://github.com',
+  github: 'https://github.com/bulhwi',
   twitter: 'https://twitter.com/Twitter',
   facebook: 'https://facebook.com',
   youtube: 'https://youtube.com',
