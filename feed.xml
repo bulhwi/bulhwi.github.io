@@ -11,9 +11,9 @@
       <atom:link href="https://tailwind-nextjs-starter-blog.vercel.app/feed.xml" rel="self" type="application/rss+xml"/>
       
   <item>
-    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/javascript-clean-up-1</guid>
+    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/javascript-clean-up-1</guid>
     <title>ES6 함수선언 유형, Promise, 클로저(Closure), 커링(Currying)</title>
-    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/javascript-clean-up-1</link>
+    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/javascript-clean-up-1</link>
     <description>함수선언 유형, Promise, 클로저(Closure), 커링(Currying)</description>
     <pubDate>Tue, 26 Dec 2023 00:00:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
@@ -21,9 +21,9 @@
   </item>
 
   <item>
-    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/webpack-config</guid>
+    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/webpack-config</guid>
     <title>Webpack 기본 설정 정리</title>
-    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/webpack-config</link>
+    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/webpack-config</link>
     <description>Webpack 기본 설정 정리</description>
     <pubDate>Fri, 25 Aug 2023 11:29:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
@@ -31,9 +31,9 @@
   </item>
 
   <item>
-    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/git-config</guid>
+    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/git-config</guid>
     <title>Git 계정 설정</title>
-    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/git-config</link>
+    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/git-config</link>
     <description>git 계정 설정</description>
     <pubDate>Sat, 05 Aug 2023 21:18:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
@@ -41,9 +41,9 @@
   </item>
 
   <item>
-    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/springboot-junit</guid>
+    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/springboot-junit</guid>
     <title>Spring Boot + JUnit 단위테스트</title>
-    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/springboot-junit</link>
+    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/springboot-junit</link>
     <description>JUnit 테스트</description>
     <pubDate>Sat, 05 Aug 2023 21:04:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
