@@ -1,0 +1,142 @@
+---
+title: 'ES6 함수선언 유형, Promise, 클로저(Closure), 커링(Currying)'
+date: 2023-12-26
+lastmod: '2023-12-26'
+tags: ['JavaScript']
+draft: false
+summary: '함수선언 유형, Promise, 클로저(Closure), 커링(Currying)'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+## 함수 선언 유형.
+
+```javascript
+function foo() {} //일반적인 선언
+
+const bar = (function () {})(
+  // 함수도 객체로 취급이 되기때문에 변수에 할당이 가능하다
+
+  // 즉시 호출되는 펑션에 선언방식.
+  // 브라우저에 의해 js가 로딩되면 최초 1번 호출되는 콜백 펑션임.
+  function () {
+    console.log('IIFE')
+  }
+)()
+
+// ES6부터 지원하는 화살표 함수.
+const bar = (x) => x * 2
+const bar = (x) => {
+  return 0
+}
+```
+
+## JavaScript 비동기적 프로그래밍(Promise, Async, await)
+
+콜백지옥의 단점(중첩된 중괄호, 예외처리의 어려움등등등)을 해결하려는 시도속에서 만들어진 Promise는 비교적으로 안전하고 관리하기 쉬운 코드 구조를 가지지만 번거롭다는
+평가도 있었다고 한다.
+
+```javascript
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('응답')
+  }, 1000)
+})
+
+promise
+  .then((res) => {
+    console.log(res) //응답
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+
+async function promiseFunc() {
+  let result = await promise
+    .then((res) => {
+      return res
+    })
+    .catch((err) => {
+      return err
+    })
+
+  console.log(result)
+}
+
+promiseFunc()
+```
+
+## 클로저(Closure)
+
+```javascript
+function func1(x) {
+  return function func2() {
+    return x
+  }
+}
+const f = func1(10) // function bar를 리턴.
+console.log(f()) // 10
+```
+
+'console.log(func1(10))'시점에서 x의 사이클은 끝나지만 func1의 내부 함수인 func2함수에서는 x의 참조를 유지한다.
+이러한 상황에서 갇혀있다. 닫혀있다는 표현으로 클로저라고 부름.
+
+**내부함수에서 외부의 스코프를 기억하고 있는 상태 또는 외부에서 선언된 변수,데이터등의 참조를 끊지 않고 가지고 있는 상태.**
+
+## 커링(Currying)
+
+- 커링은 N개의 인자를 받는 함수를 단일 인자를 받는 N개의 함수열로 작성하는 함수형 프로그래밍 기법 중 하나이다.
+  함수의 재사용성 측면에서 유용하게 사용이 된다.
+
+```javascript
+function funcA(a, b, c) {
+  return a + b + c
+}
+
+function funcB(a) {
+  return function func2(b) {
+    return function func3(c) {
+      return a + b + c
+    }
+  }
+}
+
+console.log(funcA(1, 2, 3)) // 6
+console.log(funcB(1)(2)(3)) // 6
+```
+
+위와 같이 funcA와 funcB는 동일하게 동작한다. **funcB** 함수는 함수와 인자의 클로저를 사용하여 커링 함수를 만든다.
+ES6 화살표 함수로도 작성이 가능하다.
+
+```javascript
+const funcC = (a) => (b) => (c) => {
+  return a + b + c
+}
+console.log(funcC(1)(2)(3)) //6
+```
+
+커링함수의 큰 장점인 재사용성 측면에서 예를 들면,
+
+```javascript
+let addr = (a) => (b) => (c) => {
+  console.log(`${a} ${b} ${c}`)
+}
+
+let addr2 = addr('경기도')
+addr2('안양시')('동안구')
+let addr3 = addr2('안양시')
+addr3('만안구')
+
+addr3 = addr2('수원시')
+addr3('권선구')
+addr3('팔달구')
+
+// 출력
+// 경기도 안양시 동안구
+// 경기도 안양시 만안구
+// 경기도 수원시 권선구
+// 경기도 수원시 팔달구
+```
+
+위와 같은 형식으로 함수 인자의 연산 단계에서 호출자 또는 함수 사용자의 개입이 가능하다.
