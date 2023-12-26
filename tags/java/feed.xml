@@ -2,18 +2,18 @@
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
       <title>bulhwi.github.io</title>
-      <link>https://tailwind-nextjs-starter-blog.vercel.app/blog</link>
+      <link>https://bulhwi.github.io/blog</link>
       <description>-</description>
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
       <lastBuildDate>Sat, 05 Aug 2023 21:04:00 GMT</lastBuildDate>
-      <atom:link href="https://tailwind-nextjs-starter-blog.vercel.app/tags/java/feed.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://bulhwi.github.io/tags/java/feed.xml" rel="self" type="application/rss+xml"/>
       
   <item>
-    <guid>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/springboot-junit</guid>
+    <guid>https://bulhwi.github.io/blog/doc/springboot-junit</guid>
     <title>Spring Boot + JUnit 단위테스트</title>
-    <link>https://tailwind-nextjs-starter-blog.vercel.app/blog/doc/springboot-junit</link>
+    <link>https://bulhwi.github.io/blog/doc/springboot-junit</link>
     <description>JUnit 테스트</description>
     <pubDate>Sat, 05 Aug 2023 21:04:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
