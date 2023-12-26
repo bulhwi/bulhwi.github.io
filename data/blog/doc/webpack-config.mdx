@@ -57,18 +57,18 @@ npm install 명령어를 이용하여 webpack과 webpack-cli 를 install 한다.
 프로젝트 루트경로에 'webpack.config.js'파일을 생성한다.
 
 ```javascript
-var path = require('path')
+var path = require('path');
 
 module.exports = {
   entry: './src/index.js',
-}
+};
 ```
 
 프로젝트 src폴더를 만들고 하위 경로에 'index.js'파일을 생성한다.
 
 ```javascript
 //index.js
-console.log('webpack test')
+console.log('webpack test');
 ```
 
 추가적으로 'package.json'파일에 scripts속성에 코드를 수정한다.
@@ -127,7 +127,7 @@ console.log('webpack test')
 
 ```javascript
 output: {
-  filename: '[hash].bundle.js'
+  filename: '[hash].bundle.js';
 }
 ```
 
@@ -135,7 +135,7 @@ output: {
 
 ```javascript
 output: {
-  filename: '[chunkhash].bundle.js'
+  filename: '[chunkhash].bundle.js';
 }
 ```
 
@@ -175,7 +175,7 @@ module.exports = {
       // ...
     ],
   },
-}
+};
 ```
 
 **Loader는 기본적 오른쪽에서 왼쪽순으로 적용된다.**
@@ -187,7 +187,7 @@ module: {
       test: /\.scss$/,
       use: ['css-loader', 'sass-loader'],
     },
-  ]
+  ];
 }
 ```
 
@@ -218,7 +218,7 @@ module: {
         { loader: 'sass-loader' },
       ],
     },
-  ]
+  ];
 }
 ```
 
@@ -234,12 +234,12 @@ module: {
 
 ```javascript
 // webpack.config.js
-var webpack = require('webpack')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   plugins: [new HtmlWebpackPlugin(), new webpack.ProgressPlugin()],
-}
+};
 ```
 
 플러그인은 repuire()함수를 사용하여 생성된 객체인스턴스만 추가 될수 있다.
