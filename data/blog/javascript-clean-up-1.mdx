@@ -21,15 +21,15 @@ const bar = (function () {})(
   // 즉시 호출되는 펑션에 선언방식.
   // 브라우저에 의해 js가 로딩되면 최초 1번 호출되는 콜백 펑션임.
   function () {
-    console.log('IIFE')
+    console.log('IIFE');
   }
-)()
+)();
 
 // ES6부터 지원하는 화살표 함수.
-const bar = (x) => x * 2
+const bar = (x) => x * 2;
 const bar = (x) => {
-  return 0
-}
+  return 0;
+};
 ```
 
 ## JavaScript 비동기적 프로그래밍(Promise, Async, await)
@@ -40,31 +40,31 @@ const bar = (x) => {
 ```javascript
 const promise = new Promise((resolve, reject) => {
   setTimeout(() => {
-    resolve('응답')
-  }, 1000)
-})
+    resolve('응답');
+  }, 1000);
+});
 
 promise
   .then((res) => {
-    console.log(res) //응답
+    console.log(res); //응답
   })
   .catch((err) => {
-    console.log(err)
-  })
+    console.log(err);
+  });
 
 async function promiseFunc() {
   let result = await promise
     .then((res) => {
-      return res
+      return res;
     })
     .catch((err) => {
-      return err
-    })
+      return err;
+    });
 
-  console.log(result)
+  console.log(result);
 }
 
-promiseFunc()
+promiseFunc();
 ```
 
 ## 클로저(Closure)
@@ -72,11 +72,11 @@ promiseFunc()
 ```javascript
 function func1(x) {
   return function func2() {
-    return x
-  }
+    return x;
+  };
 }
-const f = func1(10) // function bar를 리턴.
-console.log(f()) // 10
+const f = func1(10); // function bar를 리턴.
+console.log(f()); // 10
 ```
 
 'console.log(func1(10))'시점에서 x의 사이클은 끝나지만 func1의 내부 함수인 func2함수에서는 x의 참조를 유지한다.
@@ -91,19 +91,19 @@ console.log(f()) // 10
 
 ```javascript
 function funcA(a, b, c) {
-  return a + b + c
+  return a + b + c;
 }
 
 function funcB(a) {
   return function func2(b) {
     return function func3(c) {
-      return a + b + c
-    }
-  }
+      return a + b + c;
+    };
+  };
 }
 
-console.log(funcA(1, 2, 3)) // 6
-console.log(funcB(1)(2)(3)) // 6
+console.log(funcA(1, 2, 3)); // 6
+console.log(funcB(1)(2)(3)); // 6
 ```
 
 위와 같이 funcA와 funcB는 동일하게 동작한다. **funcB** 함수는 함수와 인자의 클로저를 사용하여 커링 함수를 만든다.
@@ -111,26 +111,26 @@ ES6 화살표 함수로도 작성이 가능하다.
 
 ```javascript
 const funcC = (a) => (b) => (c) => {
-  return a + b + c
-}
-console.log(funcC(1)(2)(3)) //6
+  return a + b + c;
+};
+console.log(funcC(1)(2)(3)); //6
 ```
 
 커링함수의 큰 장점인 재사용성 측면에서 예를 들면,
 
 ```javascript
 let addr = (a) => (b) => (c) => {
-  console.log(`${a} ${b} ${c}`)
-}
+  console.log(`${a} ${b} ${c}`);
+};
 
-let addr2 = addr('경기도')
-addr2('안양시')('동안구')
-let addr3 = addr2('안양시')
-addr3('만안구')
+let addr2 = addr('경기도');
+addr2('안양시')('동안구');
+let addr3 = addr2('안양시');
+addr3('만안구');
 
-addr3 = addr2('수원시')
-addr3('권선구')
-addr3('팔달구')
+addr3 = addr2('수원시');
+addr3('권선구');
+addr3('팔달구');
 
 // 출력
 // 경기도 안양시 동안구
