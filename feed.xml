@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sat, 30 Dec 2023 21:18:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 31 Dec 2023 22:46:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
+    <title>브라우저의 렌더링 과정</title>
+    <link>https://bulhwi.github.io/blog/doc/browser-rendering-plan</link>
+    <description>브라우저의 렌더링 과정</description>
+    <pubDate>Sun, 31 Dec 2023 22:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>javascript</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/task-queue-and-micro-queue</guid>
     <title>태스크큐 &amp; 마이크로태스크큐</title>
