@@ -32,3 +32,87 @@ fetch('https://jsonplaceholder.typicode.com/todos/1')
 ```
 
 fetch 함수는 HTTP 응답을 나타내는 Response 객체를 래핑한 프로미스를 반환하므로 후속 처리 메서드 then을 통해 Response객체를 전달받을 수 있다.
+
+```javascript
+// fetch api 커스텀훅 예시
+const useFetch = () => {
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchData = async (url, options) => {
+    try {
+      const result = await fetch(url, options);
+      const json = await result.json();
+
+      if (!result.ok) {
+        throw new Error(json.message || 'Fetch failed');
+      }
+
+      setResponse(json);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const get = (url) => fetchData(url, { method: 'GET' });
+  const post = (url, data) => fetchData(url, { method: 'POST', body: JSON.stringify(data) });
+  const put = (url, data) => fetchData(url, { method: 'PUT', body: JSON.stringify(data) });
+  const patch = (url, data) => fetchData(url, { method: 'PATCH', body: JSON.stringify(data) });
+  const remove = (url) => fetchData(url, { method: 'DELETE' });
+
+  return { response, loading, error, get, post, put, patch, remove };
+};
+
+export default useFetch;
+```
+
+```javascript
+// useFetch 훅 사용 예시
+import React, { useEffect } from 'react';
+import useFetch from './useFetch';
+
+const ExampleComponent = () => {
+  const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
+  const { response, loading, error, get, post, put, patch, remove } = useFetch();
+
+  useEffect(() => {
+    // GET 요청
+    get(apiUrl);
+
+    // POST 요청
+    const postData = { userId: 1, title: 'Buy groceries', completed: false };
+    post(apiUrl, postData);
+
+    // PUT 요청
+    const putData = { userId: 1, title: 'Buy groceries', completed: true };
+    put(apiUrl, putData);
+
+    // PATCH 요청
+    const patchData = { completed: true };
+    patch(apiUrl, patchData);
+
+    // DELETE 요청
+    remove(apiUrl);
+  }, [apiUrl, get, post, put, patch, remove]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
+
+  return (
+    <div>
+      <h1>Data from Placeholder API</h1>
+      <pre>{JSON.stringify(response, null, 2)}</pre>
+    </div>
+  );
+};
+
+export default ExampleComponent;
+```
