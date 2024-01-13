@@ -95,14 +95,36 @@ async function fetchTodo(): Promise<void> {
 fetchTodo();
 ```
 
-```javascript
+```typescript
 // fetch api 커스텀훅 예시
-const useFetch = () => {
-  const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { useState, useEffect } from 'react';
 
-  const fetchData = async (url, options) => {
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+interface FetchOptions {
+  method: HttpMethod;
+  headers?: Record<string, string>;
+  body?: string;
+}
+
+interface UseFetchResult<T> {
+  response: T | null;
+  loading: boolean;
+  error: Error | null;
+  fetchData: (url: string, options: FetchOptions) => void;
+  get: (url: string) => void;
+  post: <D>(url: string, data: D) => void;
+  put: <D>(url: string, data: D) => void;
+  patch: <D>(url: string, data: D) => void;
+  remove: (url: string) => void;
+}
+
+const useFetch = <T>(): UseFetchResult<T> => {
+  const [response, setResponse] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = async (url: string, options: FetchOptions): Promise<void> => {
     try {
       const result = await fetch(url, options);
       const json = await result.json();
@@ -119,41 +141,53 @@ const useFetch = () => {
     }
   };
 
-  const get = (url) => fetchData(url, { method: 'GET' });
-  const post = (url, data) => fetchData(url, { method: 'POST', body: JSON.stringify(data) });
-  const put = (url, data) => fetchData(url, { method: 'PUT', body: JSON.stringify(data) });
-  const patch = (url, data) => fetchData(url, { method: 'PATCH', body: JSON.stringify(data) });
-  const remove = (url) => fetchData(url, { method: 'DELETE' });
+  const get = (url: string): void => fetchData(url, { method: 'GET' });
+  const post = <D>(url: string, data: D): void =>
+    fetchData(url, { method: 'POST', body: JSON.stringify(data) });
+  const put = <D>(url: string, data: D): void =>
+    fetchData(url, { method: 'PUT', body: JSON.stringify(data) });
+  const patch = <D>(url: string, data: D): void =>
+    fetchData(url, { method: 'PATCH', body: JSON.stringify(data) });
+  const remove = (url: string): void => fetchData(url, { method: 'DELETE' });
 
-  return { response, loading, error, get, post, put, patch, remove };
+  return { response, loading, error, fetchData, get, post, put, patch, remove };
 };
 
 export default useFetch;
 ```
 
-```javascript
+```typescript jsx
 // useFetch 훅 사용 예시
-import React, { useEffect } from 'react';
-import useFetch from './useFetch';
 
-const ExampleComponent = () => {
+import React, { useEffect } from 'react';
+import useFetch, { FetchOptions } from './useFetch';
+
+// Placeholder API의 Todo 모델에 맞춰서 타입 정의
+interface Todo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const ExampleComponent: React.FC = () => {
   const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
-  const { response, loading, error, get, post, put, patch, remove } = useFetch();
+  const { response, loading, error, fetchData, get, post, put, patch, remove } = useFetch<Todo>();
 
   useEffect(() => {
     // GET 요청
     get(apiUrl);
 
     // POST 요청
-    const postData = { userId: 1, title: 'Buy groceries', completed: false };
+    const postData: Todo = { userId: 1, id: 1, title: 'Buy groceries', completed: false };
     post(apiUrl, postData);
 
     // PUT 요청
-    const putData = { userId: 1, title: 'Buy groceries', completed: true };
+    const putData: Todo = { userId: 1, id: 1, title: 'Buy groceries', completed: true };
     put(apiUrl, putData);
 
     // PATCH 요청
-    const patchData = { completed: true };
+    const patchData: Partial<Todo> = { completed: true };
     patch(apiUrl, patchData);
 
     // DELETE 요청
