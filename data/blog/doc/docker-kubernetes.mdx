@@ -1,0 +1,129 @@
+---
+title: 'Docker, Kubernetes'
+date: 2025-03-18T21:46
+lastmod: '2023-08-05'
+tags: ['frontend', 'web']
+draft: true
+summary: '서버컴포넌트 vs 클라이언트컴포넌트'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+### Docker
+
+도커는 애플리케이션과 그 종속성을 컨테이너라는 격리된 환경에 패키징하여 일관된 실행 환경을 제공하는 플랫폼이다.
+
+- 애플리케이션과 종속성을 하나의 이미지로 패키징
+- 경량화된 컨테이너 실행 환경 제공
+- 빠른 배포, 확장성, 이식성, 유연성 제공
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+CMD ["node", "server.js"]
+```
+
+### Kubernetes
+
+쿠버네티스는 도커 컨테이너를 관리하고 자동화된 배포 및 오케스트레이션을 제공하는 오픈소스 플랫폼이다.
+
+- 자동화된 배포 및 확장
+- 컨테이너 상태의 모니터링
+- 효율적인 리소스 관리 및 부하 분산
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: yourregistry/node-app:latest
+```
+
+### 도커만으로 부족한 이유
+
+단일 컨테이너 실행과 관리에는 효과적이지만, 복잡한 환경에서는 한계가 있다.
+
+- 다수 컨테이너 환경에서의 확장성과 관리 복잡성
+- 장애 발생 시 자동 복구 미지원
+- 부하 분산 및 자동화된 트래픽 관리 부재
+
+### 쿠버네티스가 필요한 시점
+
+- 컨테이너 개수와 서비스 복잡성이 증가할 때
+- 자동화된 배포, 확장, 복구가 필요할 때
+- 다수의 환경 간 배포 일관성이 필요할 때
+
+## Kubernetes에서의 자동화된 배포 예시
+
+### 배포 전략
+
+- 롤링업데이트(Rolling Update): 서비스 중단 없이 점진적으로 컨테이너 업데이트
+- 블루-그린(Blue-Green): 두 가지 환경을 준비하여 즉각적인 전환
+- 카나리(Canary) 배포: 일부 사용자에게만 신규 버전을 점진적으로 적용하여 모니터링
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app
+          image: myregistry/my-app:latest
+```
+
+### 자동 확장
+
+쿠버네티스는 트래픽 증가 등 상황에 따라 자동으로 확장(스케일 아웃/인)을 수행합니다.
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-app-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: my-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
