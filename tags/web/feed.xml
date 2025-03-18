@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>bulhwi.github.io</title>
+      <link>https://bulhwi.github.io/blog</link>
+      <description>-</description>
+      <language>en-us</language>
+      <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
+      <webMaster>address@yoursite.com (bulhwi)</webMaster>
+      <lastBuildDate>Sun, 31 Dec 2023 22:46:00 GMT</lastBuildDate>
+      <atom:link href="https://bulhwi.github.io/tags/web/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
+    <title>브라우저의 렌더링 과정</title>
+    <link>https://bulhwi.github.io/blog/doc/browser-rendering-plan</link>
+    <description>브라우저의 렌더링 과정</description>
+    <pubDate>Sun, 31 Dec 2023 22:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>web</category><category>frontend</category>
+  </item>
+
+    </channel>
+  </rss>

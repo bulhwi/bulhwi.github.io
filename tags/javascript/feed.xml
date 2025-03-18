@@ -7,19 +7,9 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sun, 31 Dec 2023 22:46:00 GMT</lastBuildDate>
+      <lastBuildDate>Sat, 30 Dec 2023 21:18:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/tags/javascript/feed.xml" rel="self" type="application/rss+xml"/>
       
-  <item>
-    <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
-    <title>브라우저의 렌더링 과정</title>
-    <link>https://bulhwi.github.io/blog/doc/browser-rendering-plan</link>
-    <description>브라우저의 렌더링 과정</description>
-    <pubDate>Sun, 31 Dec 2023 22:46:00 GMT</pubDate>
-    <author>address@yoursite.com (bulhwi)</author>
-    <category>javascript</category>
-  </item>
-
   <item>
     <guid>https://bulhwi.github.io/blog/doc/task-queue-and-micro-queue</guid>
     <title>태스크큐 &amp; 마이크로태스크큐</title>
@@ -37,7 +27,7 @@
     <description>Web API - fetch</description>
     <pubDate>Tue, 26 Dec 2023 22:59:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>web-api</category><category>javascript</category>
+    <category>frontend</category><category>javascript</category>
   </item>
 
   <item>
@@ -47,17 +37,7 @@
     <description>함수선언 유형, Promise, 클로저(Closure), 커링(Currying)</description>
     <pubDate>Tue, 26 Dec 2023 00:00:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>JavaScript</category>
-  </item>
-
-  <item>
-    <guid>https://bulhwi.github.io/blog/doc/webpack-config</guid>
-    <title>Webpack 기본 설정 정리</title>
-    <link>https://bulhwi.github.io/blog/doc/webpack-config</link>
-    <description>Webpack 기본 설정 정리</description>
-    <pubDate>Fri, 25 Aug 2023 11:29:00 GMT</pubDate>
-    <author>address@yoursite.com (bulhwi)</author>
-    <category>Webpack</category><category>JavaScript</category>
+    <category>frontend</category><category>javascript</category>
   </item>
 
     </channel>

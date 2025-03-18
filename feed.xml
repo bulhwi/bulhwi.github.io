@@ -21,13 +21,23 @@
   </item>
 
   <item>
+    <guid>https://bulhwi.github.io/blog/doc/api-try-catch</guid>
+    <title>try/catch</title>
+    <link>https://bulhwi.github.io/blog/doc/api-try-catch</link>
+    <description>try/catch</description>
+    <pubDate>Sun, 31 Dec 2023 22:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>frontend</category>
+  </item>
+
+  <item>
     <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
     <title>브라우저의 렌더링 과정</title>
     <link>https://bulhwi.github.io/blog/doc/browser-rendering-plan</link>
     <description>브라우저의 렌더링 과정</description>
     <pubDate>Sun, 31 Dec 2023 22:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>javascript</category>
+    <category>web</category><category>frontend</category>
   </item>
 
   <item>
@@ -47,7 +57,7 @@
     <description>TypeScript - any</description>
     <pubDate>Sat, 30 Dec 2023 19:39:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>typescript</category>
+    <category>frontend</category><category>typescript</category>
   </item>
 
   <item>
@@ -57,7 +67,7 @@
     <description>Web API - fetch</description>
     <pubDate>Tue, 26 Dec 2023 22:59:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>web-api</category><category>javascript</category>
+    <category>frontend</category><category>javascript</category>
   </item>
 
   <item>
@@ -67,7 +77,7 @@
     <description>함수선언 유형, Promise, 클로저(Closure), 커링(Currying)</description>
     <pubDate>Tue, 26 Dec 2023 00:00:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>JavaScript</category>
+    <category>frontend</category><category>javascript</category>
   </item>
 
   <item>
@@ -77,7 +87,7 @@
     <description>Webpack 기본 설정 정리</description>
     <pubDate>Fri, 25 Aug 2023 11:29:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>Webpack</category><category>JavaScript</category>
+    <category>Webpack</category><category>frontend</category>
   </item>
 
   <item>
@@ -97,7 +107,7 @@
     <description>JUnit 테스트</description>
     <pubDate>Sat, 05 Aug 2023 21:04:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
-    <category>Java</category><category>SpringBoot</category><category>JUnit</category>
+    <category>backend</category><category>springboot</category><category>junit</category>
   </item>
 
     </channel>
