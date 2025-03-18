@@ -3,7 +3,7 @@ title: 'Docker, Kubernetes'
 date: 2025-03-18T21:46
 lastmod: '2023-08-05'
 tags: ['frontend', 'web']
-draft: true
+draft: false
 summary: '서버컴포넌트 vs 클라이언트컴포넌트'
 layout: PostSimple
 bibliography: references-data.bib
@@ -77,12 +77,26 @@ spec:
 - 롤링업데이트(Rolling Update): 서비스 중단 없이 점진적으로 컨테이너 업데이트
 - 블루-그린(Blue-Green): 두 가지 환경을 준비하여 즉각적인 전환
 - 카나리(Canary) 배포: 일부 사용자에게만 신규 버전을 점진적으로 적용하여 모니터링
+- 리크리에이트 (Recreate): 기존 컨테이너를 중단하고 새로운 컨테이너로 교체
+
+### 롤링업데이트(Rolling Update)
+
+점진적으로 새로운 버전을 배포하여 서비스 중단 없이 배포 진행
+
+- 장점
+
+  - 서비스 중단 X
+  - 안정적인 배포 가능
+
+- 단점
+  - 문제가 발생했을 때 롤백이 다소 느릴 수 있음
 
 ```yaml
+#example
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
+  name: rolling-update-example
 spec:
   replicas: 3
   strategy:
@@ -90,6 +104,155 @@ spec:
     rollingUpdate:
       maxUnavailable: 1
       maxSurge: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: web
+          image: myapp:v2
+```
+
+### 블루-그린(Blue-Green)
+
+두 개의 독립된 환경을 구성하여 새로운 버전을 별도의 환경에서 배포 후 트래픽을 전환.
+
+- 장점: 빠른 롤백, 즉각적인 전환 가능
+- 단점: 리소스 사용량 증가
+
+```yaml
+# Example
+# Blue(현재버전) Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: blue
+    spec:
+      containers:
+        - name: my-app
+          image: myregistry/my-app:blue
+```
+
+```yaml
+# Example
+# Green(신규버전) Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: green
+    spec:
+      containers:
+        - name: my-app
+          image: myregistry/my-app:green
+```
+
+```yaml
+# Example
+# 서비스 설정 (트래픽 전환 예시)
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+    version: blue # 버전 전환 시 blue를 green으로 변경
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+
+### 카나리(Canary) 배포
+
+일부 사용자에게만 새로운 버전을 배포하여 점진적으로 테스트 후 전환하는 방식
+
+- 장점: 안전성이 높으며 문제 발생 시 피해 최소화
+- 단점: 추가 관리와 복잡성 증가
+
+```yaml
+# Example
+# DestinationRule 설정 (Istio 기반 설정)
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: my-app-destination
+spec:
+  host: my-app # 서비스 호스트명
+  subsets:
+    - name: stable # 기존 안정 버전
+      labels:
+        version: stable
+    - name: canary # 신규 테스트 버전
+      labels:
+        version: canary
+```
+
+```yaml
+# Example
+# VirtualService 설정
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: my-app-virtualservice
+spec:
+  hosts:
+    - my-app # 적용할 서비스 호스트
+  http:
+    - route:
+        - destination:
+            host: my-app
+            subset: stable # 기존 버전
+          weight: 90 # 기존 버전으로의 트래픽 비율
+        - destination:
+            host: my-app
+            subset: canary # 신규 버전
+          weight: 10 # 신규 버전으로의 트래픽 비율
+```
+
+### 리크리에이트 (Recreate) 배포
+
+기존 컨테이너를 완전히 종료한 후 새로운 컨테이너를 배포하는 방식.
+
+- 장점: 간단한 구현
+- 단점: 배포 과정 중 서비스 중단 발생
+
+```yaml
+# Example
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recreate-example
+spec:
+  replicas: 3
+  strategy:
+    type: Recreate # 기존 컨테이너를 모두 종료한 뒤 신규 컨테이너 배포
   selector:
     matchLabels:
       app: my-app
@@ -100,30 +263,9 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: myregistry/my-app:latest
+          image: myregistry/my-app:v2
 ```
 
-### 자동 확장
+### ---
 
-쿠버네티스는 트래픽 증가 등 상황에 따라 자동으로 확장(스케일 아웃/인)을 수행합니다.
-
-```yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: my-app-autoscaler
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: my-app
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
-```
+배포 전략은 서비스의 성격과 요구사항, 리스크 허용도 등에 따라 다르게 적용될 수 있으며,때로는 여러 전략을 혼합하여 사용하면 더 안전하고 효율적일 수 있다.
