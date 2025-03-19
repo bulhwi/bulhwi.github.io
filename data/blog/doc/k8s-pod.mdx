@@ -1,0 +1,89 @@
+---
+title: 'Kubernetes Pod'
+date: 2025-03-19T22:55
+lastmod: '2025-03-19'
+tags: ['backend', 'devops']
+draft: false
+summary: 'Kubernetes Pod'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+### 쿠버네티스에서의 Pod
+
+쿠버네티스(Kubernetes)에서 Pod(파드)는 가장 작은 배포 단위로, 하나 이상의 컨테이너를 포함하는 논리적인 그룹이다. 쿠버네티스에서 애플리케이션을 실행할 때 컨테이너를 직접 실행하는 것이 아니라 Pod을 통해 실행합니다.
+
+### Pod
+
+- 컨테이너를 감싸는 추상화 계층
+  - 하나 이상의 컨테이너를 포함할 수 있음
+  - 동일한 네트워크 네임스페이스, 저장소 볼륨을 공유
+- 쿠버네티스에서의 기본 배포 단위
+  - 컨테이너를 개별적으로 배포하는 것이 아니라 Pod단위로 배포
+  - Pod가 생성되면 특정 노드(Node)ㅇ에 스케줄링 됨
+- 생명 주기가 관리됨
+  - Pod은 일시적인 존재이며, 죽으면 다시 생성되거나 제거됨
+
+### Pod 내부 구조
+
+Pod는 여러 개의 컨테이너를 포함할 수 있으며, 내부적으로 다음과 같은 리소스를 공유한다.
+
+- 네트워크
+  - 같은 Pod 내의 컨테이너들은 동일한 네트워크 네임스페이스를 공유
+  - 같은 localhost를 사용할 수 있음
+  - Pod 내 컨테이너 간에는 localhost:port로 통신 가능
+- 스토리지
+  - Pod 내 컨테이너들이 공유할 수 있는 볼륨을 제공
+  - 컨테이너가 재시작되더라도 데이터를 유지할 수 있음
+  - emptyDir, hostPath, persistentVolumeClaim 등의 스토리지 타입을 사용할 수 있음
+- 라이브사이클 & 상태관리
+  - Pod의 상태를 kubectlget pods 명령어로 확인 가능
+  - Pod가 비정상적인 상태가 되면 다시 시작되거나, 새로운 Pod로 생성될 수 있음(Deployment에서 관리하는 경우)
+
+### Pod 종류
+
+쿠버네티스에서는 다양한 방식으로 Pod를 관리 할 수 있다.
+
+- Standalone Pod - 독립 실행되는 Pod, 하지만 쿠버네티스에서는 잘 사용되지 않음
+- ReplicaSet 관리 Pod - 동일한 Pod을 여러 개 복제하여 관리 (자동 복구 가능)
+- Deployment 관리 Pod - 배포 및 롤링 업데이트를 지원하는 일반적인 Pod 배포 방식
+- StatefulSet 관리 Pod - 상태를 유지해야 하는 애플리케이션 (예: 데이터베이스)
+- DaemonSet관리 Pod - 모든 노드에서 하나씩 실행되는 Pod (예: 로그 수집, 모니터링 에이전트)
+- Job / CronJob 관리 Pod - 특정 작업을 실행한 후 종료되는 일회성 또는 반복 실행되는 작업
+
+### 간단한 Pod 생성 예제
+
+```yaml
+# Example
+# sample-nginx-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+```
+
+```bash
+kubectl apply -f sample-nginx-pod.yaml
+```
+
+### Pod가 중요한 이유
+
+- 컨테이너를 그룹화하여 관리할 수 있음
+- 동일한 네트워크 및 볼륨을 공유하여 효율적인 애플리케이션 실행 가능
+- 다른 쿠버네티스 오브젝트(Deployment, StatefulSet 등)의 기반이 됨
+- 장애 발생 시 자동으로 새로운 Pod을 생성할 수 있도록 설계 가능
+
+---
+
+- Pod은 쿠버네티스에서 컨테이너를 실행하는 기본 단위
+- 하나 이상의 컨테이너를 포함할 수 있으며 네트워크와 스토리지를 공유
+- 직접 관리하기보다는 Deployment, ReplicaSet 등을 활용하여 운영하는 것이 일반적
+
+실제 운영 환경에서는 단순 Pod이 아니라 Deployment, ReplicaSet 등을 사용하여 Pod을 관리하는 것이 일반적인가가가가가가각
