@@ -7,19 +7,9 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sat, 22 Mar 2025 12:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 31 Dec 2023 22:46:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/tags/frontend/feed.xml" rel="self" type="application/rss+xml"/>
       
-  <item>
-    <guid>https://bulhwi.github.io/blog/doc/git-reflog-guide</guid>
-    <title>git - reflog</title>
-    <link>https://bulhwi.github.io/blog/doc/git-reflog-guide</link>
-    <description>git - reflog</description>
-    <pubDate>Sat, 22 Mar 2025 12:00:00 GMT</pubDate>
-    <author>address@yoursite.com (bulhwi)</author>
-    <category>frontend</category>
-  </item>
-
   <item>
     <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
     <title>브라우저의 렌더링 과정</title>
