@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Fri, 21 Mar 2025 23:46:00 GMT</lastBuildDate>
+      <lastBuildDate>Sat, 22 Mar 2025 12:00:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/git-reflog-guide</guid>
+    <title>git - reflog</title>
+    <link>https://bulhwi.github.io/blog/doc/git-reflog-guide</link>
+    <description>git - reflog</description>
+    <pubDate>Sat, 22 Mar 2025 12:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>frontend</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/k8s-pod-controller-explained</guid>
     <title>쿠버네티스의 다양한 Pod 정리</title>
