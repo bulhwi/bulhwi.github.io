@@ -7,9 +7,29 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sat, 22 Mar 2025 12:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sat, 22 Mar 2025 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/git-pull-no-rebase-extended</guid>
+    <title>Git Pull --no-rebase와 그 외 명령어들 정리</title>
+    <link>https://bulhwi.github.io/blog/doc/git-pull-no-rebase-extended</link>
+    <description>git pull --no-rebase, --rebase, --ff-only의 차이와 실무에서의 사용법을 정리한 글입니다.</description>
+    <pubDate>Sat, 22 Mar 2025 22:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>Git</category>
+  </item>
+
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/git-pull-rebase-merge-guide</guid>
+    <title>Git Pull, Rebase, Merge 정리</title>
+    <link>https://bulhwi.github.io/blog/doc/git-pull-rebase-merge-guide</link>
+    <description>git pull --rebase, --no-rebase, git merge의 차이점과 실무에서의 선택 기준을 정리한 글</description>
+    <pubDate>Sat, 22 Mar 2025 22:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>Git</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/git-reflog-guide</guid>
     <title>git - reflog</title>
