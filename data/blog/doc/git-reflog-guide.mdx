@@ -1,0 +1,133 @@
+---
+title: 'git - reflog'
+date: '2025-03-22T12:00'
+lastmod: '2023-08-05'
+tags: ['frontend']
+draft: false
+summary: 'git - reflog'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# 🔄 Git `reflog` 완벽 정리: 사라진 커밋도 되살릴 수 있다!
+
+Git을 사용하다 보면 실수로 커밋을 삭제하거나, `reset --hard`, `rebase` 등의 명령어로 인해 **사라진 것처럼 보이는 작업 이력**을 찾고 싶을 때가 있다. 이럴 때 유용하게 쓰이는 명령어가 바로 `git reflog`.
+
+---
+
+## 📌 `git reflog`란?
+
+`git reflog`는 **내 로컬 저장소에서 HEAD가 이동한 모든 기록을 추적**하는 명령어입니다.
+
+- `git log`는 브랜치의 커밋 이력만 보여주지만
+- `git reflog`는 브랜치 이동, 커밋, reset, merge, rebase 등 HEAD가 변경된 모든 흔적을 보여준다
+
+👉 즉, **Git 내부 작업 히스토리를 추적**하는 도구라고 보면 됩니다.
+
+---
+
+## 🧠 왜 필요한가?
+
+| 상황                      | 해결                             |
+| ------------------------- | -------------------------------- |
+| reset 후 커밋 날림        | 이전 커밋 위치 확인 후 복구 가능 |
+| rebase 실패               | rebase 전 상태로 돌아가기        |
+| 커밋 덮어쓰기 (`--amend`) | 덮기 전 커밋 되살리기            |
+| 잘못된 브랜치 작업        | 어디서부터 작업했는지 추적 가능  |
+
+---
+
+## 💻 기본 사용법
+
+```bash
+git reflog
+```
+
+or
+
+```bash
+# 특정 브랜치의 reflog 보기
+git reflog show {branch-name}
+```
+
+예시 출력:
+
+```
+c2f8a7f (HEAD -> main) HEAD@{0}: commit: Fix typo
+a7f56d1 HEAD@{1}: reset: moving to HEAD~1
+b1c9d9e HEAD@{2}: checkout: moving from feature to main
+```
+
+- `HEAD@{0}`: 가장 최근 HEAD 상태
+- `HEAD@{1}`: 그 이전 상태
+- 오른쪽 설명: 어떤 동작이 있었는지 보여줌
+
+---
+
+## 💡 커밋 되살리기 예시
+
+```bash
+git reset --hard HEAD~1  # 실수로 커밋 삭제
+
+git reflog  # 이전 커밋 SHA 확인
+git reset --hard a7f56d1  # 되살리기!
+```
+
+---
+
+## 🎛️ 출력 포맷 커스터마이징
+
+더 많은 정보(날짜, 메시지 등)를 보고 싶다면 `--pretty` 옵션을 사용합니다.
+
+### ✅ 날짜 포함해서 보기
+
+```bash
+git reflog --pretty="%h | %ad | %gs" --date=iso
+```
+
+출력 예시:
+
+```
+c2f8a7f | 2024-03-19 20:22:55 +0900 | commit: Fix typo
+a7f56d1 | 2024-03-19 20:15:11 +0900 | reset: moving to HEAD~1
+```
+
+| 포맷 코드 | 의미                  |
+| --------- | --------------------- |
+| `%h`      | 짧은 커밋 해시        |
+| `%ad`     | 작성 날짜             |
+| `%gs`     | reflog 설명 (subject) |
+
+---
+
+## 🧪 유용한 alias 등록
+
+```bash
+git config --global alias.reflogf "reflog --pretty='%h | %ad | %gs' --date=iso"
+```
+
+이제 `git reflogf`로 자주 쓰는 형태로 확인할 수 있어요.
+
+---
+
+## 🛑 주의사항
+
+- `reflog`는 **로컬 저장소에만 존재**
+- 시간이 오래 지나거나 `git gc`(garbage collection) 이후 일부 히스토리가 사라질 수 있음
+
+---
+
+## ✅ 정리
+
+| 항목         | 내용                                               |
+| ------------ | -------------------------------------------------- |
+| 역할         | HEAD 이동 기록 추적                                |
+| 활용         | 커밋 복구, 브랜치 추적, reset/rebase 사고 복구     |
+| 커스터마이징 | `--pretty`와 `--date` 옵션으로 출력 형식 조정 가능 |
+| 실무 팁      | alias 등록해서 빠르게 확인 가능                    |
+
+---
+
+> 💡 `git reflog`는 "내가 뭘 잘못했지?" 싶을 때 정말 유용한 명령어.
+> 되살릴 수 없다고 생각했던 커밋도, `reflog` 덕분에 구할 수 있다!
