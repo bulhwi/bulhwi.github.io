@@ -81,6 +81,16 @@
   </item>
 
   <item>
+    <guid>https://bulhwi.github.io/blog/doc/http-error-code</guid>
+    <title>HTTP 상태 코드</title>
+    <link>https://bulhwi.github.io/blog/doc/http-error-code</link>
+    <description>HTTP 상태 코드</description>
+    <pubDate>Mon, 24 Feb 2025 22:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>beckend</category>
+  </item>
+
+  <item>
     <guid>https://bulhwi.github.io/blog/doc/browser-rendering-plan</guid>
     <title>브라우저의 렌더링 과정</title>
     <link>https://bulhwi.github.io/blog/doc/browser-rendering-plan</link>
