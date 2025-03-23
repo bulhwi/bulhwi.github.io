@@ -41,6 +41,16 @@
   </item>
 
   <item>
+    <guid>https://bulhwi.github.io/blog/doc/java-optional-stream-lambda</guid>
+    <title>Java의 Optional, Stream, Lambda 정리</title>
+    <link>https://bulhwi.github.io/blog/doc/java-optional-stream-lambda</link>
+    <description>자바에서 자주 사용되는 Optional, Stream, Lambda 표현을 예제 중심으로 정리.</description>
+    <pubDate>Fri, 21 Feb 2025 09:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>backend</category>
+  </item>
+
+  <item>
     <guid>https://bulhwi.github.io/blog/doc/springboot-junit</guid>
     <title>Spring Boot + JUnit 단위테스트</title>
     <link>https://bulhwi.github.io/blog/doc/springboot-junit</link>
