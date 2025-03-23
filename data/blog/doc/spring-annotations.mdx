@@ -1,0 +1,74 @@
+---
+title: 'Spring 애너테이션 기반 개발 흐름 정리'
+date: 2025-02-19T22:46
+lastmod: '2025-03-22'
+tags: ['backend']
+draft: true
+summary: 'Spring에서 자주 사용하는 @Component, @Service, @Repository의 차이점과 역할을 정리.'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# Spring 애너테이션 기반 개발 흐름 정리
+
+Spring에서는 다양한 애너테이션을 활용해 구성 요소를 선언하고 의존성을 주입합니다. 이 글에서는 대표적인 컴포넌트 스캔 대상인 `@Component`, `@Service`, `@Repository`의 차이와 역할을 정리합니다.
+
+---
+
+## ✅ @Component
+
+- 모든 Spring Bean의 기본 구성 요소
+- 특별한 역할이 없는 일반적인 컴포넌트에 사용
+
+```java
+@Component
+public class EmailSender {
+    public void send(String email) {
+        // send email logic
+    }
+}
+```
+
+---
+
+## ✅ @Service
+
+- 비즈니스 로직을 처리하는 컴포넌트
+- `@Component`의 세분화된 역할 지정
+
+```java
+@Service
+public class UserService {
+    public void register(User user) {
+        // register logic
+    }
+}
+```
+
+---
+
+## ✅ @Repository
+
+- 데이터 접근 계층(DAO)에 사용
+- 예외 처리 시 `PersistenceExceptionTranslationPostProcessor`에 의해 자동 변환
+
+```java
+@Repository
+public class UserRepository {
+    public User findById(Long id) {
+        // DB access logic
+    }
+}
+```
+
+---
+
+## ✅ 공통점
+
+- 모두 `@Component`를 상속한 메타 애너테이션
+- 컴포넌트 스캔 대상이 되어 Spring Container에 등록됨
+
+---
+
+> 실무에서는 역할에 맞게 애너테이션을 구분해 사용하는 것이 유지보수성과 가독성을 높이는 데 중요합니다.

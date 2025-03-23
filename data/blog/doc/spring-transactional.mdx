@@ -1,0 +1,63 @@
+---
+title: 'Spring에서의 트랜잭션 처리 정리'
+date: 2025-02-19T22:46
+lastmod: '2025-03-22'
+tags: ['backend']
+draft: true
+summary: '@Transactional의 동작 원리와 rollback 규칙에 대해 설명합니다.'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# Spring에서의 트랜잭션 처리 정리
+
+`@Transactional`은 데이터 정합성을 보장하기 위한 핵심 기능입니다. 이 글에서는 Spring에서 트랜잭션이 어떻게 동작하는지, 어떤 경우에 rollback이 되는지를 정리합니다.
+
+---
+
+## ✅ @Transactional 기본 개념
+
+- 하나의 작업 단위를 정의하여 모든 작업이 성공해야만 커밋되고, 하나라도 실패하면 전체 rollback
+- 주로 Service 계층에서 사용
+
+```java
+@Transactional
+public void transfer(User from, User to, int amount) {
+    withdraw(from, amount);
+    deposit(to, amount);
+}
+```
+
+---
+
+## ✅ 동작 방식
+
+- Spring AOP 기반의 프록시 패턴 사용
+- 내부 메서드 호출은 트랜잭션 적용되지 않음 (self-invocation 문제)
+
+---
+
+## ✅ rollback 규칙
+
+- 기본적으로 **RuntimeException** 또는 **Error** 발생 시 rollback
+- `checked exception`은 rollback되지 않음 (명시 필요)
+
+```java
+@Transactional(rollbackFor = Exception.class)
+public void doSomething() throws Exception {
+    // force rollback for checked exception
+}
+```
+
+---
+
+## ✅ 트랜잭션 전파 옵션
+
+- `REQUIRED` (기본값): 기존 트랜잭션이 있으면 참여, 없으면 새로 생성
+- `REQUIRES_NEW`: 항상 새로운 트랜잭션 시작
+- `NESTED`: 중첩 트랜잭션 (savepoint 사용)
+
+---
+
+> 트랜잭션은 복잡한 로직에서 데이터 정합성을 보장하는 중요한 도구입니다. rollback 규칙과 전파 옵션을 정확히 이해하고 사용해야 합니다.
