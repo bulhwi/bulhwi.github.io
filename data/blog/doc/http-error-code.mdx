@@ -1,0 +1,153 @@
+---
+title: 'HTTP 상태 코드'
+date: 2025-02-24T22:46
+lastmod: '2023-08-05'
+tags: ['beckend']
+draft: false
+summary: 'HTTP 상태 코드'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# HTTP 상태 코드
+
+HTTP 상태 코드는 웹 개발에서 자주 마주치지만, 자주 헷갈리고 까먹는다. ;;
+자주 쓰이는 상태 코드들을 상황에 맞게 정리하고, 헷갈리기 쉬운것들을 나열해보자.
+
+---
+
+## 1. 상태 코드 분류
+
+HTTP 상태 코드는 크게 다섯 가지로 나뉜다:
+
+| 범위 | 의미                           |
+| ---- | ------------------------------ |
+| 1xx  | Informational (정보 제공)      |
+| 2xx  | Success (성공)                 |
+| 3xx  | Redirection (리다이렉션)       |
+| 4xx  | Client Error (클라이언트 오류) |
+| 5xx  | Server Error (서버 오류)       |
+
+---
+
+## 2. 실무에서 자주 쓰는 코드 정리
+
+### ✅ 2xx Success
+
+- **200 OK**: 요청 성공. 일반적인 응답.
+- **201 Created**: 리소스 생성 성공 (ex. 회원가입, 게시글 작성).
+- **204 No Content**: 요청 성공했지만 반환할 콘텐츠 없음 (ex. 삭제 요청 성공 시).
+
+### 🔄 3xx Redirection
+
+- **301 Moved Permanently**: 리소스 영구 이동.
+- **302 Found**: 일시적 이동.
+- **304 Not Modified**: 캐시 사용. 콘텐츠 변경 없음.
+
+### ⚠️ 4xx Client Error
+
+- **400 Bad Request**: 잘못된 요청 (ex. 유효성 검증 실패).
+- **401 Unauthorized**: 인증 필요 또는 실패 (ex. 토큰 없음/만료).
+- **403 Forbidden**: 권한 없음 (ex. 접근은 되었지만 권한 없음).
+- **404 Not Found**: 요청한 리소스 없음.
+- **409 Conflict**: 충돌 (ex. 이메일 중복, 리소스 상태 불일치).
+
+### ❌ 5xx Server Error
+
+- **500 Internal Server Error**: 서버 내부 오류.
+- **502 Bad Gateway**: 게이트웨이/프록시 서버의 잘못된 응답.
+- **503 Service Unavailable**: 일시적인 서버 과부하/점검 중.
+
+---
+
+## 3. 실무에서 자주 헷갈리는 사례
+
+### 🔐 로그인 실패: 401 vs 403?
+
+- **401 Unauthorized**: 로그인 실패, 인증 필요.
+- **403 Forbidden**: 로그인은 했지만 접근 권한 없음.
+
+### 🗑️ 삭제 요청한 리소스가 없음: 404 vs 204?
+
+- 이미 삭제된 리소스일 경우:
+- **204 No Content**: 삭제 성공 (존재하지 않아도 응답 자체는 OK로 처리).
+- 존재하지 않는 리소스를 삭제하려는 경우:
+- **404 Not Found** 사용 가능.
+
+### 🆔 서버와 리소스 충돌: 409 Conflict
+
+- 이미 존재하는 리소스와 충돌 발생 시 **409**를 사용하는 게 명확.
+- 논리적인 충돌을 의미하며, 서버의 상태나 제약조건과 맞치 않을 때 발생.
+
+1. 중복된 리소스 생성시
+   상황: 회원가입 요청이 들어왔는데, 이미 해당 이메일을 가진 사용자가 존재함.
+
+```bash
+POST /users
+Content-Type: application/json
+
+{
+  "email": "email@example.com",
+  "password": "123456"
+}
+```
+
+서버응답:
+
+```bash
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "errorCode": "EMAIL_ALREADY_EXISTS",
+  "message": "이미 등록된 이메일입니다."
+}
+```
+
+새로운 리소스를 생성하려는 요청이지만 서버의 현재 리소스 상태와 충돌하므로 409를 반환함.
+
+2. 버전 충돌
+   상황: 누군가가 게시글을 수정하는 중에, 다른 사람이 먼저 수정해버림
+
+- A 사용자가 게시글을 수정하려고 함.
+- B 사용자가 먼저 수정해서 서버에 저장된 버전이 변경됨
+- A 사용자의 수정 요청은 서버의 최식 상태와 버전 충돌
+
+서버응답:
+
+```bash
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "errorCode": "VERSION_MISMATCH",
+  "message": "다른 사용자가 먼저 수정했습니다. 다시 시도해주세요."
+}
+```
+
+데이터의 일관성을 유지하기 위한 용도로, 버전 충돌 시에도 409를 사용함.
+
+3. 리소스 상태와 충돌
+
+- 어떤 리소스가 특정상태일 때만 갱신 가능하다고 정해져있다고 예를 들면, 그 상태가 아닐 때
+  예: 주문이 배송환료 상태인 경우는 취소 할 수 없음 -> 이경우도 409
+
+왜 400 Bad Request가 아닌가?
+400은 요청 자체가 잘못됐을 때 - 예: 필수 파라미터 누락, 타입 오류 등
+409는 요청은 형식상 문제없지만, 서버의 현재 상태와 논리적으로 맞지 않을 때 씀
+
+| 상황                                | 적절한 상태 코드   |
+| ----------------------------------- | ------------------ |
+| JSON 형식 오류, 필드 누락           | `400 Bad Request`  |
+| 인증 누락                           | `401 Unauthorized` |
+| 권한 없음                           | `403 Forbidden`    |
+| 존재하지 않는 리소스                | `404 Not Found`    |
+| 리소스 중복, 상태 불일치, 버전 충돌 | ✅ `409 Conflict`  |
+
+---
+
+## 참고
+
+[MDN Web Docs - HTTP Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status)
+[RFC 7231 - Semantics and Content](https://datatracker.ietf.org/doc/html/rfc7231)
