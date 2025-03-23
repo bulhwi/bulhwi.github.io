@@ -1,0 +1,278 @@
+---
+title: 'Java의 Optional, Stream, Lambda 정리'
+date: 2025-02-21T09:46
+lastmod: '2025-03-22'
+tags: ['backend']
+draft: false
+summary: '자바에서 자주 사용되는 Optional, Stream, Lambda 표현을 예제 중심으로 정리.'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# Java의 Optional, Stream, Lambda 정리
+
+Java 8부터 도입된 Optional, Stream, Lambda는 자바 개발에서 매우 자주 사용되지만, 문법이 익숙하지 않거나 헷갈림
+
+---
+
+## ✅ Optional
+
+`Optional<T>`은 null 값을 직접 다루는 대신 **명시적인 컨테이너**로 null을 감싸 예외 상황을 줄이기 위한 클래스.
+
+### 사용 예:
+
+```java
+Optional<String> name = Optional.ofNullable(getUserName());
+name.ifPresent(System.out::println);
+```
+
+### 주요 메서드 요약
+
+| 메서드                | 설명                                                |
+| --------------------- | --------------------------------------------------- |
+| `of(T)`               | null이 아닌 값으로 Optional 생성. null이면 NPE 발생 |
+| `ofNullable(T)`       | null 여부와 상관없이 Optional 생성                  |
+| `empty()`             | 빈 Optional 객체 생성                               |
+| `isPresent()`         | 값 존재 여부 확인                                   |
+| `ifPresent(Consumer)` | 값이 존재할 때만 동작 수행                          |
+| `orElse(T)`           | 값이 없을 경우 기본값 반환                          |
+| `orElseGet(Supplier)` | 기본값을 지연 평가로 생성                           |
+| `orElseThrow()`       | 예외 던짐                                           |
+| `map(Function)`       | 값이 있으면 매핑                                    |
+| `flatMap(Function)`   | 중첩된 Optional 처리                                |
+| `filter(Predicate)`   | 조건 만족할 때만 Optional 유지                      |
+
+## `orElse()`
+
+- Optional에 값이 없을 경우 **기본값을 반환**
+- 하지만 항상 기본값 표현식이 실행됨에 유의.
+
+```java
+public String getUserName(User user) {
+    return Optional.ofNullable(user.getName())
+                   .orElse("이름 없음");
+}
+```
+
+> `null`일 경우 `"이름 없음"` 반환
+
+## `orElseGet(Supplier)`
+
+- `orElse()`와 비슷하지만, 기본값 생성이 지연 평가(lazy) 됨
+- 비용이 큰 작업이 기본값으로 들어갈 때 유용
+
+```java
+String name = Optional.ofNullable(user.getName())
+                      .orElseGet(() -> loadDefaultName());
+```
+
+> `user.getName()`이 null일 때만 `loadDefaultName()`이 호출됨
+
+```java
+// 반면 orElse는 무조건 실행
+String name = Optional.ofNullable(user.getName())
+                      .orElse(loadDefaultName()); // 무조건 실행됨
+```
+
+## `ifPresent()`
+
+- 값이 존재할 경우 람다 내 코드 실행
+- null 체크 없이 깔끔한 조건 처리 가능
+
+```java
+Optional<String> email = Optional.ofNullable(user.getEmail());
+email.ifPresent(e -> System.out.println("이메일: " + e));
+```
+
+> `email`이 null이 아니면 출력
+
+## `map()`
+
+- 값이 존재할 경우 변환(mapping) 해서 새로운 Optional 반환
+- 체이닝이 가능하고, 가독성 좋은 `null-safe` 처리에 유용
+
+```java
+Optional<User> userOpt = Optional.ofNullable(user);
+Optional<String> email = userOpt.map(User::getEmail);
+```
+
+> `user`가 null이 아니면 `getEmail()`을 호출해 `Optional`반환
+
+## `flatMap()`
+
+- `map()`과 유사하지만, **중첩된 Optional을 평탄화**해줌
+- `Optional<Optional<T>>` -> `Optional<T>`로 변환
+
+```java
+public class User {
+    private Optional<String> phone;
+
+    public Optional<String> getPhone() {
+        return phone;
+    }
+}
+
+Optional<User> userOpt = Optional.ofNullable(user);
+
+// flatMap 없으면 중첩됨: Optional<Optional<String>>
+Optional<String> phone = userOpt.flatMap(User::getPhone);
+```
+
+> `map()`으로 했을 경우 `Optional<Optional<String>>`이 되버림.
+
+### ⚠️ 주의할 점
+
+- `orElse()`는 **항상 실행**되므로, 비용이 큰 연산은 `orElseGet()`을 써야 성능상 이점이 있음
+- Optional은 **DTO나 필드로 남용하지 않는 것이 좋음** → 메서드 리턴값 용도로만 사용하는 것이 가장 바람직
+
+---
+
+## ✅ Lambda
+
+람다는 익명 함수를 간단히 표현하는 방식.
+
+```java
+List<String> list = Arrays.asList("a", "b", "c");
+list.forEach(item -> System.out.println(item));
+```
+
+### 자주 사용하는 형태
+
+```java
+(a, b) -> a + b
+() -> System.out.println("Hello")
+s -> s.length()
+```
+
+### 함수형 인터페이스
+
+| 인터페이스       | 매개변수 | 리턴값  | 설명         |
+| ---------------- | -------- | ------- | ------------ |
+| `Function<T, R>` | 1개      | 있음    | T를 R로 변환 |
+| `Consumer<T>`    | 1개      | 없음    | 소비만 함    |
+| `Supplier<T>`    | 0개      | 있음    | 값 공급      |
+| `Predicate<T>`   | 1개      | boolean | 조건 판별    |
+
+### ⚠️ 주의할 점
+
+- 람다는 내부적으로 **익명 클래스와 유사한 객체**로 생성되며, 너무 복잡하게 작성하면 **가독성과 디버깅**이 어려움
+- 람다 내에서 외부 변수 사용 시 **final 또는 effectively final** 조건을 만족해야 함
+
+---
+
+## ✅ Stream API
+
+Java의 Stream API는 컬렉션 데이터를 **선언형**으로 처리할 수 있게 해주는 기능.
+복잡한 for-loop를 줄이고, 필터링/변환/집계 로직을 깔끔하게 작성할 수 있다.
+스트림은 데이터 처리 파이프라인을 간결하게 작성할 수 있게 해준다.
+
+```java
+List<String> result = list.stream()
+    .filter(s -> s.startsWith("a"))
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+```
+
+### 주요 연산
+
+#### 중간 연산 (Intermediate)
+
+| 메서드              | 설명                      |
+| ------------------- | ------------------------- |
+| `filter(Predicate)` | 조건에 맞는 요소만 필터링 |
+| `map(Function)`     | 요소를 변환               |
+| `flatMap(Function)` | 스트림을 평탄화           |
+| `sorted()`          | 정렬                      |
+| `distinct()`        | 중복 제거                 |
+| `peek(Consumer)`    | 디버깅/중간 로깅용        |
+
+#### 최종 연산 (Terminal)
+
+| 메서드                     | 설명                     |
+| -------------------------- | ------------------------ |
+| `collect()`                | 결과 수집 (List, Set 등) |
+| `forEach()`                | 각 요소 처리             |
+| `count()`                  | 개수 반환                |
+| `reduce()`                 | 요소 누적 처리           |
+| `anyMatch()`, `allMatch()` | 조건 만족 여부 확인      |
+| `findFirst()`, `findAny()` | 요소 하나 반환           |
+
+## 예시
+
+### 🔸 1. 이름이 "A"로 시작하는 사람만 필터링
+
+```java
+List<String> names = List.of("Alice", "Bob", "Alex", "David");
+
+List<String> result = names.stream()
+    .filter(name -> name.startsWith("A"))
+    .collect(Collectors.toList());
+// 결과: ["Alice", "Alex"]
+```
+
+---
+
+### 🔸 2. 숫자 제곱 후 합산
+
+```java
+List<Integer> numbers = List.of(1, 2, 3, 4);
+
+int sum = numbers.stream()
+    .map(n -> n * n)
+    .reduce(0, Integer::sum);  // or .mapToInt(i -> i * i).sum()
+// 결과: 1*1 + 2*2 + 3*3 + 4*4 = 1 + 4 + 9 + 16 = 30
+```
+
+---
+
+### 🔸 3. 중첩 리스트 평탄화 (`flatMap`)
+
+```java
+List<List<String>> nested = List.of(
+    List.of("a", "b"),
+    List.of("c", "d")
+);
+
+List<String> flat = nested.stream()
+    .flatMap(Collection::stream)
+    .collect(Collectors.toList());
+// 결과: ["a", "b", "c", "d"]
+```
+
+---
+
+## ⚠️ 주의할 점
+
+- Stream은 **한 번 사용하면 재사용 불가** → 다시 사용하려면 `.stream()` 다시 호출해야 함
+- `forEach`는 **최종 연산**이므로 이후 연산 불가
+- `parallelStream()`은 성능 향상이 보장되지 않음 → **작은 데이터셋에는 오히려 느릴 수 있음**
+- `peek()`은 디버깅 용도이며 부작용 로직은 피하는 것이 좋음
+
+---
+
+### 성능 팁
+
+- Stream은 **lazy evaluation**을 하므로, 최종 연산이 실행될 때 중간 연산들이 평가됨
+- `parallelStream()`은 병렬 처리 성능이 좋은 대신, **작은 컬렉션에는 오히려 느릴 수 있음**
+- Stream을 너무 많이 중첩하거나, 람다식이 복잡할 경우 → 가독성과 성능 모두 저하 가능
+- `map().filter().collect()` 구조보다 **필터 → 맵 순서**가 일반적으로 더 효율적
+- `collect(Collectors.toMap(...))` 사용 시 key 충돌에 주의
+- `IntStream`, `LongStream` 등 기본형 스트림 사용 시 **박싱/언박싱 비용 줄일 수 있음**
+
+> ## Stream API 는 따로 자세히 정리해보자 (뭐가 많네;;)
+
+---
+
+## ✅ 정리
+
+| 개념     | 핵심 포인트                      | 주의할 점                           |
+| -------- | -------------------------------- | ----------------------------------- |
+| Optional | null 방지를 위한 명시적 컨테이너 | DTO나 필드에는 사용 지양            |
+| Lambda   | 익명 함수 표현을 간결하게        | 가독성과 디버깅 유의                |
+| Stream   | 데이터 처리 파이프라인 구성      | 과도한 중첩과 병렬 스트림 남용 주의 |
+
+---
+
+> 실무에서는 Optional로 null 방어 코드를 간결하게 만들고, 람다와 스트림으로 컬렉션 처리 로직을 깔끔하게 정리하는 것이 핵심.
+> 하지만 너무 남용하거나 복잡한 흐름을 만들면 오히려 코드가 불명확해질 수 있으니 **"적절한 선"을 지키는 것이 중요**.
