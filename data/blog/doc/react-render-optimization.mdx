@@ -1,0 +1,238 @@
+---
+title: 'React 렌더링 최적화'
+date: 2025-03-25T23:46
+lastmod: '2025-03-25'
+tags: ['frontend']
+draft: true
+summary: '언제 리렌더가 일어날까잉?'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# React 렌더링 최적화 – 언제 리렌더가 일어날까?
+
+React는 **상태(state)**와 **props**가 바뀔 때마다 컴포넌트를 리렌더링합니다.  
+불필요한 리렌더링은 성능 저하와 예기치 않은 사이드 이펙트를 일으킬 수 있으므로, 이를 제어하는 방법을 이해하는 것이 중요합니다.
+
+---
+
+## 1. 서론 – 리렌더링, 왜 민감할까?
+
+React의 선언적 특성 덕분에 데이터 변경 시 자동으로 화면을 업데이트할 수 있지만,  
+불필요한 리렌더링이 많아지면 다음과 같은 문제가 발생할 수 있습니다:
+
+- **애니메이션/스크롤 튐**
+- **렌더 지연 및 UX 저하**
+- **모바일 기기에서의 성능 저하**
+- **useEffect 등 사이드 이펙트 문제**
+
+> **팁:** 리렌더링 최적화는 반드시 필요하지 않은 부분에서만 적용해야 합니다.
+
+---
+
+## 2. 리렌더링의 기본 규칙
+
+React는 다음과 같은 경우 컴포넌트를 다시 렌더합니다:
+
+- 자신의 **state**가 변경될 때
+- 자신의 **props**가 변경될 때
+- **부모 컴포넌트**가 리렌더될 때
+- **context** 값이 변경될 때
+- `forceUpdate` 호출 시
+
+예시:
+
+```tsx
+import { useState } from 'react';
+
+const Parent = () => {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      <Child />
+    </>
+  );
+};
+
+const Child = () => {
+  console.log('Child 렌더링');
+  return <div>Hello</div>;
+};
+```
+
+부모의 상태 변화로 인해 **Child**도 매번 리렌더됩니다.
+
+---
+
+## 3. React.memo – 컴포넌트 메모이제이션
+
+`React.memo`는 props가 변경되지 않으면 컴포넌트를 리렌더링하지 않게 만들어줍니다.
+
+```tsx
+import React from 'react';
+
+const Child = React.memo(({ value }: { value: string }) => {
+  console.log('Child 렌더링');
+  return <p>{value}</p>;
+});
+
+const Parent = () => {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+      <Child value="고정된 값" />
+    </>
+  );
+};
+```
+
+> **주의:** 함수, 객체, 배열 등은 참조가 매 렌더마다 새로 생성되므로 얕은 비교에서 다르다고 판단되어, 추가 최적화가 필요할 수 있습니다.
+
+---
+
+## 4. useCallback – 함수 최적화
+
+부모 컴포넌트에서 생성된 함수가 자식 컴포넌트에 전달될 때, 매번 새로운 참조가 생성되면 자식이 리렌더됩니다.
+
+**개선 전:**
+
+```tsx
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleClick = () => {
+    console.log('clicked');
+  };
+
+  return (
+    <>
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+      <Child onClick={handleClick} />
+    </>
+  );
+};
+
+const Child = React.memo(({ onClick }: { onClick: () => void }) => {
+  console.log('Child 렌더링');
+  return <button onClick={onClick}>Click</button>;
+});
+```
+
+**개선 후 (useCallback 적용):**
+
+```tsx
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log('clicked');
+  }, []);
+
+  return (
+    <>
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+      <Child onClick={handleClick} />
+    </>
+  );
+};
+```
+
+이제 `handleClick`은 동일한 참조를 유지하여 불필요한 자식 리렌더링을 막습니다.
+
+---
+
+## 5. useMemo – 비용이 큰 계산 최적화
+
+복잡한 연산이나 정렬, 필터링 같은 작업은 `useMemo`를 사용하여 메모이제이션할 수 있습니다.
+
+```tsx
+const sortedList = useMemo(() => {
+  return data.sort((a, b) => a.value - b.value);
+}, [data]);
+```
+
+> **주의:** 연산이 가벼운 경우 오히려 사용 비용이 더 들 수 있으므로, 실제 성능 개선 효과가 있을 때만 사용합니다.
+
+---
+
+## 6. 실전 최적화 예시
+
+아래 예제는 `React.memo`와 `useCallback`을 함께 사용하여 자식 컴포넌트의 불필요한 리렌더링을 방지하는 예시입니다.
+
+```tsx
+import React, { useState, useCallback } from 'react';
+
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log('clicked!');
+  }, []);
+
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+      <Child onClick={handleClick} />
+    </div>
+  );
+};
+
+const Child = React.memo(({ onClick }: { onClick: () => void }) => {
+  console.log('🎯 Child 렌더링됨');
+  return <button onClick={onClick}>Click me</button>;
+});
+
+export default Parent;
+```
+
+---
+
+## 7. useEffect와 리렌더링
+
+```tsx
+useEffect(() => {
+  console.log('마운트 시 한 번 실행');
+}, []);
+
+useEffect(() => {
+  console.log('count 변경 시 실행');
+}, [count]);
+```
+
+---
+
+## 8. 서버 컴포넌트와 최적화
+
+```tsx
+export default function ServerComponent({ data }) {
+  return (
+    <div>
+      <h2>서버 컴포넌트</h2>
+      <ul>
+        {data.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+---
+
+## 9. 결론
+
+- 필요한 곳에만 최적화
+- React.memo, useCallback, useMemo의 조합 이해
+- 서버 컴포넌트는 렌더링 부담을 낮추는 좋은 수단
+
+---
+
+## 참고
+
+- https://react.dev/learn/optimizing-performance
+- https://react.dev/reference/react/memo
