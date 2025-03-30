@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sat, 22 Mar 2025 12:29:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 30 Mar 2025 22:46:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/tags/frontend/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/jquery4-vs-vanillajs</guid>
+    <title>jQuery 4.0 Beta 출시</title>
+    <link>https://bulhwi.github.io/blog/doc/jquery4-vs-vanillajs</link>
+    <description>jQuery 4.0 Beta 출시 - 주요변경사항과 여전히 유지되는 이유</description>
+    <pubDate>Sun, 30 Mar 2025 22:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>frontend</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/css-styling-strategies</guid>
     <title>짜증나는 스타일링 전략 비교: CSS Module vs Tailwind vs Styled-Components</title>
