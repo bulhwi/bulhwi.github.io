@@ -7,7 +7,7 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Mon, 16 Jun 2025 22:46:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 16 Jun 2025 15:46:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
   <item>
@@ -15,7 +15,7 @@
     <title>Effective TypeScript item1,2</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item1-2</link>
     <description>TypeScript와 JavaScript의 관계 파악하기, tsconfig 옵션 이해하기</description>
-    <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
+    <pubDate>Mon, 16 Jun 2025 15:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
   </item>
@@ -25,7 +25,7 @@
     <title>Effective TypeScript item3</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item3</link>
     <description>코드 생성과 타입은 별개임을 이해하기</description>
-    <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
+    <pubDate>Mon, 16 Jun 2025 15:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
   </item>
@@ -35,7 +35,7 @@
     <title>Effective TypeScript item4</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item4</link>
     <description>구조적 타이핑에 익숙해지기</description>
-    <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
+    <pubDate>Mon, 16 Jun 2025 15:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
   </item>
@@ -45,7 +45,7 @@
     <title>Effective TypeScript item5</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item5</link>
     <description>`any` 타입 지양하기</description>
-    <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
+    <pubDate>Mon, 16 Jun 2025 15:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
   </item>
