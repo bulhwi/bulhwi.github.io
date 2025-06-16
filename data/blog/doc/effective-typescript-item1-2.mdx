@@ -1,0 +1,179 @@
+---
+title: 'Effective TypeScript item1,2'
+date: 2025-06-16T22:46
+lastmod: '2025-06-16'
+tags: ['frontend', 'typescript']
+draft: false
+summary: 'effective typescript item1,2'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# 📘 이펙티브 타입스크립트 – Item 1~2 정리
+
+## ✅ Item 1: TypeScript와 JavaScript의 관계 파악하기
+
+### 🔍 핵심 요약
+
+TypeScript는 **JavaScript의 상위 집합(Superset)** 이다. 즉, **모든 JavaScript 코드는 유효한 TypeScript 코드**.
+
+- 타입 검사는 컴파일 단계에서만 이뤄지고, 실행은 JS로 변환된 결과물이 담당.
+- TypeScript는 **정적 타입 검사 도구**이지, 런타임 타입 검사가 아님.
+
+### ✅ 핵심 포인트
+
+1. **TS는 런타임에서 타입 체크를 하지 않는다**
+2. **TS 타입 오류가 있어도 JS는 생성된다 (`--noEmitOnError` 제외)**
+3. **JS 문법이 TypeScript에 그대로 존재한다**
+
+---
+
+### 💻 예시 코드
+
+```ts
+// example.ts
+function double(x: number): number {
+  return x * 2;
+}
+
+const result = double('hello'); // ❌ TS 오류
+console.log(result); // 런타임에서는 NaN 출력
+```
+
+```bash
+$ tsc example.ts        # 컴파일 경고 발생
+$ node example.js       # NaN 출력됨
+```
+
+---
+
+### 🛠 설정 팁
+
+`tsconfig.json`에서 아래 옵션을 설정하면 타입 오류 시 JS 생성을 방지할 수 있다.
+
+```json
+{
+  "compilerOptions": {
+    "noEmitOnError": true
+  }
+}
+```
+
+---
+
+### 📦 요약
+
+| 항목             | 설명                                          |
+| ---------------- | --------------------------------------------- |
+| TS = JS + 타입   | TypeScript는 JavaScript 문법 + 정적 타입 검사 |
+| 실행은 JS가 담당 | 타입 오류 있어도 실행은 JavaScript가 처리     |
+| 정적 안정성      | 타입 오류는 컴파일 타임에만 확인됨            |
+
+---
+
+## ✅ Item 2: 사용 중인 tsconfig 옵션 이해하기
+
+- https://www.typescriptlang.org/tsconfig/
+
+### 🔍 핵심 요약
+
+TypeScript의 동작은 **`tsconfig.json` 설정**에 따라 크게 달라짐.
+**strict 모드**를 포함한 다양한 옵션이 타입 안전성과 직결되므로 이해가 필요함.
+
+---
+
+### 💡 주요 옵션
+
+| 옵션               | 설명                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| `strict`           | 모든 엄격 모드 켜기 (`noImplicitAny`, `strictNullChecks` 등 포함) |
+| `noImplicitAny`    | 암묵적인 `any` 허용 안 함                                         |
+| `strictNullChecks` | `null`/`undefined` 체크 강화                                      |
+| `esModuleInterop`  | ESModule 호환 import 사용 가능                                    |
+| `target`, `module` | 출력 JS 버전, 모듈 시스템 설정                                    |
+
+---
+
+### 🧾 예시 tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "outDir": "./dist"
+  },
+  "include": ["src"]
+}
+```
+
+---
+
+### 💥 예시 코드
+
+```ts
+function divide(a: number, b: number) {
+  return a / b;
+}
+console.log(divide(10)); // 인자 하나 빠짐
+```
+
+- `strict: true`가 없으면 통과
+- `strict + noImplicitAny`가 있으면 컴파일 에러 발생
+
+---
+
+### 🛠 tsc 명령어 정리
+
+#### 🔹 전체 프로젝트 컴파일
+
+```bash
+npx tsc
+```
+
+#### 🔹 타입 오류 발생 시 JS 파일 생성 방지
+
+```bash
+npx tsc --noEmitOnError
+```
+
+또는 `tsconfig.json`에 아래 설정 추가:
+
+```json
+{
+  "compilerOptions": {
+    "noEmitOnError": true
+  }
+}
+```
+
+#### 🔹 특정 파일만 컴파일
+
+```bash
+npx tsc src/example.ts
+```
+
+#### 🔹 타입 검사만 수행하고 JS는 생성하지 않기
+
+```bash
+npx tsc --noEmit
+```
+
+> 💡 VSCode 외부에서 타입 체크 자동화할 때 유용
+
+---
+
+### 📦 요약
+
+| 항목                                   | 설명                      |
+| -------------------------------------- | ------------------------- |
+| 설정이 타입스크립트의 성격을 바꾼다    | 느슨한 TS vs 엄격한 TS    |
+| `strict: true`는 사실상 필수           | 타입 안정성을 위한 시작점 |
+| `tsc` 명령어로 타입 검사를 자동화 가능 | 빌드/CI에 쉽게 연동 가능  |
+
+---
