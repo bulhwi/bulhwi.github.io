@@ -14,7 +14,7 @@
     <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item1-2</guid>
     <title>Effective TypeScript item1,2</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item1-2</link>
-    <description>effective typescript item1,2</description>
+    <description>TypeScript와 JavaScript의 관계 파악하기, tsconfig 옵션 이해하기</description>
     <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
@@ -24,7 +24,7 @@
     <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item3</guid>
     <title>Effective TypeScript item3</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item3</link>
-    <description>Effective TypeScript item3</description>
+    <description>코드 생성과 타입은 별개임을 이해하기</description>
     <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
@@ -34,7 +34,7 @@
     <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item4</guid>
     <title>Effective TypeScript item4</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item4</link>
-    <description>Effective TypeScript item4</description>
+    <description>구조적 타이핑에 익숙해지기</description>
     <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
@@ -44,7 +44,7 @@
     <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item5</guid>
     <title>Effective TypeScript item5</title>
     <link>https://bulhwi.github.io/blog/doc/effective-typescript-item5</link>
-    <description>Effective TypeScript item5</description>
+    <description>`any` 타입 지양하기</description>
     <pubDate>Mon, 16 Jun 2025 22:46:00 GMT</pubDate>
     <author>address@yoursite.com (bulhwi)</author>
     <category>frontend</category><category>typescript</category>
