@@ -1,0 +1,144 @@
+---
+title: 'Effective TypeScript item4'
+date: 2025-06-16T22:46
+lastmod: '2025-06-16'
+tags: ['frontend', 'typescript']
+draft: false
+summary: 'Effective TypeScript item4'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# ✅ Item 4: 구조적 타이핑에 익숙해지기
+
+---
+
+## 1️⃣ 자바스크립트는 본질적으로 **덕 타이핑(Duck Typing)** 기반
+
+→ 객체가 특정 **형태(shape)**를 갖추고 있으면, **그 타입처럼 취급**함.
+
+```js
+const person = {
+  name: 'Boohi',
+  age: 30,
+};
+
+function greet(p) {
+  console.log(`Hello, ${p.name}`);
+}
+
+greet(person); // ✅ 속성 구조가 맞기 때문에 문제 없이 동작
+```
+
+➡ JavaScript는 **명시적 타입 선언이 없어도**, 속성만 맞으면 작동함.
+
+---
+
+## 2️⃣ TypeScript는 이 JS의 유연함을 반영해 **구조적 타이핑**을 채택
+
+### 🔸 구조적 타이핑 (Structural Typing)
+
+- **객체의 속성과 형태**에 따라 타입을 판단함
+- 타입 이름이나 선언 위치는 중요하지 않음
+
+```ts
+type Person = { name: string };
+
+const user = { name: 'Boohi', age: 30 };
+
+const p: Person = user; // ✅ age가 추가로 있어도 name 속성만 맞으면 OK
+```
+
+➡ 속성 “구조”만 맞으면 타입 호환 가능 → **구조적 타이핑**
+
+---
+
+## 3️⃣ 🔁 비교: 명목적 타이핑 (Nominal Typing) vs 구조적 타이핑
+
+| 구분 | 구조적 타이핑 (TS, Go 등) | 명목적 타이핑 (Java, C# 등)   |
+| ---- | ------------------------- | ----------------------------- |
+| 기준 | **형태(shape)**           | **이름(name)** 또는 선언 위치 |
+| 예시 | `{ name: string }`이면 OK | `Person` 타입이어야만 OK      |
+| 장점 | 유연성, 간결함            | 안전성, 의도 명확             |
+| 단점 | 과도한 호환 허용 가능성   | 반복 선언, 명시성 요구        |
+
+---
+
+## 4️⃣ 예시 코드로 비교 이해하기
+
+### ✅ 구조적 타이핑 예시 (TS)
+
+```ts
+type Point2D = { x: number; y: number };
+
+const point3D = { x: 1, y: 2, z: 3 };
+
+function draw(p: Point2D) {
+  console.log(p.x, p.y);
+}
+
+draw(point3D); // ✅ z 속성이 있어도 구조가 맞으면 통과
+```
+
+➡ `point3D`는 `Point2D`보다 속성이 더 많지만, 필수 속성을 만족하므로 **호환됨**
+
+---
+
+### ❌ 명목적 타이핑이라면 (Java 스타일)
+
+```java
+class Point2D {
+  int x;
+  int y;
+}
+
+class Point3D extends Point2D {
+  int z;
+}
+
+Point2D p = new Point3D(); // ✅ 명시적으로 상속해야만 가능
+```
+
+➡ 구조가 같아도 타입 이름이 다르면 **호환되지 않음**
+
+---
+
+## 5️⃣ 구조적 타이핑의 주의점
+
+### ⚠️ 의도치 않은 타입 호환을 허용할 수 있음
+
+```ts
+type Email = { value: string };
+type Username = { value: string };
+
+function send(email: Email) {
+  console.log(`Sending to ${email.value}`);
+}
+
+const username: Username = { value: 'boohi' };
+send(username); // ❌ 타입이 다르지만 구조가 같아서 통과됨
+```
+
+➡ 이처럼 **"의미는 다르지만 구조가 같은 타입" 간의 허용**이 버그를 유발할 수 있음
+
+> 이를 해결하기 위해 “**브랜디드 타입(Branded Type)**” 패턴을 사용하는 경우도 있음
+
+---
+
+## 💡 요약 정리
+
+| 핵심 개념            | 설명                                          |
+| -------------------- | --------------------------------------------- |
+| 덕 타이핑            | JS는 구조가 맞으면 타입처럼 취급              |
+| 구조적 타이핑        | TS는 객체의 형태(shape)에 따라 타입 호환 판단 |
+| 명목적 타이핑과 차이 | 이름 기반이 아니라 구조 기반                  |
+| 장점                 | 유연하고 간단한 타입 선언 가능                |
+| 단점                 | 의도치 않은 호환이 허용될 수 있음             |
+| 대응 전략            | 브랜디드 타입 등으로 의미 분리 필요           |
+
+---
+
+## ✅ 결론
+
+> TypeScript는 JavaScript의 유연한 동적 특성을 따르기 위해 **구조적 타이핑**을 사용합니다.
