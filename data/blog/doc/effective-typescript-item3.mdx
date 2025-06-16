@@ -1,0 +1,179 @@
+---
+title: 'Effective TypeScript item3'
+date: 2025-06-16T22:46
+lastmod: '2025-06-16'
+tags: ['frontend', 'typescript']
+draft: false
+summary: 'Effective TypeScript item3'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# ✅ Item 3: 코드 생성과 타입은 별개임을 이해하기
+
+---
+
+## 1️⃣ 타입스크립트 컴파일러의 두 가지 독립적 역할
+
+타입스크립트 컴파일러(`tsc`)는 다음 두 가지 일을 수행함:
+
+| 역할            | 설명                                         |
+| --------------- | -------------------------------------------- |
+| ① **코드 생성** | 최신 TS 코드를 브라우저 호환 JS로 트랜스파일 |
+| ② **타입 검사** | 정적 타입 시스템으로 코드 오류를 사전에 발견 |
+
+이 두 작업은 **완전히 독립적**이다.
+즉, **타입 오류가 있어도 JS로 변환은 수행됨.**
+
+---
+
+## 2️⃣ 타입 오류가 있어도 컴파일은 가능
+
+자바나 C 같은 언어에서는 **타입 오류가 있으면 실행 파일 생성 자체가 되지 않음.**
+
+예: 자바
+
+```java
+int x = "hello"; // 컴파일 에러 발생
+// .class 파일조차 생성되지 않음
+```
+
+그러나 타입스크립트에서는 다음과 같은 코드도 JS로 변환됨:
+
+```ts
+function double(x: number): number {
+  return x * 2;
+}
+
+const result = double('hello'); // ❌ 타입 오류
+console.log(result);
+```
+
+```bash
+$ tsc double.ts
+# 오류는 발생하지만, 여전히 double.js는 생성됨
+
+$ node double.js
+# NaN 출력됨
+```
+
+➡ 이는 타입스크립트가 **개발자 생산성을 높이고, 점진적 마이그레이션을 지원하기 위함**이다.
+
+---
+
+## 3️⃣ 런타임에는 타입 검사 기능이 존재하지 않는다
+
+타입스크립트의 타입은 **컴파일 타임에만 존재**.
+**런타임에서 타입 정보는 완전히 사라짐.**
+
+```ts
+type User = {
+  name: string;
+  age: number;
+};
+
+const user: User = { name: 'Boohi', age: 27 };
+console.log(typeof user); // object
+```
+
+### ❌ 잘못된 기대: 타입으로 런타임 분기
+
+```ts
+function handle(input: string | number) {
+  if (input is string) {  // ❌ Error
+    console.log("문자열입니다");
+  }
+}
+```
+
+### ✅ 올바른 방식
+
+```ts
+function handle(input: string | number) {
+  if (typeof input === 'string') {
+    console.log('문자열입니다');
+  }
+}
+```
+
+---
+
+## 4️⃣ 타입 연산은 런타임에 영향을 주지 않는다
+
+```ts
+type User = { name: string; age: number };
+type Keys = keyof User; // "name" | "age"
+// Keys는 JS 코드에선 존재하지 않음
+```
+
+- 이런 타입 연산은 컴파일 결과물에서 완전히 사라짐
+
+---
+
+## 5️⃣ 런타임 타입은 선언된 타입과 다를 수 있다
+
+```ts
+function greet(name: string) {
+  return `Hello, ${name}`;
+}
+
+greet(true as any); // ❌ 타입 무시하면 런타임 오류 가능
+```
+
+- 타입은 개발자에게 문법적 보조장치일 뿐, 강제력이 없다는 걸 보여주는 예
+
+---
+
+## 6️⃣ 타입스크립트 타입으로 함수 오버로드는 런타임 분기 불가
+
+```ts
+function format(input: string): string;
+function format(input: number): string;
+function format(input: string | number): string {
+  return input.toString();
+}
+```
+
+- 타입스크립트는 타입 선언을 통해 함수 시그니처를 여러 개로 허용할 수 있지만
+- 런타임에 어떤 시그니처가 사용됐는지를 판단하거나 분기할 수는 없습니다
+
+---
+
+## 7️⃣ 타입은 런타임 성능에 영향을 주지 않는다
+
+```ts
+type LargeObject = {
+  a1: number;
+  a2: number;
+  a3: number;
+  // ...
+  a100: number;
+};
+
+function compute(obj: LargeObject) {
+  return obj.a1 + obj.a2;
+}
+```
+
+- 타입스크립트 타입은 아무리 복잡하거나 많아도 런타임에서의 성능과는 무관합니다.
+- 실제 실행되는 JS 코드만이 브라우저 성능에 영향을 줍니다.
+
+---
+
+## 📦 요약 표
+
+| 항목                              | 설명                                         |
+| --------------------------------- | -------------------------------------------- |
+| 타입 오류 있어도 컴파일 가능      | TS는 트랜스파일러 + 타입 검사기              |
+| 런타임 타입 없음                  | 타입 정보는 JS에서 완전히 사라짐             |
+| 타입 연산은 컴파일용              | keyof, infer, mapped type 등은 실행되지 않음 |
+| 선언된 타입과 실제 값 불일치 가능 | 타입 캐스트나 any 사용 시 발생               |
+| 타입으로 오버로드 불가능          | 오버로드는 시그니처 수준에서만 유효          |
+| 성능 무관                         | 타입은 실행 성능에 아무런 영향 없음          |
+
+---
+
+## ✅ 결론
+
+> 타입스크립트의 타입은 **정적 분석 도구일 뿐, 런타임의 일부가 아니다.**
