@@ -1,0 +1,109 @@
+---
+title: 'Effective TypeScript item7'
+date: 2025-06-22T15:46
+lastmod: '2025-06-22'
+tags: ['frontend', 'typescript']
+draft: false
+summary: '타입은 값들의 집합'
+layout: PostSimple
+bibliography: references-data.bib
+canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1/
+---
+
+# ✅ Item 7: 타입은 값들의 집합
+
+---
+
+## 🎯 핵심 메시지
+
+> 타입은 해당 타입이 가질 수 있는 **모든 값들의 집합** 으로 이해하자.
+
+타입 간의 관계, 유니언/인터섹션 타입, 서브타입을 더 명확하게 이해할 수 있다.
+
+---
+
+## 🔶 유니언 타입 (`|`) = **합집합 (Union of Sets)**
+
+```ts
+type Animal = 'cat' | 'dog';
+type Pet = 'dog' | 'parrot';
+
+type AnimalOrPet = Animal | Pet; // 'cat' | 'dog' | 'parrot'
+```
+
+👉 여러 타입의 가능한 값을 합쳐서 하나의 집합을 구성함.
+
+---
+
+## 🔷 인터섹션 타입 (`&`) = **교집합 (Intersection of Sets)**
+
+```ts
+type HasName = { name: string };
+type HasAge = { age: number };
+
+type Person = HasName & HasAge;
+
+const p: Person = {
+  name: 'Boohi',
+  age: 30,
+}; // ✅ name과 age 모두 필요
+```
+
+👉 두 타입을 모두 만족하는 구조만 포함.
+
+---
+
+## ✳️ type vs interface: 집합으로 해석하기
+
+### 🔶 type: 값 집합을 직접 정의하거나 결합
+
+```ts
+type Fruit = 'apple' | 'banana';
+type ExtendedFruit = Fruit | 'orange'; // 합집합
+```
+
+---
+
+### 🔷 interface: 객체 구조를 정의하고 확장
+
+```ts
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Admin extends User {
+  role: 'admin';
+}
+```
+
+`Admin`은 `User`의 속성을 포함한 **확장된 집합**이다.
+
+---
+
+## 📚 extends와 집합 관계
+
+```ts
+type A = 'a' | 'b';
+type B = 'a' | 'b' | 'c';
+
+type Result = A extends B ? true : false; // ✅ true
+type Result2 = B extends A ? true : false; // ❌ false
+```
+
+→ `extends`는 **부분집합 관계**를 의미함.
+
+---
+
+## 🧩 정리 표
+
+| 개념         | 의미           | 예시                    | 설명                |
+| ------------ | -------------- | ----------------------- | ------------------- | ---------------- | ----------------- |
+| 타입         | 값들의 집합    | `'a'`, `number`         | 가능한 값들의 정의  |
+| 유니언 `     | `              | 합집합                  | `'a'                | 'b'`             | 여러 타입 중 하나 |
+| 인터섹션 `&` | 교집합         | `{ id } & { name }`     | 둘 다 만족하는 타입 |
+| extends      | 부분집합       | `T extends U`           | T는 U의 서브타입    |
+| type         | 값 집합 정의   | `type A = B             | C`                  | 유니언, 인터섹션 |
+| interface    | 구조 기반 정의 | `interface A extends B` | 객체 중심 설계      |
+
+---
