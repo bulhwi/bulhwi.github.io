@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Mon, 16 Jun 2025 15:46:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 22 Jun 2025 15:46:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/tags/frontend/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item7</guid>
+    <title>Effective TypeScript item7</title>
+    <link>https://bulhwi.github.io/blog/doc/effective-typescript-item7</link>
+    <description>타입은 값들의 집합</description>
+    <pubDate>Sun, 22 Jun 2025 15:46:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>frontend</category><category>typescript</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/effective-typescript-item1-2</guid>
     <title>Effective TypeScript item1,2</title>
