@@ -1,0 +1,751 @@
+---
+title: 'Claude Code Hooks로 개발 워크플로우 완전 자동화하기'
+date: 2025-11-16T22:00
+lastmod: '2025-11-16'
+tags: ['claude-code', 'hooks', 'automation', 'productivity', 'workflow']
+draft: false
+summary: 'Claude Code의 숨은 보석 Hooks. 코드 포맷팅, 테스트, Git 자동화까지 모든 반복 작업을 자동화하는 완벽 가이드.'
+layout: PostSimple
+---
+
+# ⚡ Claude Code Hooks로 개발 워크플로우 완전 자동화하기
+
+"Claude야, 코드 수정한 다음에 Prettier 돌려줘" 매번 말하기 귀찮지 않나?
+**Hooks를 쓰면 자동으로 실행된다.**
+
+---
+
+## 🎯 Hooks가 뭔데?
+
+Claude Code의 특정 시점에 **자동으로 실행되는 쉘 커맨드**다.
+
+Git hooks와 비슷한데, Claude Code의 라이프사이클에 붙는다고 보면 된다.
+
+### 왜 써야 하나?
+
+**Before Hooks**:
+
+```
+너: "코드 수정해줘"
+Claude: (코드 수정)
+너: "Prettier 돌려줘"
+Claude: (포맷팅)
+너: "테스트 돌려줘"
+Claude: (테스트)
+너: "커밋해줘"
+```
+
+**After Hooks**:
+
+```
+너: "코드 수정해줘"
+Claude: (코드 수정)
+→ 자동 포맷팅
+→ 자동 테스트
+→ 자동 커밋
+```
+
+**핵심**: LLM에게 "부탁"하는 게 아니라 **무조건 실행**되게 만든다.
+
+---
+
+## 📋 사용 가능한 Hook 이벤트
+
+Claude Code는 8가지 이벤트를 제공한다:
+
+| 이벤트               | 실행 시점         | 주요 용도       |
+| -------------------- | ----------------- | --------------- |
+| **PreToolUse**       | 도구 실행 직전    | 파일 백업, 검증 |
+| **PostToolUse**      | 도구 실행 완료 후 | 포맷팅, 테스트  |
+| **UserPromptSubmit** | 프롬프트 제출 시  | 로깅, 알림      |
+| **Notification**     | 알림 발생 시      | 데스크톱 알림   |
+| **Stop**             | Claude 응답 완료  | 정리 작업       |
+| **SessionStart**     | 세션 시작         | 환경 설정       |
+| **SessionEnd**       | 세션 종료         | 로그 저장       |
+| **Error**            | 에러 발생 시      | 에러 리포팅     |
+
+**가장 많이 쓰는 건**: `PostToolUse` (도구 실행 후)
+
+---
+
+## ⚙️ 설정 방법
+
+### 설정 파일 위치
+
+**전역 설정** (모든 프로젝트):
+
+```
+~/.claude/settings.json
+```
+
+**프로젝트별 설정** (특정 프로젝트만):
+
+```
+.claude/settings.json
+```
+
+### 기본 문법
+
+```json
+{
+  "hooks": {
+    "이벤트명": [
+      {
+        "matcher": "도구명_정규식",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "실행할_쉘_커맨드"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 🔥 실전 예제
+
+### 1. 코드 수정 후 자동 포맷팅
+
+**시나리오**: Claude가 파일을 수정하면 자동으로 Prettier 실행
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**작동 방식**:
+
+- `Edit` 또는 `Write` 도구가 실행되면
+- 해당 파일 경로를 가져와서
+- Prettier로 자동 포맷팅
+
+---
+
+### 2. Bash 명령어 로깅
+
+**시나리오**: Claude가 실행하는 모든 Bash 명령어를 로그에 기록
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command + \" - \" + (.tool_input.description // \"No description\")' >> ~/.claude/bash-log.txt"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**결과 (`~/.claude/bash-log.txt`)**:
+
+```
+npm install - Install dependencies
+git status - Check git status
+npm test - Run test suite
+```
+
+---
+
+### 3. TypeScript 타입 체크
+
+**시나리오**: 파일 수정 후 자동으로 타입 체크
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tsc --noEmit || exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**`|| exit 0`**: 타입 에러가 있어도 Hook을 중단하지 않음
+
+---
+
+### 4. 파일 변경 시 자동 테스트
+
+**시나리오**: 코드 수정하면 관련 테스트 자동 실행
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test -- $(jq -r '.tool_input.file_path // empty' | sed 's/\\.ts$/.test.ts/')"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 5. Git 자동 스테이징
+
+**시나리오**: 파일 수정하면 자동으로 `git add`
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git add $(jq -r '.tool_input.file_path // empty')"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 6. 데스크톱 알림
+
+**시나리오**: Claude 작업 완료 시 알림
+
+**macOS**:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code 작업 완료!\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Linux (notify-send)**:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude Code' '작업 완료!'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 7. 세션 시작 시 환경 체크
+
+**시나리오**: Claude 시작하면 Node 버전, Git 상태 확인
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '=== Environment Check ===' && node -v && git status -s"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 🚀 고급 활용: 조합 패턴
+
+### 완벽한 코드 수정 워크플로우
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')",
+            "description": "자동 포맷팅"
+          },
+          {
+            "type": "command",
+            "command": "npx eslint --fix $(jq -r '.tool_input.file_path // empty')",
+            "description": "ESLint 자동 수정"
+          },
+          {
+            "type": "command",
+            "command": "git add $(jq -r '.tool_input.file_path // empty')",
+            "description": "Git 스테이징"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**실행 순서**:
+
+1. Prettier로 포맷팅
+2. ESLint로 린팅 및 자동 수정
+3. Git에 자동 추가
+
+---
+
+### 프로젝트별 다른 Hook 설정
+
+**프론트엔드 프로젝트** (`.claude/settings.json`):
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run format && npm run lint:fix"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**백엔드 프로젝트** (`.claude/settings.json`):
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "go fmt ./... && golangci-lint run --fix"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 💡 Hook 데이터 활용하기
+
+Hooks는 stdin으로 JSON 데이터를 받는다.
+
+### 사용 가능한 데이터
+
+```json
+{
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "/path/to/file.ts",
+    "old_string": "...",
+    "new_string": "..."
+  }
+}
+```
+
+### jq로 데이터 추출
+
+```bash
+# 파일 경로 가져오기
+jq -r '.tool_input.file_path'
+
+# 도구 이름 가져오기
+jq -r '.tool_name'
+
+# 안전하게 값 가져오기 (없으면 빈 문자열)
+jq -r '.tool_input.file_path // empty'
+```
+
+---
+
+## 🛡️ Hook 실행 제어
+
+### Exit Code로 동작 제어
+
+```bash
+# 성공 (계속 진행)
+exit 0
+
+# 에러 (Claude에게 에러 메시지 전달)
+echo "타입 에러 발견!" >&2
+exit 2
+
+# 기타 에러 (Hook만 실패, Claude는 계속)
+exit 1
+```
+
+### 조건부 실행
+
+**TypeScript 파일만 타입 체크**:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path // empty'); if [[ $FILE == *.ts || $FILE == *.tsx ]]; then tsc --noEmit; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 🎨 실전 시나리오
+
+### 시나리오 1: Next.js 프로젝트
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          },
+          {
+            "type": "command",
+            "command": "npx next lint --fix $(jq -r '.tool_input.file_path // empty') || exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🚀 Next.js 개발 환경 체크' && node -v && npm -v"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 시나리오 2: CI/CD 준비 자동화
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run format"
+          },
+          {
+            "type": "command",
+            "command": "npm run lint:fix"
+          },
+          {
+            "type": "command",
+            "command": "npm test -- --passWithNoTests"
+          },
+          {
+            "type": "command",
+            "command": "npm run build || exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**효과**: 코드 수정만 하면 배포 준비 완료!
+
+---
+
+### 시나리오 3: 보안 체크 자동화
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path // empty'); grep -n 'API_KEY\\|SECRET\\|PASSWORD' \"$FILE\" && echo '⚠️ 민감 정보 감지!' >&2 && exit 2 || exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**작동**:
+
+- 파일에 `API_KEY`, `SECRET`, `PASSWORD` 같은 문자열 있으면
+- Claude에게 경고 전달하고 Hook 중단
+
+---
+
+## ⚠️ 주의사항
+
+### 1. 성능 문제
+
+Hooks가 너무 많거나 무거우면 느려진다.
+
+**해결책**:
+
+- 꼭 필요한 Hook만 활성화
+- 무거운 작업은 백그라운드 실행
+  ```bash
+  npm test &
+  ```
+
+---
+
+### 2. 무한 루프 조심
+
+**잘못된 예**:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write file.ts && echo '포맷팅 완료'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+문제: Prettier가 파일을 수정하면 다시 `Edit` 이벤트 발생 → 무한 루프
+
+**해결책**: `prettier`는 Hook으로만 실행하고, Claude가 직접 실행하지 않게 함
+
+---
+
+### 3. 에러 핸들링
+
+Hook 에러가 Claude를 멈추게 할 수 있다.
+
+**안전한 패턴**:
+
+```bash
+# 에러 무시
+command || exit 0
+
+# 에러만 로깅
+command || echo "에러 발생: $?" >> ~/.claude/errors.log
+```
+
+---
+
+## 🔧 디버깅 팁
+
+### Hook 실행 확인
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Hook] Edit detected' >> ~/.claude/hook-debug.log && cat >> ~/.claude/hook-debug.log"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`~/.claude/hook-debug.log` 확인하면 어떤 데이터가 전달되는지 볼 수 있다.
+
+---
+
+### Verbose 모드
+
+```bash
+claude --verbose
+```
+
+Hook 실행 과정이 터미널에 출력된다.
+
+---
+
+## 🎓 추천 Hook 조합
+
+### 완벽한 웹개발 설정
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          },
+          {
+            "type": "command",
+            "command": "npx eslint --fix $(jq -r '.tool_input.file_path // empty') || exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git fetch && git status -sb"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"작업 완료!\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 🚀 정리
+
+**Hooks의 핵심 장점**:
+
+1. **자동화**: 반복 작업을 완전 제거
+2. **일관성**: 항상 같은 품질 유지 (포맷팅, 린팅)
+3. **생산성**: Claude에게 일일이 지시할 필요 없음
+4. **안전성**: 보안 체크, 테스트 자동화
+
+**시작하기 좋은 Hook**:
+
+1. `PostToolUse` + Prettier (코드 포맷팅)
+2. `PostToolUse` + ESLint (린팅)
+3. `Stop` + 알림 (작업 완료 알림)
+
+**고급 활용**:
+
+- 프로젝트별 다른 Hook 설정
+- MCP + Hooks 조합
+- CI/CD 파이프라인 자동화
+
+Hooks 쓰면 Claude Code가 진짜 자동화된 개발 머신으로 변한다. 한번 설정하면 계속 써먹을 수 있으니 투자 가치 충분! 🔥
+
+---
+
+**참고 자료**:
+
+- [Claude Code Hooks 공식 문서](https://docs.claude.com/en/docs/claude-code/hooks)
+- [Hooks 레퍼런스](https://docs.claude.com/en/docs/claude-code/hooks-reference)
+- [GitButler Hooks 가이드](https://docs.gitbutler.com/features/ai-integration/claude-code-hooks)
