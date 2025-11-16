@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>bulhwi.github.io</title>
+      <link>https://bulhwi.github.io/blog</link>
+      <description>-</description>
+      <language>en-us</language>
+      <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
+      <webMaster>address@yoursite.com (bulhwi)</webMaster>
+      <lastBuildDate>Sun, 16 Nov 2025 22:30:00 GMT</lastBuildDate>
+      <atom:link href="https://bulhwi.github.io/tags/performance/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/claude-code-performance-cost-optimization</guid>
+    <title>Claude Code 성능 최적화 및 비용 절약 완벽 가이드</title>
+    <link>https://bulhwi.github.io/blog/doc/claude-code-performance-cost-optimization</link>
+    <description>Claude Code API 비용을 50-70% 절감하는 실전 전략. 모델 선택, 컨텍스트 관리, 토큰 최적화까지 완벽 정리.</description>
+    <pubDate>Sun, 16 Nov 2025 22:30:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>claude-code</category><category>optimization</category><category>cost-saving</category><category>performance</category><category>productivity</category>
+  </item>
+
+    </channel>
+  </rss>

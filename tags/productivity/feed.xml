@@ -11,6 +11,16 @@
       <atom:link href="https://bulhwi.github.io/tags/productivity/feed.xml" rel="self" type="application/rss+xml"/>
       
   <item>
+    <guid>https://bulhwi.github.io/blog/doc/claude-code-performance-cost-optimization</guid>
+    <title>Claude Code 성능 최적화 및 비용 절약 완벽 가이드</title>
+    <link>https://bulhwi.github.io/blog/doc/claude-code-performance-cost-optimization</link>
+    <description>Claude Code API 비용을 50-70% 절감하는 실전 전략. 모델 선택, 컨텍스트 관리, 토큰 최적화까지 완벽 정리.</description>
+    <pubDate>Sun, 16 Nov 2025 22:30:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>claude-code</category><category>optimization</category><category>cost-saving</category><category>performance</category><category>productivity</category>
+  </item>
+
+  <item>
     <guid>https://bulhwi.github.io/blog/doc/claude-code-settings-guide</guid>
     <title>Claude Code 설정 완전정복: CLAUDE.md부터 settings.json까지</title>
     <link>https://bulhwi.github.io/blog/doc/claude-code-settings-guide</link>
