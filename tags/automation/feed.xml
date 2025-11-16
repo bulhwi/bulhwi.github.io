@@ -11,6 +11,16 @@
       <atom:link href="https://bulhwi.github.io/tags/automation/feed.xml" rel="self" type="application/rss+xml"/>
       
   <item>
+    <guid>https://bulhwi.github.io/blog/doc/claude-code-git-workflow</guid>
+    <title>Claude Code + Git 워크플로우 완벽 가이드</title>
+    <link>https://bulhwi.github.io/blog/doc/claude-code-git-workflow</link>
+    <description>Claude Code로 Git 워크플로우를 자동화하는 방법. 브랜치 전략, PR 자동화, Conventional Commits, Git Hooks까지 실전 시나리오로 배운다.</description>
+    <pubDate>Sun, 16 Nov 2025 22:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>claude-code</category><category>git</category><category>workflow</category><category>automation</category><category>productivity</category>
+  </item>
+
+  <item>
     <guid>https://bulhwi.github.io/blog/doc/claude-code-hooks-automation</guid>
     <title>Claude Code Hooks로 개발 워크플로우 완전 자동화하기</title>
     <link>https://bulhwi.github.io/blog/doc/claude-code-hooks-automation</link>
