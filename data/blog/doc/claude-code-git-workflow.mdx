@@ -124,7 +124,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### 커밋 스타일 커스터마이징
 
-`.claude/CLAUDE.md`:
+`.claude/CLAUDE.md`에 추가:
 
 ```markdown
 ## Commit Message Style
@@ -138,8 +138,6 @@ When creating commits, follow these rules:
 5. Explain WHY, not WHAT in the body
 
 Example:
-```
-
 feat(api): add rate limiting to auth endpoints
 
 Previous implementation allowed unlimited requests, causing
@@ -147,10 +145,9 @@ server overload during peak hours. New rate limiter uses
 Redis to track request counts per IP.
 
 Closes #456
-
 ```
 
-```
+**이렇게 설정하면 Claude가 자동으로 이 스타일을 따라 커밋 메시지를 생성한다.**
 
 ---
 
