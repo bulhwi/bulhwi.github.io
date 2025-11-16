@@ -1,0 +1,551 @@
+---
+title: 'Claude Code로 웹개발할 때 필수 MCP 서버 추천'
+date: 2025-11-16T21:30
+lastmod: '2025-11-16'
+tags: ['claude-code', 'mcp', 'web-development', 'nextjs', 'productivity']
+draft: false
+summary: 'Claude Code의 진짜 파워를 끌어내는 MCP 서버들. Next.js DevTools, Chrome Browser, GitHub, DB 연동까지 실전 웹개발에 바로 쓸 수 있는 설정법.'
+layout: PostSimple
+---
+
+# 🔌 Claude Code로 웹개발할 때 필수 MCP 서버 추천
+
+Claude Code를 쓰면서 "이게 내 프로젝트 상태를 제대로 모르네?" 생각한 적 있다면, MCP가 답이다.
+
+---
+
+## 🎯 MCP(Model Context Protocol)가 뭔데?
+
+**MCP = AI를 위한 USB-C**
+
+Claude Code가 외부 시스템(DB, GitHub, 브라우저 등)과 소통할 수 있게 해주는 표준 프로토콜이다.
+
+### 왜 필요한가?
+
+Claude Code는 기본적으로 **로컬 파일만** 볼 수 있다.
+하지만 실제 웹개발은:
+
+- 실시간 서버 에러 확인
+- DB 쿼리 실행
+- GitHub 이슈/PR 관리
+- 브라우저 테스트
+
+이 모든 걸 MCP로 해결할 수 있다!
+
+---
+
+## 🚀 웹개발 필수 MCP 서버 TOP 5
+
+### 1. **Next.js DevTools MCP** ⭐️⭐️⭐️⭐️⭐️
+
+Vercel 공식 MCP. Next.js 개발 서버와 직접 연결된다.
+
+**할 수 있는 것들**:
+
+- ✅ 빌드 에러 실시간 확인
+- ✅ 런타임 에러 추적
+- ✅ TypeScript 타입 에러 감지
+- ✅ 페이지 라우트/컴포넌트 메타데이터 조회
+- ✅ Server Actions 인스펙션
+- ✅ 개발 로그 접근
+- ✅ Next.js 지식 베이스 쿼리
+
+**설치 (Next.js 16+)**:
+
+```bash
+# Claude Code CLI로 자동 설치
+claude mcp add next-devtools npx next-devtools-mcp@latest
+```
+
+**수동 설정**:
+
+`~/.claude/mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    }
+  }
+}
+```
+
+**자동 초기화 트릭**:
+
+`.claude/CLAUDE.md`에 추가:
+
+```markdown
+When starting work on a Next.js project, ALWAYS call the `init` tool
+from next-devtools-mcp FIRST to set up proper context.
+```
+
+**사용 예시**:
+
+```bash
+claude
+
+> "현재 개발 서버에 어떤 에러 있어?"
+> "/_next/mcp 엔드포인트에서 라우트 정보 가져와줘"
+> "빌드 에러 수정하고 재배포해줘"
+```
+
+**핵심**: Next.js 16+부터 `/_next/mcp` 엔드포인트가 내장되어 있어서,
+개발 서버가 켜져 있으면 자동으로 연결된다!
+
+---
+
+### 2. **Puppeteer MCP (Chrome Browser)** ⭐️⭐️⭐️⭐️⭐️
+
+브라우저 자동화의 끝판왕. Claude가 직접 Chrome을 조작한다.
+
+**할 수 있는 것들**:
+
+- ✅ 웹페이지 자동 탐색
+- ✅ 스크린샷 캡처
+- ✅ DOM 조작 및 텍스트 추출
+- ✅ 폼 작성 및 제출
+- ✅ JavaScript 실행
+- ✅ 네트워크 요청 모니터링
+
+**설치**:
+
+```bash
+# 자동 설치 (추천)
+npx puppeteer-mcp-claude install
+
+# 또는 수동 설정
+npm install -g puppeteer-mcp-claude
+```
+
+**설정**:
+
+`~/.claude/mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": ["puppeteer-mcp-claude"]
+    }
+  }
+}
+```
+
+**사용 예시**:
+
+```bash
+claude
+
+> "localhost:3000 열고 스크린샷 찍어줘"
+> "로그인 폼에 테스트 계정으로 자동 로그인해줘"
+> "메인 페이지의 모든 링크 텍스트 추출해줘"
+> "버튼 클릭했을 때 console.log 내용 확인해줘"
+```
+
+**실전 활용**:
+
+- E2E 테스트 시나리오 자동 생성
+- UI 회귀 테스트 (스크린샷 비교)
+- 크롤링 및 데이터 수집
+- 폼 자동화
+
+**주의**: Playwright MCP도 있는데, 더 현대적이고 크로스 브라우저 지원이 좋다.
+하지만 Puppeteer가 문서화가 더 잘 되어 있음.
+
+---
+
+### 3. **GitHub MCP** ⭐️⭐️⭐️⭐️
+
+GitHub API를 Claude가 직접 사용한다.
+
+**할 수 있는 것들**:
+
+- ✅ 이슈/PR 생성/수정
+- ✅ 코드 리뷰 자동화
+- ✅ 브랜치 관리
+- ✅ GitHub Actions 워크플로우 확인
+- ✅ 릴리즈 노트 생성
+
+**설치**:
+
+```bash
+npm install -g @modelcontextprotocol/server-github
+```
+
+**설정**:
+
+`~/.claude/mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "mcp-server-github",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_your_token_here"
+      }
+    }
+  }
+}
+```
+
+**GitHub Token 만들기**:
+
+1. GitHub Settings → Developer settings → Personal access tokens
+2. Generate new token (classic)
+3. 권한: `repo`, `workflow`, `read:org`
+
+**사용 예시**:
+
+```bash
+claude
+
+> "현재 프로젝트의 open 이슈 목록 보여줘"
+> "PR #123의 코드 리뷰해줘"
+> "버그 수정하고 이슈 #45 close하는 PR 만들어줘"
+> "최근 10개 커밋으로 릴리즈 노트 작성해줘"
+```
+
+---
+
+### 4. **PostgreSQL/Supabase MCP** ⭐️⭐️⭐️⭐️
+
+DB 쿼리를 Claude가 직접 실행한다.
+
+**할 수 있는 것들**:
+
+- ✅ 테이블 스키마 조회
+- ✅ SQL 쿼리 실행
+- ✅ 데이터 분석
+- ✅ 마이그레이션 생성
+- ✅ 인덱스 최적화 제안
+
+**설치 (PostgreSQL)**:
+
+```bash
+npm install -g @modelcontextprotocol/server-postgres
+```
+
+**설정**:
+
+`~/.claude/mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": ["postgresql://user:password@localhost:5432/mydb"]
+    }
+  }
+}
+```
+
+**사용 예시**:
+
+```bash
+claude
+
+> "users 테이블 스키마 보여줘"
+> "최근 24시간 내 가입한 유저 수 알려줘"
+> "email 중복 체크 쿼리 최적화해줘"
+> "posts 테이블에 full-text search 인덱스 추가하는 마이그레이션 작성해줘"
+```
+
+**Supabase 사용자라면**:
+
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase"],
+      "env": {
+        "SUPABASE_URL": "https://your-project.supabase.co",
+        "SUPABASE_SERVICE_KEY": "your-service-key"
+      }
+    }
+  }
+}
+```
+
+---
+
+### 5. **Fetch MCP (Web Search & API)** ⭐️⭐️⭐️⭐️
+
+웹 검색 및 API 호출을 Claude가 처리한다.
+
+**할 수 있는 것들**:
+
+- ✅ 실시간 웹 검색
+- ✅ REST API 테스트
+- ✅ HTML 파싱
+- ✅ JSON 데이터 분석
+
+**설치**:
+
+```bash
+npm install -g @modelcontextprotocol/server-fetch
+```
+
+**설정**:
+
+`~/.claude/mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "mcp-server-fetch"
+    }
+  }
+}
+```
+
+**사용 예시**:
+
+```bash
+claude
+
+> "https://api.github.com/repos/vercel/next.js 호출해서 스타 수 알려줘"
+> "Hacker News API에서 최신 프론트엔드 뉴스 가져와줘"
+> "내 API 엔드포인트 /api/users POST 테스트해줘"
+```
+
+---
+
+## 🛠️ MCP 설정 완벽 가이드
+
+### 설정 파일 위치
+
+**macOS/Linux**:
+
+```
+~/.claude/mcp_settings.json
+```
+
+**Windows**:
+
+```
+%APPDATA%\Claude\mcp_settings.json
+```
+
+### 전체 설정 예시
+
+```json
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["puppeteer-mcp-claude"]
+    },
+    "github": {
+      "command": "mcp-server-github",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxxxx"
+      }
+    },
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": ["postgresql://localhost:5432/mydb"]
+    },
+    "fetch": {
+      "command": "mcp-server-fetch"
+    }
+  }
+}
+```
+
+---
+
+## 💡 실전 워크플로우
+
+### 시나리오 1: Next.js 버그 수정
+
+```bash
+claude
+
+> "next-devtools로 현재 개발 서버 에러 확인해줘"
+
+Claude: "3개의 TypeScript 에러 발견:
+- pages/api/users.ts:15 - Type 'string' not assignable to 'number'
+- ..."
+
+> "해당 에러들 수정하고, puppeteer로 localhost:3000 테스트해줘"
+
+Claude: "수정 완료. 브라우저 테스트 결과 모든 페이지 정상 렌더링 확인."
+
+> "github mcp로 버그 수정 PR 만들어줘"
+```
+
+**5분 안에 버그 발견 → 수정 → 테스트 → PR 완료!**
+
+---
+
+### 시나리오 2: DB 스키마 변경
+
+```bash
+claude
+
+> "postgres mcp로 users 테이블 스키마 보여줘"
+> "avatar_url 컬럼 추가하는 마이그레이션 작성해줘"
+> "마이그레이션 실행하고 결과 확인해줘"
+> "API 코드도 업데이트해서 avatar_url 반환하도록 수정"
+> "fetch mcp로 GET /api/users/1 테스트해서 avatar_url 포함되는지 확인"
+```
+
+---
+
+### 시나리오 3: E2E 테스트 자동화
+
+```bash
+claude
+
+> "puppeteer로 다음 시나리오 테스트해줘:
+   1. localhost:3000 접속
+   2. 회원가입 폼 작성
+   3. 대시보드로 리다이렉트 확인
+   4. 각 단계 스크린샷 저장
+   5. 결과 리포트 생성"
+```
+
+---
+
+## ⚠️ 주의사항
+
+### 1. 보안
+
+**절대 하지 말 것**:
+
+- `.env` 파일에 MCP 토큰 저장 후 Git 커밋
+- 프로덕션 DB 직접 연결
+- API 키를 `mcp_settings.json`에 평문 저장
+
+**권장 방법**:
+
+```bash
+# 환경 변수로 관리
+export GITHUB_TOKEN=ghp_xxxxx
+export DB_URL=postgresql://...
+
+# mcp_settings.json에서 참조
+{
+  "env": {
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+  }
+}
+```
+
+---
+
+### 2. 성능
+
+- MCP 서버가 많으면 Claude Code 시작이 느려질 수 있다
+- 필요한 것만 활성화
+- 무거운 작업(대용량 DB 쿼리)은 주의
+
+---
+
+### 3. 디버깅
+
+MCP 연결 안 될 때:
+
+```bash
+# Claude Code 로그 확인
+claude --verbose
+
+# MCP 서버 직접 실행해서 테스트
+npx next-devtools-mcp@latest
+
+# 설정 파일 문법 검증
+cat ~/.claude/mcp_settings.json | jq
+```
+
+---
+
+## 🎨 추가 추천 MCP 서버
+
+### Sentry MCP
+
+에러 트래킹 자동화
+
+```bash
+npm install -g @sentry/mcp-server
+```
+
+### Slack MCP
+
+알림 및 로그 전송
+
+```bash
+npm install -g @modelcontextprotocol/server-slack
+```
+
+### Memory MCP
+
+프로젝트 컨텍스트 영구 저장
+
+```bash
+npm install -g @modelcontextprotocol/server-memory
+```
+
+---
+
+## 🚀 MCP로 달라지는 개발 경험
+
+**Before MCP**:
+
+```
+"이 에러 뭐야?"
+→ 터미널 확인
+→ 브라우저 콘솔 확인
+→ DB 클라이언트 실행
+→ GitHub 열어서 이슈 작성
+```
+
+**After MCP**:
+
+```
+claude "에러 확인하고 수정해서 PR까지 만들어줘"
+```
+
+---
+
+## 🎓 정리
+
+**웹개발 필수 MCP TOP 5**:
+
+1. **Next.js DevTools** - 개발 서버 실시간 모니터링
+2. **Puppeteer** - 브라우저 자동화
+3. **GitHub** - 이슈/PR 관리
+4. **PostgreSQL/Supabase** - DB 쿼리 실행
+5. **Fetch** - API 테스트
+
+**핵심 팁**:
+
+- `.claude/CLAUDE.md`로 자동 초기화 설정
+- 환경 변수로 민감 정보 관리
+- 프로젝트별로 필요한 MCP만 활성화
+
+**다음 단계**:
+
+- 커스텀 MCP 서버 만들기
+- MCP + Hooks 조합으로 워크플로우 완전 자동화
+
+MCP 쓰면 Claude Code가 진짜 팀원처럼 느껴진다. 한번 써보면 못 돌아간다! 🔥
+
+---
+
+**참고 자료**:
+
+- [MCP 공식 문서](https://docs.claude.com/en/docs/mcp)
+- [Next.js DevTools MCP](https://github.com/vercel/next-devtools-mcp)
+- [Puppeteer MCP](https://github.com/jaenster/puppeteer-mcp-claude)
+- [MCP 서버 목록](https://mcpservers.org)
