@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sun, 16 Nov 2025 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 16 Nov 2025 22:30:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/claude-code-settings-guide</guid>
+    <title>Claude Code 설정 완전정복: CLAUDE.md부터 settings.json까지</title>
+    <link>https://bulhwi.github.io/blog/doc/claude-code-settings-guide</link>
+    <description>Claude Code를 내 스타일대로 완벽하게 설정하는 법. CLAUDE.md 활용부터 settings.json 모든 옵션까지 실전 가이드.</description>
+    <pubDate>Sun, 16 Nov 2025 22:30:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>claude-code</category><category>configuration</category><category>settings</category><category>productivity</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/claude-code-hooks-automation</guid>
     <title>Claude Code Hooks로 개발 워크플로우 완전 자동화하기</title>
