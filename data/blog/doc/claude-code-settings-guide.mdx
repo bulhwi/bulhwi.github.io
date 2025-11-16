@@ -1,0 +1,1764 @@
+---
+title: 'Claude Code 설정 완전정복: CLAUDE.md부터 settings.json까지'
+date: 2025-11-16T22:30
+lastmod: '2025-11-16'
+tags: ['claude-code', 'configuration', 'settings', 'productivity']
+draft: false
+summary: 'Claude Code를 내 스타일대로 완벽하게 설정하는 법. CLAUDE.md 활용부터 settings.json 모든 옵션까지 실전 가이드.'
+layout: PostSimple
+---
+
+# ⚙️ Claude Code 설정 완전정복: CLAUDE.md부터 settings.json까지
+
+Claude Code를 제대로 쓰려면 **설정**이 핵심이다.
+기본 설정만 쓰면 잠재력의 30%도 못 쓴다.
+
+---
+
+## 🎯 설정 파일 구조
+
+Claude Code는 2가지 설정 방식을 쓴다:
+
+### 1. **CLAUDE.md** (Memory Files)
+
+- Claude에게 주는 **지시사항 및 컨텍스트**
+- 자연어로 작성
+- 프로젝트별 규칙, 컨벤션, 가이드라인
+
+### 2. **settings.json** (Configuration Files)
+
+- Claude의 **동작 방식 제어**
+- JSON 형식
+- 권한, 환경변수, Hooks, MCP 등
+
+---
+
+## 📂 설정 파일 위치 및 우선순위
+
+### 위치
+
+**전역 설정** (모든 프로젝트):
+
+```
+~/.claude/
+├── CLAUDE.md              # 전역 지시사항
+└── settings.json          # 전역 설정
+```
+
+**프로젝트 설정** (특정 프로젝트):
+
+```
+.claude/
+├── CLAUDE.md              # 프로젝트 지시사항
+├── settings.json          # 팀 공유 설정 (Git에 커밋)
+└── settings.local.json    # 개인 설정 (Git 제외)
+```
+
+### 우선순위 (높음 → 낮음)
+
+```
+1. Enterprise 정책 (회사용)
+2. 커맨드라인 옵션 (--add-dir 등)
+3. .claude/settings.local.json (개인)
+4. .claude/settings.json (프로젝트)
+5. ~/.claude/settings.json (전역)
+```
+
+**중요**: 같은 옵션이 여러 곳에 있으면 위에 있는 게 이긴다!
+
+---
+
+## 📝 CLAUDE.md 완벽 활용
+
+### 기본 개념
+
+Claude가 시작할 때 자동으로 읽는 **지시사항 파일**이다.
+
+**용도**:
+
+- 프로젝트 구조 설명
+- 코딩 컨벤션
+- 자주 쓰는 패턴
+- 주의사항
+
+---
+
+### 전역 CLAUDE.md 예제
+
+`~/.claude/CLAUDE.md`:
+
+```markdown
+# Global Instructions for Claude Code
+
+## 코딩 스타일
+
+- TypeScript 우선
+- 함수형 프로그래밍 선호
+- 에러는 항상 명시적으로 처리
+- 주석보다 명확한 변수명
+
+## Git Commit 규칙
+
+- Conventional Commits 사용
+- 한글로 작성 (한국어 프로젝트)
+- 이모지 사용 금지
+
+## 파일 작성 시 주의
+
+- 새 파일 생성 전 반드시 물어보기
+- README나 문서 파일은 요청받을 때만 생성
+- .env 파일은 절대 생성하지 않기
+
+## 테스트
+
+- 중요한 로직은 테스트 작성
+- Jest 사용
+- 파일명: `*.test.ts`
+
+## 반응
+
+- 간결하게 답변
+- 이모지 사용하지 않기 (요청 시 제외)
+```
+
+---
+
+### 프로젝트별 CLAUDE.md 예제
+
+`.claude/CLAUDE.md` (Next.js 프로젝트):
+
+```markdown
+# Next.js Blog Project
+
+## 프로젝트 구조
+
+- `/pages` - Next.js 페이지
+- `/components` - React 컴포넌트
+- `/lib` - 유틸리티 함수
+- `/styles` - 전역 스타일
+- `/data/blog` - MDX 블로그 포스트
+
+## 기술 스택
+
+- Next.js 12.1.4
+- React 17.0.2
+- Tailwind CSS 3.0
+- MDX (블로그 포스트)
+
+## 컨벤션
+
+- 컴포넌트는 PascalCase
+- 파일명은 kebab-case
+- CSS는 Tailwind만 사용 (CSS Modules 금지)
+
+## 개발 명령어
+
+- `npm start` - 개발 서버 (hot reload)
+- `npm run build` - 프로덕션 빌드 + Static Export
+- `npm run lint` - ESLint + Prettier
+
+## 블로그 포스트 작성
+
+- `node ./scripts/compose.js`로 생성
+- Frontmatter 필수 필드:
+  - title, date, tags, draft, summary, layout
+
+## MCP 초기화
+
+- Next.js 프로젝트 시작 시 항상 next-devtools-mcp의 `init` 툴 호출
+```
+
+---
+
+### CLAUDE.md 계층 구조
+
+같은 프로젝트 내에서 여러 CLAUDE.md를 둘 수 있다:
+
+```
+my-project/
+├── .claude/CLAUDE.md           # 프로젝트 전체
+├── frontend/.claude/CLAUDE.md  # 프론트엔드만
+└── backend/.claude/CLAUDE.md   # 백엔드만
+```
+
+**동작**:
+
+- Claude는 **가장 가까운** CLAUDE.md를 우선 사용
+- `frontend/` 안에서 작업하면 `frontend/.claude/CLAUDE.md` 적용
+
+---
+
+## ⚙️ settings.json 완벽 가이드
+
+### 기본 구조
+
+```json
+{
+  "permissions": {},
+  "environment": {},
+  "hooks": {},
+  "mcpServers": {},
+  "preferences": {}
+}
+```
+
+---
+
+### 1. **permissions** - 권한 제어
+
+**민감한 파일 보호하기**:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      {
+        "tool": "Write",
+        "patterns": [".env*", "*.key", "credentials.json", "secrets/**"]
+      },
+      {
+        "tool": "Read",
+        "patterns": [".env.production"]
+      },
+      {
+        "tool": "Bash",
+        "patterns": ["rm -rf*", "dd *", "mkfs*"]
+      }
+    ]
+  }
+}
+```
+
+**효과**:
+
+- `.env` 파일 수정 방지
+- 민감한 파일 읽기 차단
+- 위험한 Bash 명령어 차단
+
+---
+
+### 2. **environment** - 환경 변수
+
+**자동 환경 변수 설정**:
+
+```json
+{
+  "environment": {
+    "NODE_ENV": "development",
+    "API_BASE_URL": "http://localhost:3000",
+    "DEBUG": "true"
+  }
+}
+```
+
+**팀 전체 공유** (`.claude/settings.json`):
+
+```json
+{
+  "environment": {
+    "NEXT_PUBLIC_APP_NAME": "MyApp",
+    "NEXT_PUBLIC_VERSION": "1.0.0"
+  }
+}
+```
+
+**개인 환경변수** (`.claude/settings.local.json`):
+
+```json
+{
+  "environment": {
+    "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+    "DATABASE_URL": "${DATABASE_URL}"
+  }
+}
+```
+
+**주의**: 민감한 정보는 `settings.local.json`에!
+
+---
+
+### 3. **hooks** - 자동화
+
+이전 포스트 참고! 간단 예제:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 4. **mcpServers** - MCP 서버 설정
+
+```json
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "github": {
+      "command": "mcp-server-github",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": ["${DATABASE_URL}"]
+    }
+  }
+}
+```
+
+---
+
+### 5. **preferences** - 사용자 설정
+
+```json
+{
+  "preferences": {
+    "autoCompact": true,
+    "model": "claude-sonnet-4-5",
+    "verbose": false,
+    "maxContextLength": 200000
+  }
+}
+```
+
+**옵션**:
+
+- `autoCompact`: 컨텍스트 자동 압축
+- `model`: 사용할 모델
+- `verbose`: 디버그 모드
+- `maxContextLength`: 최대 컨텍스트 길이
+
+---
+
+## 📚 실전 CLAUDE.md 템플릿 (검증된 예제)
+
+### 1. **SaaS 웹 애플리케이션** (Anthropic Best Practices 기반)
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# SaaS Web Application
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- TypeScript 5.3
+- Tailwind CSS
+- Prisma + PostgreSQL
+- tRPC
+
+## Commands
+
+- `npm run dev` - Start dev server (localhost:3000)
+- `npm run build` - Production build
+- `npm run typecheck` - Run TypeScript compiler (no emit)
+- `npm run lint` - ESLint check
+- `npm run format` - Prettier format
+- `npm run db:push` - Push schema to database
+- `npm run db:studio` - Open Prisma Studio
+
+## Code Style
+
+- Use ES modules (import/export) syntax, not CommonJS (require)
+- Prefer functional components and hooks
+- Use TypeScript strict mode
+- No `any` types - use `unknown` if necessary
+- Async/await preferred over .then()
+
+## Workflow
+
+1. Make code changes
+2. Run typecheck: `npm run typecheck`
+3. Run tests: `npm test`
+4. Format code: `npm run format`
+
+## Project Structure
+
+- `/app` - Next.js app directory (pages, layouts, API routes)
+- `/components` - Reusable React components
+- `/lib` - Utilities and helpers
+- `/prisma` - Database schema and migrations
+- `/server` - tRPC server code
+
+## Important Notes
+
+- Always run typecheck before committing
+- Database migrations require manual review
+- API routes should validate input with Zod
+- Use Server Components by default, Client Components only when needed
+
+## Testing
+
+- Jest for unit tests
+- Playwright for E2E tests
+- Test files: `*.test.ts` or `*.spec.ts`
+- Aim for >80% coverage on critical paths
+```
+
+---
+
+### 2. **Python Data Science 프로젝트**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Data Science Project
+
+## Environment
+
+- Python 3.11
+- Poetry for dependency management
+- pyenv for Python version management
+
+## Setup Commands
+
+- `poetry install` - Install dependencies
+- `poetry shell` - Activate virtual environment
+- `poetry add <package>` - Add new dependency
+
+## Development Commands
+
+- `poetry run pytest` - Run tests
+- `poetry run black .` - Format code
+- `poetry run mypy .` - Type checking
+- `poetry run ruff check .` - Linting
+
+## Code Style
+
+- Follow PEP 8
+- Use type hints for all functions
+- Black for formatting (line length: 88)
+- Docstrings in Google style
+
+## Project Structure
+
+- `/data` - Raw and processed data (gitignored)
+- `/notebooks` - Jupyter notebooks for exploration
+- `/src` - Main source code
+- `/tests` - Test files
+- `/models` - Trained ML models (gitignored)
+
+## Workflow
+
+1. Write code with type hints
+2. Run `black .` for formatting
+3. Run `mypy .` for type checking
+4. Run `pytest` for testing
+5. Update documentation if API changed
+
+## Important
+
+- Never commit large data files or models
+- Use DVC for data version control
+- All experiments should be logged in notebooks
+- Random seeds should be set for reproducibility
+```
+
+---
+
+### 3. **Mobile App (React Native)**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# React Native Mobile App
+
+## Stack
+
+- React Native 0.73
+- TypeScript
+- Expo SDK 50
+- React Navigation
+- Zustand (state management)
+
+## Commands
+
+- `npm start` - Start Expo dev server
+- `npm run ios` - Run on iOS simulator
+- `npm run android` - Run on Android emulator
+- `npm test` - Run Jest tests
+- `npm run lint` - ESLint
+- `npm run typecheck` - TypeScript check
+
+## Code Conventions
+
+- Components in PascalCase
+- Files in kebab-case
+- Use absolute imports via tsconfig paths
+- Prefer hooks over class components
+- StyleSheet.create for styles (no inline styles)
+
+## Project Structure
+
+- `/src/screens` - Screen components
+- `/src/components` - Reusable components
+- `/src/navigation` - Navigation config
+- `/src/stores` - Zustand stores
+- `/src/api` - API client
+- `/src/utils` - Helper functions
+- `/src/types` - TypeScript types
+
+## Platform-Specific Code
+
+- Use `.ios.tsx` and `.android.tsx` for platform-specific files
+- Check Platform.OS for runtime platform checks
+- Test on both iOS and Android
+
+## Performance
+
+- Use React.memo for expensive components
+- Optimize FlatList with getItemLayout
+- Avoid inline functions in render
+- Use Flipper for debugging
+
+## Testing
+
+- Jest + React Native Testing Library
+- Test user interactions, not implementation
+- Mock native modules when needed
+```
+
+---
+
+### 4. **RESTful API (Express + TypeScript)**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# RESTful API Server
+
+## Stack
+
+- Node.js 20
+- Express.js
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Redis (caching)
+
+## Commands
+
+- `npm run dev` - Dev server with hot reload
+- `npm run build` - Compile TypeScript
+- `npm start` - Production server
+- `npm test` - Run tests (Jest)
+- `npm run migrate` - Run DB migrations
+- `npm run seed` - Seed database
+
+## Code Standards
+
+- Use async/await, not callbacks
+- Proper error handling with try-catch
+- Validate input with Zod
+- Use dependency injection
+- Write JSDoc comments for public APIs
+
+## Project Structure
+
+- `/src/routes` - Express routes
+- `/src/controllers` - Request handlers
+- `/src/services` - Business logic
+- `/src/models` - Database models
+- `/src/middleware` - Express middleware
+- `/src/utils` - Helper functions
+- `/src/types` - TypeScript types
+
+## API Design Principles
+
+- RESTful endpoints (/api/v1/users)
+- Consistent response format
+- Proper HTTP status codes
+- Pagination for list endpoints
+- Rate limiting enabled
+
+## Error Handling
+
+- Custom error classes
+- Centralized error middleware
+- Log errors to console (dev) and file (prod)
+- Never expose stack traces in production
+
+## Security
+
+- Helmet.js for HTTP headers
+- CORS configured properly
+- JWT for authentication
+- bcrypt for password hashing
+- Input validation on all endpoints
+
+## Testing
+
+- Unit tests for services
+- Integration tests for routes
+- Use test database
+- Mock external APIs
+```
+
+---
+
+### 5. **Fullstack Monorepo (Turborepo)**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Fullstack Monorepo
+
+## Stack
+
+- Turborepo
+- pnpm workspaces
+- TypeScript
+
+## Packages
+
+- `apps/web` - Next.js frontend
+- `apps/api` - Express backend
+- `packages/ui` - Shared React components
+- `packages/config` - Shared configs (ESLint, TypeScript)
+- `packages/database` - Prisma schema
+
+## Commands (from root)
+
+- `pnpm dev` - Run all apps in dev mode
+- `pnpm build` - Build all packages
+- `pnpm test` - Run all tests
+- `pnpm lint` - Lint all packages
+- `pnpm typecheck` - Type check all packages
+
+## Workspace Commands
+
+- `pnpm --filter web dev` - Run web app only
+- `pnpm --filter api build` - Build API only
+- `pnpm add <pkg> --filter web` - Add dependency to web
+
+## Code Sharing
+
+- Use workspace protocol: `"ui": "workspace:*"`
+- Shared types in `packages/types`
+- Shared utilities in `packages/utils`
+
+## Workflow
+
+1. Make changes in appropriate package
+2. Run typecheck: `pnpm typecheck`
+3. Run affected tests: `turbo test --filter=...^HEAD`
+4. Build: `turbo build`
+
+## Important
+
+- Changes in `packages/*` affect multiple apps
+- Run `turbo prune --scope=web` for deployments
+- Use `turbo run` for caching benefits
+- Never import from `apps/*` in `packages/*`
+
+## CI/CD
+
+- Vercel for frontend
+- Railway for backend
+- GitHub Actions for CI
+- Turborepo remote caching enabled
+```
+
+---
+
+### 6. **오픈소스 라이브러리**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Open Source Library
+
+## Project Info
+
+- Library for [specific purpose]
+- Published on npm as `@org/package-name`
+- Follows semver versioning
+
+## Commands
+
+- `npm run dev` - Watch mode for development
+- `npm run build` - Build for production
+- `npm run test` - Run test suite
+- `npm run test:watch` - Watch mode testing
+- `npm run docs` - Generate documentation
+- `npm run publish:patch` - Publish patch version
+
+## Code Quality
+
+- 100% TypeScript
+- JSDoc comments for all public APIs
+- Examples in documentation
+- Zero dependencies (if possible)
+
+## Testing
+
+- Vitest for unit tests
+- Test coverage >90%
+- Test all public APIs
+- Test edge cases and errors
+
+## Documentation
+
+- README.md with usage examples
+- API reference in `/docs`
+- Changelog follows Keep a Changelog format
+- Migration guides for breaking changes
+
+## Publishing Checklist
+
+1. Update version in package.json
+2. Update CHANGELOG.md
+3. Run `npm run build`
+4. Run `npm test`
+5. Run `npm run docs`
+6. Create git tag
+7. Push to GitHub
+8. Run `npm publish`
+
+## Contribution Guidelines
+
+- Fork and PR workflow
+- Discuss major changes in issues first
+- Add tests for new features
+- Update documentation
+- Sign commits
+```
+
+---
+
+### 7. **AI/ML 프로젝트 (PyTorch)**
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# ML Project - PyTorch
+
+## Environment
+
+- Python 3.10
+- CUDA 12.1
+- PyTorch 2.1
+- Weights & Biases for experiment tracking
+
+## Setup
+
+- `conda env create -f environment.yml`
+- `conda activate ml-project`
+- `wandb login` - Authenticate W&B
+
+## Training Commands
+
+- `python train.py --config configs/base.yaml` - Train model
+- `python train.py --resume checkpoint.pth` - Resume training
+- `python eval.py --checkpoint best.pth` - Evaluate model
+
+## Code Structure
+
+- `/configs` - Training configurations (YAML)
+- `/data` - Dataset loaders
+- `/models` - Model architectures
+- `/trainers` - Training loops
+- `/utils` - Helper functions
+- `/notebooks` - Exploration notebooks
+
+## Best Practices
+
+- Set random seeds for reproducibility
+- Log all hyperparameters to W&B
+- Save checkpoints every N epochs
+- Use mixed precision training (AMP)
+- Profile code before optimizing
+
+## Experiment Tracking
+
+- Every run logged to W&B
+- Include: hyperparameters, metrics, artifacts
+- Tag experiments meaningfully
+- Document failed experiments
+
+## Data
+
+- Raw data in `/data/raw` (gitignored)
+- Processed data in `/data/processed`
+- Use DataLoader with num_workers=4
+- Augmentation in dataset class
+
+## Model Development
+
+1. Start with baseline model
+2. Add complexity incrementally
+3. Validate on dev set frequently
+4. Ablation studies for each component
+5. Document architectural choices
+
+## Deployment
+
+- Export to ONNX format
+- Optimize with TensorRT (if GPU)
+- Benchmark inference speed
+- Package with Docker
+```
+
+---
+
+## 🎓 CLAUDE.md 작성 팁 (Anthropic 공식 권장사항)
+
+### ✅ DO (권장)
+
+1. **간결하게 작성**
+
+   - 토큰을 절약하고 노이즈를 줄인다
+   - 핵심 정보만 포함
+
+2. **반복해서 개선**
+
+   - 프롬프트처럼 테스트하면서 다듬기
+   - 효과 없는 내용은 제거
+
+3. **팀과 공유**
+
+   - Git에 커밋해서 팀원들과 공유
+   - `#` 키로 자주 쓰는 명령어 추가
+
+4. **명령어 문서화**
+   - `npm run build` - 용도 설명
+   - 자주 쓰는 bash 커맨드 정리
+
+### ❌ DON'T (피해야 할 것)
+
+1. **장황한 설명**
+
+   - 모든 세부사항을 넣지 말 것
+   - 핵심만 간단히
+
+2. **코드 복붙**
+
+   - 전체 코드를 넣지 말 것
+   - 패턴과 규칙만 설명
+
+3. **일회성 정보**
+
+   - 한 번만 쓸 정보는 제외
+   - 반복적으로 필요한 것만
+
+4. **검증 없이 추가**
+   - 실제로 도움되는지 테스트
+   - 효과 없으면 삭제
+
+---
+
+## 🌟 GitHub에서 찾은 실제 CLAUDE.md 예제들
+
+실제 프로젝트에서 사용되는 검증된 CLAUDE.md 파일들:
+
+### 1. **메모리 뱅크 시스템** (Centminmod)
+
+[centminmod/my-claude-code-setup](https://github.com/centminmod/my-claude-code-setup/blob/master/CLAUDE.md)
+
+**특징**:
+
+- AI 메모리 뱅크 시스템
+- 세션 연속성 유지
+- 효율적인 명령어 가이드 (`fd`, `rg` 추천)
+- 의사결정 트리 포함
+
+**구조**:
+
+```markdown
+# AI INSTRUCTIONS
+
+## Core Guidelines
+
+- Ignore GEMINI.md
+- Use code-searcher subagent for context efficiency
+- Validate tool results before proceeding
+
+## Memory Bank System
+
+- CLAUDE-activeContext.md - Current session context
+- CLAUDE-patterns.md - Code patterns
+- CLAUDE-decisions.md - Key decisions
+
+## Preferred Commands
+
+✅ RECOMMENDED: fd, rg (fast)
+❌ AVOID: tree, find, grep (slow)
+```
+
+---
+
+### 2. **종합 개발 템플릿** (tsdevau)
+
+[Claude Rules Template Gist](https://gist.github.com/tsdevau/673876d17d344f97ba3473bc081bd1e5)
+
+**특징**:
+
+- 프로젝트별 커스터마이징 가능한 종합 템플릿
+- Tech Stack, Constraints, Validation 체크포인트
+- 코드 스탠다드 포함
+
+**구조**:
+
+```markdown
+# [Project Name] - Claude Development Rules
+
+## Tech Stack
+
+- [List all technologies]
+
+## Critical Constraints
+
+- [Must-follow rules]
+- [Security requirements]
+- [Performance requirements]
+
+## Validation Checkpoints
+
+- [ ] Typecheck passed
+- [ ] Tests passed
+- [ ] Linting clean
+
+## Code Standards
+
+- [Naming conventions]
+- [File structure]
+- [Error handling patterns]
+```
+
+---
+
+### 3. **Kotlin Multiplatform** (futuredapp)
+
+[kmp-futured-template/CLAUDE.md](https://github.com/futuredapp/kmp-futured-template/blob/develop/CLAUDE.md)
+
+**특징**:
+
+- 크로스 플랫폼 개발에 특화
+- Gradle 명령어 상세 설명
+- 플랫폼별 주의사항
+
+**구조**:
+
+```markdown
+# Kotlin Multiplatform Project
+
+## Architecture
+
+- Shared business logic in commonMain
+- Platform-specific UI in androidMain/iosMain
+
+## Gradle Commands
+
+- `./gradlew build` - Build all targets
+- `./gradlew :shared:testDebugUnitTest` - Run shared tests
+- `./gradlew :androidApp:assembleDebug` - Build Android
+
+## Code Organization
+
+- `/shared` - KMP shared code
+- `/androidApp` - Android-specific
+- `/iosApp` - iOS-specific
+
+## Important Notes
+
+- Use expect/actual for platform-specific code
+- Common code should be platform-agnostic
+- Test on all target platforms
+```
+
+---
+
+### 4. **AI IntelliJ Plugin** (DroidconKotlin)
+
+[awesome-claude-code - Real Examples](https://github.com/hesreallyhim/awesome-claude-code)
+
+**특징**:
+
+- IntelliJ 플러그인 개발
+- Gradle 빌드 패턴
+- 코딩 컨벤션 명확
+
+**구조**:
+
+```markdown
+# IntelliJ IDEA Plugin Development
+
+## Build Commands
+
+- `./gradlew buildPlugin` - Build plugin
+- `./gradlew runIde` - Run IDE with plugin
+- `./gradlew test` - Run tests
+
+## Plugin Structure
+
+- `/src/main/kotlin` - Plugin source
+- `/src/main/resources/META-INF/plugin.xml` - Plugin descriptor
+
+## Coding Patterns
+
+- Use IntelliJ Platform SDK APIs
+- Follow JetBrains plugin guidelines
+- Implement actions, listeners, services
+
+## Testing
+
+- Use light platform tests
+- Mock IntelliJ components
+- Test actions and UI
+```
+
+---
+
+### 5. **AWS MCP Server** (Python)
+
+실제 프로덕션 Python 프로젝트
+
+**특징**:
+
+- Python 환경 설정 상세
+- 보안 고려사항
+- AWS 통합
+
+**구조**:
+
+```markdown
+# AWS MCP Server
+
+## Environment Setup
+
+- Python 3.11+
+- Poetry for dependencies
+- AWS CLI configured
+
+## Development
+
+- `poetry install` - Install dependencies
+- `poetry run pytest` - Run tests
+- `poetry run mypy .` - Type check
+
+## Security
+
+- Never commit AWS credentials
+- Use IAM roles when possible
+- Rotate secrets regularly
+
+## AWS Services
+
+- S3 for storage
+- Lambda for compute
+- DynamoDB for data
+
+## Important
+
+- All AWS calls must have error handling
+- Use boto3 for AWS SDK
+- Log all AWS API calls
+```
+
+---
+
+### 6. **Auto Claude Code** (adimenia)
+
+[auto-claude-code](https://github.com/adimenia/auto-claude-code)
+
+**특징**:
+
+- 자동화 워크플로우
+- 글로벌 + 프로젝트 설정 분리
+- MCP 통합 예제
+
+**전역 설정** (`~/.claude/CLAUDE.md`):
+
+```markdown
+# Global Claude Code Instructions
+
+## General Preferences
+
+- Concise responses
+- No emojis unless requested
+- Show code diff when editing files
+
+## Common Commands
+
+- `/clear` - Clear context
+- `/compact` - Compress context
+- `/cost` - Check token usage
+
+## Always Check
+
+- File permissions before writing
+- Existing tests before modifying code
+- Git status before committing
+```
+
+**프로젝트 설정** (`.claude/CLAUDE.md`):
+
+```markdown
+# [Project] Specific Instructions
+
+## This Project Uses
+
+- [Specific tech stack]
+- [Specific conventions]
+
+## Before Starting
+
+1. Read CLAUDE-activeContext.md
+2. Check current branch
+3. Review recent commits
+
+## After Completing Task
+
+1. Update CLAUDE-activeContext.md
+2. Run tests
+3. Commit with conventional commit message
+```
+
+---
+
+### 7. **Context Engineering** (coleam00)
+
+[context-engineering-intro](https://github.com/coleam00/context-engineering-intro)
+
+**특징**:
+
+- 도메인별 템플릿 생성
+- 공식 문서 기반
+- 실전 구현 패턴
+
+**템플릿 생성기 구조**:
+
+```markdown
+# Technology: [Name]
+
+## Official Documentation Research
+
+- Read official docs thoroughly
+- Identify best practices
+- Note common pitfalls
+
+## Real-World Patterns
+
+- Study popular open-source projects
+- Extract common patterns
+- Document anti-patterns to avoid
+
+## Domain-Specific Rules
+
+- [Technology-specific conventions]
+- [Common gotchas]
+- [Performance tips]
+
+## Code Examples
+
+- [Minimal working example]
+- [Common use cases]
+- [Edge cases]
+```
+
+---
+
+## 📋 검증된 CLAUDE.md 체크리스트
+
+실제 프로덕션에서 사용되는 CLAUDE.md들의 공통점:
+
+### ✅ 필수 포함 항목
+
+- [ ] 프로젝트 개요 및 Tech Stack
+- [ ] 자주 쓰는 명령어 (빌드, 테스트, 린팅)
+- [ ] 코드 스타일 가이드라인
+- [ ] 프로젝트 구조 설명
+- [ ] 중요한 주의사항
+
+### ⭐ 고급 항목
+
+- [ ] 워크플로우 체크리스트
+- [ ] 의사결정 로그 (decision log)
+- [ ] 플랫폼별 특이사항
+- [ ] 보안 요구사항
+- [ ] 성능 최적화 팁
+
+### 🚫 피해야 할 것
+
+- 너무 장황한 설명
+- 전체 코드 복사
+- 자주 바뀌는 정보
+- 일회성 정보
+
+---
+
+## 🎨 실전 settings.json 예제
+
+### Next.js 프로젝트
+
+`.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      {
+        "tool": "Write",
+        "patterns": [".env*", "package-lock.json"]
+      }
+    ]
+  },
+  "environment": {
+    "NODE_ENV": "development"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          },
+          {
+            "type": "command",
+            "command": "npx next lint --fix $(jq -r '.tool_input.file_path // empty') || exit 0"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    }
+  }
+}
+```
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Next.js Project Guidelines
+
+When starting work on this project, ALWAYS call the `init` tool
+from next-devtools-mcp FIRST.
+
+## Coding Standards
+
+- Use TypeScript
+- Functional components only
+- Tailwind CSS for styling
+- No inline styles
+
+## File Organization
+
+- Components in `/components`
+- Pages in `/pages`
+- Utilities in `/lib`
+
+## Development Commands
+
+- `npm start` - Dev server with hot reload
+- `npm run build` - Production build
+```
+
+---
+
+### 백엔드 API 프로젝트
+
+`.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      {
+        "tool": "Bash",
+        "patterns": ["rm -rf*", "DROP DATABASE*"]
+      }
+    ]
+  },
+  "environment": {
+    "NODE_ENV": "development",
+    "LOG_LEVEL": "debug"
+  },
+  "mcpServers": {
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": ["postgresql://localhost:5432/devdb"]
+    }
+  }
+}
+```
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# API Server Project
+
+## Database
+
+- PostgreSQL 14
+- Use `postgres` MCP for queries
+- Migrations in `/migrations`
+
+## API Design
+
+- RESTful endpoints
+- Express.js
+- OpenAPI spec in `/docs`
+
+## Error Handling
+
+- Always use try-catch
+- Return proper HTTP status codes
+- Log errors to console
+
+## Testing
+
+- Jest for unit tests
+- Supertest for API tests
+- Run tests before committing
+```
+
+---
+
+## 🔍 컨텍스트 관리
+
+### .claudeignore
+
+불필요한 파일/디렉토리 제외:
+
+`.claudeignore`:
+
+```
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.log
+.env*
+*.lock
+package-lock.json
+yarn.lock
+```
+
+**효과**:
+
+- 컨텍스트 절약
+- 빠른 응답
+- 비용 절감
+
+---
+
+### /clear vs /compact
+
+**`/clear`**: 컨텍스트 완전 초기화
+
+```
+claude
+
+> /clear
+```
+
+**`/compact`**: 중요한 내용만 요약해서 유지
+
+```
+claude
+
+> /compact "최근 변경사항과 열린 TODO 정리해줘"
+```
+
+**언제 쓰나**:
+
+- `/clear`: 새로운 작업 시작할 때
+- `/compact`: 긴 세션에서 컨텍스트가 꽉 찼을 때
+
+---
+
+## 🚀 고급 설정 패턴
+
+### 팀 설정 vs 개인 설정
+
+**팀 공유** (`.claude/settings.json`):
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run format"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**개인 설정** (`.claude/settings.local.json`):
+
+```json
+{
+  "environment": {
+    "GITHUB_TOKEN": "ghp_xxxxx",
+    "DATABASE_URL": "postgresql://localhost:5432/mydb"
+  },
+  "preferences": {
+    "verbose": true
+  }
+}
+```
+
+**`.gitignore`에 추가**:
+
+```
+.claude/settings.local.json
+```
+
+---
+
+### 멀티 디렉토리 프로젝트
+
+**Monorepo 설정**:
+
+프로젝트 루트 `.claude/CLAUDE.md`:
+
+```markdown
+# Monorepo Project
+
+## Structure
+
+- `/packages/web` - Next.js frontend
+- `/packages/api` - Express backend
+- `/packages/shared` - Shared utilities
+
+## General Rules
+
+- pnpm 사용
+- Turborepo로 빌드
+- 공통 ESLint/Prettier 설정
+```
+
+프론트엔드 `/packages/web/.claude/CLAUDE.md`:
+
+```markdown
+# Frontend Package
+
+## Specific to Frontend
+
+- React 18
+- Next.js 14
+- Tailwind CSS
+
+When working here, focus on UI/UX and client-side logic.
+```
+
+백엔드 `/packages/api/.claude/CLAUDE.md`:
+
+```markdown
+# Backend Package
+
+## Specific to Backend
+
+- Express.js
+- PostgreSQL
+- JWT auth
+
+When working here, focus on API endpoints and database logic.
+```
+
+---
+
+## 💡 모범 사례 (Best Practices)
+
+### 1. **민감 정보 관리**
+
+**❌ 나쁜 예**:
+
+```json
+{
+  "environment": {
+    "API_KEY": "sk-1234567890abcdef"
+  }
+}
+```
+
+**✅ 좋은 예**:
+
+```json
+{
+  "environment": {
+    "API_KEY": "${API_KEY}"
+  }
+}
+```
+
+그리고 환경변수로 설정:
+
+```bash
+export API_KEY=sk-1234567890abcdef
+```
+
+---
+
+### 2. **프로젝트 설명은 CLAUDE.md에**
+
+**❌ 매번 프롬프트로 설명**:
+
+```
+너: "이 프로젝트는 Next.js 블로그고, MDX 쓰고..."
+```
+
+**✅ CLAUDE.md에 한 번만 작성**:
+
+```markdown
+# Project Overview
+
+This is a Next.js blog using MDX for content.
+```
+
+---
+
+### 3. **Hooks는 팀 전체 적용**
+
+코드 품질 도구는 팀 전체가 써야 한다:
+
+`.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run format && npm run lint:fix"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 4. **컨텍스트 최적화**
+
+**불필요한 파일 제외**:
+
+`.claudeignore`:
+
+```
+# Dependencies
+node_modules/
+vendor/
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Tests
+coverage/
+__tests__/__snapshots__/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+---
+
+## 🎓 설정 템플릿
+
+### 미니멀 설정
+
+`.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Project Instructions
+
+## Coding Style
+
+- Write clean, readable code
+- Add comments for complex logic
+
+## Testing
+
+- Write tests for critical functions
+```
+
+---
+
+### 풀스택 설정
+
+`.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      {
+        "tool": "Write",
+        "patterns": [".env*", "*.lock"]
+      }
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write $(jq -r '.tool_input.file_path // empty')"
+          },
+          {
+            "type": "command",
+            "command": "npx eslint --fix $(jq -r '.tool_input.file_path // empty') || exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git fetch && git status -sb"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "github": {
+      "command": "mcp-server-github",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": ["${DATABASE_URL}"]
+    }
+  }
+}
+```
+
+`.claude/CLAUDE.md`:
+
+```markdown
+# Fullstack Project
+
+## Stack
+
+- Frontend: Next.js + TypeScript + Tailwind
+- Backend: Express + PostgreSQL
+- Auth: JWT
+
+## Workflow
+
+1. Feature 브랜치 생성
+2. 코드 작성 + 테스트
+3. PR 생성
+4. 리뷰 후 머지
+
+## Conventions
+
+- Conventional Commits
+- ESLint + Prettier
+- 100% test coverage for critical paths
+
+## Commands
+
+- `npm run dev:frontend` - Frontend dev server
+- `npm run dev:backend` - Backend dev server
+- `npm test` - Run all tests
+- `npm run db:migrate` - Run migrations
+```
+
+---
+
+## 🚀 정리
+
+**핵심 포인트**:
+
+1. **CLAUDE.md** = 지시사항 (자연어)
+2. **settings.json** = 설정 (JSON)
+3. **우선순위**: Local > Project > Global
+4. **민감 정보**는 `settings.local.json` + 환경변수
+5. **팀 설정**은 `settings.json`에 (Git 커밋)
+
+**시작하기 좋은 설정**:
+
+1. `.claudeignore` 만들기 (node_modules, dist 제외)
+2. `.claude/CLAUDE.md` 작성 (프로젝트 개요)
+3. Prettier Hook 추가 (자동 포맷팅)
+
+**고급 활용**:
+
+- 프로젝트별 CLAUDE.md 계층 구조
+- Hooks + MCP 조합
+- 멀티 디렉토리 설정
+
+설정 잘 해두면 Claude Code가 **프로젝트 전문가**가 된다.
+한번 투자하면 계속 써먹을 수 있으니 시간 들여서 제대로 설정하자! 🔥
+
+---
+
+**참고 자료**:
+
+- [Claude Code Settings 공식 문서](https://docs.claude.com/en/docs/claude-code/settings)
+- [Settings.json 가이드](https://www.eesel.ai/blog/settings-json-claude-code)
+- [CLAUDE.md 템플릿](https://github.com/centminmod/my-claude-code-setup)
