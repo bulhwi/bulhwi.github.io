@@ -1,0 +1,352 @@
+---
+title: 'Claude Code로 바이브코딩할 때 꼭 알아야 할 꿀팁'
+date: 2025-11-16T21:10
+lastmod: '2025-11-16'
+tags: ['claude-code', 'ai', 'productivity', 'developer-tools']
+draft: false
+summary: 'Claude Code로 생산성을 극대화하는 실전 커맨드와 숨겨진 기능들을 소개합니다.'
+layout: PostSimple
+---
+
+# 🚀 Claude Code로 바이브코딩할 때 꼭 알아야 할 꿀팁
+
+오랜만에 글을 쓰네요! 요즘 Claude Code를 열심히 쓰면서 발견한 꿀팁들을 공유하려고 합니다.
+
+---
+
+## 🎯 Claude Code란?
+
+Claude Code는 Anthropic이 만든 AI 코딩 어시스턴트로, 터미널에서 직접 실행하며 코드 작성, 리팩토링, 디버깅을 도와준다.
+VSCode나 IDE 플러그인이 아니라 **독립적인 CLI 도구**라는 점이 특징이다.
+
+---
+
+## ⚡ 30초 안에 시작하기
+
+### 설치
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+### 기본 사용법
+
+```bash
+# 프로젝트 디렉토리에서 실행
+claude
+
+# 일회성 작업
+claude "package.json에서 사용 안 하는 의존성 찾아줘"
+
+# 즉시 종료하는 쿼리
+claude -p "이 함수가 뭐하는 거야?"
+```
+
+---
+
+## 💎 핵심 커맨드 꿀팁
+
+### 1. **대화 재개 기능** (`-c`, `-r`)
+
+작업 중간에 터미널 꺼도 괜찮아요!
+
+```bash
+# 최근 대화 바로 이어서
+claude -c
+
+# 이전 대화 목록에서 선택
+claude -r
+```
+
+**활용 팁**: 큰 리팩토링 작업을 여러 세션에 걸쳐 진행할 때 유용하다.
+컨텍스트가 유지되어 "아까 그거 계속해줘" 같은 말이 통한다!
+
+---
+
+### 2. **자동 커밋** (`claude commit`)
+
+코드 작성 후 커밋 메시지 고민하기 귀찮을 때:
+
+```bash
+claude commit
+```
+
+Claude가 변경사항을 분석해서 **의미 있는 커밋 메시지**를 자동으로 작성해준다.
+
+**실제 예시**:
+
+```
+Add user authentication middleware
+
+- Implement JWT token verification
+- Add role-based access control
+- Include error handling for expired tokens
+
+🤖 Generated with Claude Code
+```
+
+---
+
+### 3. **자연어 명령이 최고다**
+
+구체적으로 말할수록 좋은 결과가 나온다.
+
+**❌ 안 좋은 예**:
+
+```
+"이 버그 고쳐줘"
+```
+
+**✅ 좋은 예**:
+
+```
+"회원가입 폼에서 빈 이메일로 제출했을 때
+400 에러 대신 프론트엔드에서 검증하도록 수정해줘"
+```
+
+---
+
+## 🛠️ 실전 워크플로우
+
+### 새 프로젝트 분석하기
+
+```bash
+claude "이 프로젝트 구조 설명해주고,
+      주요 컴포넌트가 어떻게 연결되어 있는지 알려줘"
+```
+
+Claude가 코드베이스를 스캔해서 아키텍처를 파악해준다.
+
+---
+
+### 리팩토링 작업
+
+```bash
+claude "utils/api.js의 콜백 패턴을
+      async/await으로 바꿔주고,
+      에러 핸들링도 개선해줘"
+```
+
+**Tip**: 한 번에 너무 많은 파일을 요청하면 컨텍스트가 넘칠 수 있다.
+파일 단위로 나눠서 요청하는 게 좋다.
+
+---
+
+### 테스트 작성
+
+```bash
+claude "components/Calculator.jsx에 대한
+      Jest 단위 테스트 작성해줘.
+      엣지 케이스도 포함해서"
+```
+
+---
+
+## 🎨 고급 기능들
+
+### Plan Mode
+
+복잡한 작업은 계획부터!
+
+```bash
+# Plan Mode는 대화 중에 자동으로 활성화됩니다
+claude
+
+> "User 테이블에 2FA 기능 추가하고 싶은데,
+   어떻게 접근하는 게 좋을까?"
+```
+
+Claude가 단계별 계획을 제시하고, 승인 후에 실행한다.
+
+---
+
+### 병렬 작업 (Git Worktrees)
+
+여러 기능을 동시에 개발할 때:
+
+```bash
+# 메인 브랜치에서
+git worktree add ../my-project-feature1 feature/add-auth
+
+# 각 디렉토리에서 claude 실행
+cd ../my-project-feature1
+claude "인증 기능 구현해줘"
+```
+
+**여러 터미널에서 동시에 Claude를 돌릴 수 있어요!**
+
+---
+
+### Extended Thinking (깊은 사고 모드)
+
+난이도 높은 알고리즘 문제나 복잡한 아키텍처 설계에 사용:
+
+```bash
+claude --extended-thinking "최적의 캐싱 전략을 설계해줘.
+                            Redis와 CDN을 함께 사용하고,
+                            invalidation 정책도 고려해서"
+```
+
+더 깊게 분석하고 여러 옵션을 비교해준다.
+
+---
+
+## 🔧 커스터마이징 꿀팁
+
+### 1. 슬래시 명령어 만들기
+
+프로젝트 루트에 `.claude/commands/` 디렉토리 생성:
+
+```bash
+mkdir -p .claude/commands
+```
+
+**예시**: `.claude/commands/review.md`
+
+```markdown
+현재 브랜치의 변경사항을 리뷰해주세요:
+
+1. 코드 스타일 체크
+2. 잠재적 버그 찾기
+3. 성능 개선 제안
+4. 보안 이슈 확인
+```
+
+**사용**:
+
+```bash
+claude
+
+> /review
+```
+
+---
+
+### 2. Hooks로 자동화
+
+`.claude/settings.json`에서 설정:
+
+```json
+{
+  "hooks": {
+    "beforeWrite": "npm run format",
+    "afterCommit": "npm test"
+  }
+}
+```
+
+파일 쓰기 전에 자동 포맷, 커밋 후 자동 테스트 실행!
+
+---
+
+## 💡 실전 활용 시나리오
+
+### 시나리오 1: 버그 급하게 고치기
+
+```bash
+claude "production에서 로그인 안 되는 버그 있어.
+      src/auth/ 디렉토리 중심으로 원인 찾고 수정해줘"
+```
+
+Claude가 관련 파일들을 분석하고 문제를 찾아준다.
+
+---
+
+### 시나리오 2: 레거시 코드 이해하기
+
+```bash
+claude "lib/legacy-payment.js가 정확히 뭐하는 건지
+      설명해주고, 주석도 추가해줘"
+```
+
+---
+
+### 시나리오 3: 문서화
+
+```bash
+claude "README.md 업데이트해줘.
+      최근 추가된 API 엔드포인트들 포함해서"
+```
+
+---
+
+## ⚠️ 주의할 점
+
+### 1. 컨텍스트 관리
+
+너무 많은 파일을 한 번에 열면 토큰 한계에 도달할 수 있어요.
+
+**해결책**: 작업을 작은 단위로 나누기
+
+---
+
+### 2. 생성된 코드 검토하기
+
+AI가 완벽하지 않으니 **반드시 리뷰**하세요!
+
+특히:
+
+- 보안 관련 코드 (인증, 암호화)
+- 데이터베이스 쿼리
+- API 키 하드코딩 여부
+
+---
+
+### 3. `.gitignore` 체크
+
+민감한 파일들은 `.gitignore`에 추가해서 Claude가 접근하지 못하게 하세요.
+
+---
+
+## 📊 비용 관리 팁
+
+Claude Code는 API 사용량에 따라 비용이 발생한다.
+
+**비용 확인**:
+
+```bash
+claude
+
+> /cost
+```
+
+**절약 팁**:
+
+- 간단한 질문은 `-p` 옵션으로 짧게
+- 필요 없는 파일은 컨텍스트에서 제외
+- Plan Mode로 미리 검토 후 실행
+
+---
+
+## 🚀 생산성 10배 올리는 콤보
+
+제가 실제로 쓰는 워크플로우:
+
+```bash
+# 1. 새 기능 브랜치 생성
+git checkout -b feature/new-feature
+
+# 2. Claude로 구현
+claude "User 프로필 사진 업로드 기능 추가.
+      S3 업로드, 리사이징, 썸네일 생성 포함"
+
+# 3. 자동 커밋
+claude commit
+
+# 4. 테스트 작성
+claude "방금 만든 기능에 대한 통합 테스트 작성"
+
+# 5. PR 생성
+claude "현재 변경사항으로 GitHub PR 만들어줘"
+```
+
+**5단계로 기능 개발 완료!**
+
+---
+
+**참고 자료**:
+
+- [Claude Code 공식 문서](https://code.claude.com/docs)
+- [GitHub 저장소](https://github.com/anthropics/claude-code)
+
+---
