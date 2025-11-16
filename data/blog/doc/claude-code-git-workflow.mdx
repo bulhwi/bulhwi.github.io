@@ -221,7 +221,7 @@ Closes #123
 
 `.claude/CLAUDE.md`:
 
-```markdown
+````markdown
 ## Pull Request Template
 
 When creating PRs, include:
@@ -235,26 +235,32 @@ When creating PRs, include:
 7. **Related Issues**: Link to issues
 
 Format:
-```
 
+```markdown
 ## What & Why
 
-[Description]
+Added user profile editing feature to allow users to update their personal information and profile pictures.
 
 ## Technical Approach
 
-- [Key changes]
+- Created `/api/users/[id]/profile` PUT endpoint with authentication middleware
+- Integrated `sharp` library for server-side image resizing (max 800x800px)
+- Added S3 bucket integration for profile image storage
+- Implemented form validation using `zod` schema
+- Updated User model to include `profileImageUrl` field
 
 ## Testing
 
-- [ ] Unit tests passing
-- [ ] Manual testing completed
-- [ ] E2E tests added
+- [ ] Unit tests passing (auth middleware, image processing)
+- [ ] Manual testing completed (upload various image formats)
+- [ ] E2E tests added (user journey: login → edit profile → verify changes)
+- [ ] Tested with images > 5MB (should reject)
+- [ ] Verified S3 bucket permissions
 
 ## Related Issues
 
-Closes #[issue-number]
-
+Closes #42
+```
 ````
 
 ---
@@ -273,7 +279,7 @@ Closes #[issue-number]
     "beforePush": "npm test"
   }
 }
-````
+```
 
 **동작 방식**:
 
