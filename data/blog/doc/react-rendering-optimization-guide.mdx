@@ -1,0 +1,906 @@
+---
+title: 'React 렌더링 최적화 실전 가이드'
+date: '2025-11-17'
+tags: ['react', 'performance', 'optimization', 'frontend', 'rendering']
+draft: false
+summary: '불필요한 리렌더링을 찾아 제거하고, memo/useMemo/useCallback을 올바르게 사용하며, Context API 성능 이슈를 해결하는 실전 최적화 전략을 정리했습니다.'
+images: []
+layout: PostSimple
+canonicalUrl: https://bulhwi.github.io/blog/react-rendering-optimization-guide
+---
+
+## 목차
+
+1. [렌더링 최적화가 필요한 이유](#렌더링-최적화가-필요한-이유)
+2. [불필요한 리렌더링 원인 파악](#불필요한-리렌더링-원인-파악)
+3. [React.memo 활용](#reactmemo-활용)
+4. [useMemo와 useCallback](#usememo와-usecallback)
+5. [Context API 성능 최적화](#context-api-성능-최적화)
+6. [리스트 렌더링 최적화](#리스트-렌더링-최적화)
+7. [상태 관리 최적화](#상태-관리-최적화)
+8. [실전 최적화 체크리스트](#실전-최적화-체크리스트)
+
+---
+
+## 렌더링 최적화가 필요한 이유
+
+### 렌더링이란?
+
+React에서 렌더링은 컴포넌트 함수를 실행해서 JSX를 반환하는 과정입니다.
+
+```jsx
+function MyComponent() {
+  console.log('렌더링 발생!'); // 이 로그가 찍힐 때마다 렌더링
+  return <div>Hello</div>;
+}
+```
+
+### 언제 렌더링이 발생하나?
+
+1. **State가 변경될 때**
+2. **Props가 변경될 때**
+3. **부모 컴포넌트가 렌더링될 때**
+4. **Context 값이 변경될 때**
+
+### 문제: 불필요한 렌더링
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <ExpensiveChild /> {/* count와 무관하지만 매번 리렌더링됨 */}
+    </div>
+  );
+}
+
+function ExpensiveChild() {
+  console.log('ExpensiveChild 렌더링'); // count 변경 시마다 찍힘
+  // 무거운 계산...
+  return <div>...</div>;
+}
+```
+
+**결과**: `count`가 바뀔 때마다 `ExpensiveChild`도 리렌더링됨
+
+---
+
+## 불필요한 리렌더링 원인 파악
+
+### React DevTools Profiler 사용
+
+**1. 설치**
+
+Chrome/Firefox Extension: React Developer Tools
+
+**2. 프로파일링 시작**
+
+1. DevTools → Profiler 탭
+2. 🔴 녹화 시작
+3. 앱 조작 (버튼 클릭 등)
+4. ⏹️ 녹화 중지
+
+**3. 결과 분석**
+
+- **Ranked Chart**: 렌더링 시간이 긴 컴포넌트 순위
+- **Flame Graph**: 컴포넌트 트리별 렌더링 시간
+- **Why did this render?**: 렌더링 원인 표시
+
+### 콘솔 로그로 확인
+
+```jsx
+function MyComponent({ data }) {
+  console.log('MyComponent 렌더링', { data });
+
+  return <div>{data.name}</div>;
+}
+```
+
+**주의**: 프로덕션에서는 제거!
+
+---
+
+## React.memo 활용
+
+### 기본 사용법
+
+`React.memo`는 props가 변경되지 않으면 리렌더링을 건너뜁니다.
+
+**❌ Before:**
+
+```jsx
+function ExpensiveComponent({ data }) {
+  console.log('ExpensiveComponent 렌더링');
+  // 무거운 계산...
+  return <div>{data.name}</div>;
+}
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const data = { name: 'John' }; // 매번 새 객체 생성
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <ExpensiveComponent data={data} /> {/* 매번 리렌더링 */}
+    </div>
+  );
+}
+```
+
+**✅ After:**
+
+```jsx
+const ExpensiveComponent = React.memo(({ data }) => {
+  console.log('ExpensiveComponent 렌더링');
+  return <div>{data.name}</div>;
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const data = useMemo(() => ({ name: 'John' }), []); // 메모이제이션
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <ExpensiveComponent data={data} /> {/* data 변경 시에만 리렌더링 */}
+    </div>
+  );
+}
+```
+
+### 커스텀 비교 함수
+
+기본적으로 `React.memo`는 얕은 비교(shallow comparison)를 합니다.
+
+```jsx
+const MyComponent = React.memo(
+  ({ user }) => {
+    return <div>{user.name}</div>;
+  },
+  (prevProps, nextProps) => {
+    // true를 반환하면 리렌더링 건너뜀
+    // false를 반환하면 리렌더링 실행
+    return prevProps.user.id === nextProps.user.id;
+  }
+);
+```
+
+### React.memo를 사용하지 말아야 할 때
+
+**1. Props가 자주 변경되는 경우**
+
+```jsx
+// ❌ 나쁜 예: 매번 props가 바뀌므로 memo 의미 없음
+const LiveClock = React.memo(({ time }) => {
+  return <div>{time}</div>;
+});
+
+function App() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <LiveClock time={time} />;
+}
+```
+
+**2. 컴포넌트가 간단한 경우**
+
+```jsx
+// ❌ 불필요: 렌더링 비용보다 memo 비용이 더 클 수 있음
+const SimpleButton = React.memo(({ label }) => {
+  return <button>{label}</button>;
+});
+```
+
+**3. 항상 새로운 참조를 받는 경우**
+
+```jsx
+// ❌ 나쁜 예: 매번 새 함수가 전달됨
+function Parent() {
+  return <MemoizedChild onClick={() => console.log('clicked')} />;
+}
+```
+
+---
+
+## useMemo와 useCallback
+
+### useMemo: 계산 결과 메모이제이션
+
+**언제 사용?**
+
+- 무거운 계산이 있을 때
+- 참조 동일성이 중요할 때
+
+**❌ Before:**
+
+```jsx
+function ProductList({ products, filter }) {
+  // 매 렌더링마다 재계산됨
+  const filteredProducts = products.filter((p) => p.category === filter);
+
+  return (
+    <div>
+      {filteredProducts.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
+    </div>
+  );
+}
+```
+
+**✅ After:**
+
+```jsx
+function ProductList({ products, filter }) {
+  // filter나 products가 바뀔 때만 재계산
+  const filteredProducts = useMemo(() => {
+    console.log('필터링 실행');
+    return products.filter((p) => p.category === filter);
+  }, [products, filter]);
+
+  return (
+    <div>
+      {filteredProducts.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
+    </div>
+  );
+}
+```
+
+### useCallback: 함수 메모이제이션
+
+**언제 사용?**
+
+- 함수를 자식 컴포넌트에 props로 전달할 때
+- 함수가 useEffect 의존성 배열에 있을 때
+
+**❌ Before:**
+
+```jsx
+function TodoList({ todos }) {
+  const handleDelete = (id) => {
+    // 삭제 로직...
+  };
+
+  return (
+    <div>
+      {todos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} onDelete={handleDelete} />
+        // 매 렌더링마다 새 함수가 전달됨
+      ))}
+    </div>
+  );
+}
+
+const TodoItem = React.memo(({ todo, onDelete }) => {
+  return (
+    <div>
+      {todo.title}
+      <button onClick={() => onDelete(todo.id)}>삭제</button>
+    </div>
+  );
+});
+```
+
+**✅ After:**
+
+```jsx
+function TodoList({ todos }) {
+  const handleDelete = useCallback((id) => {
+    // 삭제 로직...
+  }, []); // 의존성 없으면 한 번만 생성
+
+  return (
+    <div>
+      {todos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} onDelete={handleDelete} />
+      ))}
+    </div>
+  );
+}
+```
+
+### 안티패턴: 과도한 사용
+
+**❌ 나쁜 예:**
+
+```jsx
+function MyComponent() {
+  // 불필요한 useMemo
+  const value = useMemo(() => 1 + 1, []);
+
+  // 불필요한 useCallback
+  const handleClick = useCallback(() => {
+    console.log('clicked');
+  }, []);
+
+  return <button onClick={handleClick}>{value}</button>;
+}
+```
+
+**언제 사용하지 말아야 할까?**
+
+- 간단한 계산
+- 컴포넌트 내부에서만 사용되는 함수
+- 의존성 배열이 매번 바뀌는 경우
+
+---
+
+## Context API 성능 최적화
+
+### 문제: Context 값 변경 시 모든 Consumer 리렌더링
+
+**❌ Before:**
+
+```jsx
+const UserContext = createContext();
+
+function UserProvider({ children }) {
+  const [user, setUser] = useState({ name: 'John', age: 30 });
+  const [theme, setTheme] = useState('light');
+
+  const value = {
+    user,
+    setUser,
+    theme,
+    setTheme,
+  };
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+function UserName() {
+  const { user } = useContext(UserContext);
+  console.log('UserName 렌더링'); // theme 변경 시에도 리렌더링됨!
+  return <div>{user.name}</div>;
+}
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useContext(UserContext);
+  return <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
+}
+```
+
+### 해결 1: Context 분리
+
+**✅ After:**
+
+```jsx
+// User Context
+const UserContext = createContext();
+
+function UserProvider({ children }) {
+  const [user, setUser] = useState({ name: 'John', age: 30 });
+  const value = useMemo(() => ({ user, setUser }), [user]);
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+// Theme Context (분리)
+const ThemeContext = createContext();
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+// 사용
+function UserName() {
+  const { user } = useContext(UserContext);
+  console.log('UserName 렌더링'); // user 변경 시에만 렌더링
+  return <div>{user.name}</div>;
+}
+```
+
+### 해결 2: Context Selector 패턴
+
+```jsx
+// use-context-selector 라이브러리 사용
+import { createContext, useContextSelector } from 'use-context-selector';
+
+const UserContext = createContext();
+
+function UserName() {
+  // user.name만 선택
+  const userName = useContextSelector(UserContext, (v) => v.user.name);
+
+  console.log('UserName 렌더링'); // user.name 변경 시에만 렌더링
+  return <div>{userName}</div>;
+}
+```
+
+### 해결 3: 상태 관리 라이브러리 사용
+
+Context API가 복잡해지면 Zustand, Jotai 같은 라이브러리 고려:
+
+```jsx
+// Zustand 예시
+import create from 'zustand';
+
+const useStore = create((set) => ({
+  user: { name: 'John', age: 30 },
+  theme: 'light',
+  setUser: (user) => set({ user }),
+  setTheme: (theme) => set({ theme }),
+}));
+
+function UserName() {
+  // user만 구독
+  const user = useStore((state) => state.user);
+  console.log('UserName 렌더링'); // user 변경 시에만 렌더링
+  return <div>{user.name}</div>;
+}
+```
+
+---
+
+## 리스트 렌더링 최적화
+
+### 1. 올바른 key 사용
+
+**❌ 나쁜 예:**
+
+```jsx
+// 인덱스를 key로 사용 (항목 순서가 바뀌면 문제)
+{
+  todos.map((todo, index) => <TodoItem key={index} todo={todo} />);
+}
+
+// 랜덤 값을 key로 사용 (매번 새로 생성됨)
+{
+  todos.map((todo) => <TodoItem key={Math.random()} todo={todo} />);
+}
+```
+
+**✅ 좋은 예:**
+
+```jsx
+// 고유 ID 사용
+{
+  todos.map((todo) => <TodoItem key={todo.id} todo={todo} />);
+}
+```
+
+### 2. 리스트 아이템 메모이제이션
+
+```jsx
+const TodoItem = React.memo(({ todo, onToggle, onDelete }) => {
+  console.log('TodoItem 렌더링:', todo.id);
+
+  return (
+    <div>
+      <input type="checkbox" checked={todo.completed} onChange={() => onToggle(todo.id)} />
+      <span>{todo.title}</span>
+      <button onClick={() => onDelete(todo.id)}>삭제</button>
+    </div>
+  );
+});
+
+function TodoList({ todos }) {
+  const handleToggle = useCallback((id) => {
+    // 토글 로직...
+  }, []);
+
+  const handleDelete = useCallback((id) => {
+    // 삭제 로직...
+  }, []);
+
+  return (
+    <div>
+      {todos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} onToggle={handleToggle} onDelete={handleDelete} />
+      ))}
+    </div>
+  );
+}
+```
+
+### 3. Virtual List (긴 리스트)
+
+수천 개 이상의 아이템이 있을 때는 가상화(Virtualization) 사용:
+
+```jsx
+import { FixedSizeList } from 'react-window';
+
+function VirtualizedList({ items }) {
+  const Row = ({ index, style }) => <div style={style}>{items[index].name}</div>;
+
+  return (
+    <FixedSizeList
+      height={600} // 보이는 영역 높이
+      itemCount={items.length}
+      itemSize={50} // 각 아이템 높이
+      width="100%"
+    >
+      {Row}
+    </FixedSizeList>
+  );
+}
+```
+
+**라이브러리:**
+
+- `react-window` (가볍고 빠름)
+- `react-virtualized` (더 많은 기능)
+- `@tanstack/react-virtual` (최신)
+
+---
+
+## 상태 관리 최적화
+
+### 1. 상태를 가까운 곳에 배치
+
+**❌ Before:**
+
+```jsx
+function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <div>
+      <Header /> {/* searchQuery 변경 시 리렌더링됨 */}
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      <ProductList query={searchQuery} />
+      <Footer /> {/* searchQuery 변경 시 리렌더링됨 */}
+    </div>
+  );
+}
+```
+
+**✅ After:**
+
+```jsx
+function App() {
+  return (
+    <div>
+      <Header />
+      <SearchSection /> {/* 상태를 이 안으로 이동 */}
+      <Footer />
+    </div>
+  );
+}
+
+function SearchSection() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  return (
+    <div>
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      <ProductList query={searchQuery} />
+    </div>
+  );
+}
+```
+
+### 2. 상태 분리
+
+**❌ Before:**
+
+```jsx
+function Form() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    // 한 필드만 바뀌어도 전체 formData가 새 객체로 생성됨
+  };
+
+  return (
+    <div>
+      <NameInput value={formData.name} onChange={(v) => handleChange('name', v)} />
+      <EmailInput value={formData.email} onChange={(v) => handleChange('email', v)} />
+      <MessageInput value={formData.message} onChange={(v) => handleChange('message', v)} />
+    </div>
+  );
+}
+```
+
+**✅ After:**
+
+```jsx
+function Form() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  return (
+    <div>
+      <NameInput value={name} onChange={setName} />
+      <EmailInput value={email} onChange={setEmail} />
+      <MessageInput value={message} onChange={setMessage} />
+    </div>
+  );
+}
+```
+
+### 3. 불변성 유지
+
+**❌ 나쁜 예:**
+
+```jsx
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+
+  const addTodo = (text) => {
+    todos.push({ id: Date.now(), text }); // ❌ 직접 수정
+    setTodos(todos); // React가 변경 감지 못함
+  };
+}
+```
+
+**✅ 좋은 예:**
+
+```jsx
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+
+  const addTodo = (text) => {
+    setTodos([...todos, { id: Date.now(), text }]); // ✅ 새 배열 생성
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map(
+        (todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo) // ✅ 새 객체 생성
+      )
+    );
+  };
+}
+```
+
+**Immer 라이브러리 활용:**
+
+```jsx
+import { useImmer } from 'use-immer';
+
+function TodoList() {
+  const [todos, setTodos] = useImmer([]);
+
+  const addTodo = (text) => {
+    setTodos((draft) => {
+      draft.push({ id: Date.now(), text }); // ✅ 직접 수정해도 됨 (Immer가 처리)
+    });
+  };
+}
+```
+
+---
+
+## 실전 최적화 체크리스트
+
+### 측정 먼저, 최적화는 나중에
+
+**1. 프로파일링**
+
+```jsx
+// React DevTools Profiler 사용
+// 또는
+import { Profiler } from 'react';
+
+function App() {
+  const onRenderCallback = (
+    id,
+    phase,
+    actualDuration,
+    baseDuration,
+    startTime,
+    commitTime,
+    interactions
+  ) => {
+    console.log(`${id} (${phase}) took ${actualDuration}ms`);
+  };
+
+  return (
+    <Profiler id="App" onRender={onRenderCallback}>
+      <MyApp />
+    </Profiler>
+  );
+}
+```
+
+### 최적화 우선순위
+
+**1. 가장 먼저 확인할 것:**
+
+- [ ] 불필요한 상태 업데이트
+- [ ] 너무 넓은 범위의 상태
+- [ ] Context 값이 매번 새로 생성되는지
+
+**2. 컴포넌트 레벨:**
+
+- [ ] 무거운 컴포넌트에만 `React.memo` 적용
+- [ ] Props로 전달되는 함수에 `useCallback`
+- [ ] Props로 전달되는 객체/배열에 `useMemo`
+
+**3. 리스트:**
+
+- [ ] 올바른 `key` 사용
+- [ ] 리스트 아이템 메모이제이션
+- [ ] 1000개 이상이면 가상화 고려
+
+### 성능 측정 도구
+
+**1. React DevTools Profiler**
+
+- 컴포넌트별 렌더링 시간
+- 렌더링 원인 파악
+
+**2. Chrome DevTools Performance**
+
+- 전체 성능 프로파일
+- JavaScript 실행 시간
+- 레이아웃/페인트 시간
+
+**3. Lighthouse**
+
+- 전체 앱 성능 점수
+- FCP, LCP, TTI 측정
+
+### 주의사항
+
+⚠️ **조기 최적화는 악의 근원**
+
+- 성능 문제가 실제로 있을 때만 최적화
+- 측정 없이 추측하지 않기
+
+⚠️ **과도한 메모이제이션**
+
+- 모든 컴포넌트에 `memo` 적용 ❌
+- 모든 함수에 `useCallback` ❌
+- 간단한 계산에 `useMemo` ❌
+
+⚠️ **의존성 배열 주의**
+
+```jsx
+// ❌ 나쁜 예: 의존성 누락
+const fetchData = useCallback(() => {
+  fetch(`/api/data?id=${userId}`); // userId 의존성 누락
+}, []); // ESLint 경고 무시하지 말기!
+
+// ✅ 좋은 예
+const fetchData = useCallback(() => {
+  fetch(`/api/data?id=${userId}`);
+}, [userId]);
+```
+
+---
+
+## 실전 사례
+
+### 사례 1: 검색 필터
+
+**문제:** 타이핑할 때마다 전체 상품 목록 필터링
+
+```jsx
+function ProductSearch() {
+  const [products] = useState(/* 1000개 상품 */);
+  const [query, setQuery] = useState('');
+
+  // ❌ 매 타이핑마다 1000개 필터링
+  const filtered = products.filter((p) => p.name.includes(query));
+
+  return (
+    <div>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <ProductList products={filtered} />
+    </div>
+  );
+}
+```
+
+**해결:**
+
+```jsx
+import { useDeferredValue, useMemo } from 'react';
+
+function ProductSearch() {
+  const [products] = useState(/* 1000개 상품 */);
+  const [query, setQuery] = useState('');
+
+  // 1. Debounce된 값 사용
+  const deferredQuery = useDeferredValue(query);
+
+  // 2. 메모이제이션
+  const filtered = useMemo(() => {
+    return products.filter((p) => p.name.includes(deferredQuery));
+  }, [products, deferredQuery]);
+
+  return (
+    <div>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <ProductList products={filtered} />
+    </div>
+  );
+}
+```
+
+### 사례 2: 중첩된 리스트
+
+**문제:** 카테고리별 상품 목록
+
+```jsx
+function CategoryList({ categories }) {
+  return (
+    <div>
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h2>{category.name}</h2>
+          {category.products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+            // ❌ 최상위 state 변경 시 모든 ProductCard 리렌더링
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+**해결:**
+
+```jsx
+// 카테고리를 별도 컴포넌트로 분리
+const Category = React.memo(({ category }) => {
+  return (
+    <div>
+      <h2>{category.name}</h2>
+      {category.products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+});
+
+const ProductCard = React.memo(({ product }) => {
+  return <div>{product.name}</div>;
+});
+
+function CategoryList({ categories }) {
+  return (
+    <div>
+      {categories.map((category) => (
+        <Category key={category.id} category={category} />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 마치며
+
+### 핵심 원칙
+
+1. **측정 먼저** - DevTools Profiler 활용
+2. **상태를 가까이** - 필요한 곳에만 상태 배치
+3. **적절한 메모이제이션** - 무거운 계산, 자주 전달되는 props에만
+4. **Context 분리** - 자주 바뀌는 값과 그렇지 않은 값 분리
+5. **올바른 key** - 리스트 렌더링 최적화의 기본
+
+### 다음 단계
+
+- React 공식 문서의 [Performance](https://react.dev/learn/render-and-commit) 섹션
+- [React DevTools Profiler 가이드](https://react.dev/learn/react-developer-tools)
+- [useDeferredValue](https://react.dev/reference/react/useDeferredValue) 공식 문서
+
+---
+
+**작성일:** 2025-11-17
+**마지막 수정:** 2025-11-17
