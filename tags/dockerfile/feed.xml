@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>bulhwi.github.io</title>
+      <link>https://bulhwi.github.io/blog</link>
+      <description>-</description>
+      <language>en-us</language>
+      <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
+      <webMaster>address@yoursite.com (bulhwi)</webMaster>
+      <lastBuildDate>Mon, 17 Nov 2025 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://bulhwi.github.io/tags/dockerfile/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/dockerfile-best-practices-by-framework</guid>
+    <title>실전 Dockerfile 작성 패턴: 프레임워크별 베스트 프랙티스</title>
+    <link>https://bulhwi.github.io/blog/doc/dockerfile-best-practices-by-framework</link>
+    <description>Next.js, React, Express, NestJS, FastAPI 등 주요 프레임워크별로 최적화된 Dockerfile 작성법과 멀티스테이지 빌드, 보안, 캐시 최적화 전략을 실전 예시와 함께 정리했습니다.</description>
+    <pubDate>Mon, 17 Nov 2025 00:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>docker</category><category>dockerfile</category><category>nextjs</category><category>react</category><category>nodejs</category><category>python</category><category>devops</category>
+  </item>
+
+    </channel>
+  </rss>
