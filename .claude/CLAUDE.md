@@ -87,6 +87,47 @@ Tailwind CSS 커스터마이징:
 
 ## 블로그 포스트 작성 가이드
 
+### ⚠️ 중요: 기술 정보 검증 원칙
+
+블로그 포스트 작성 시 **반드시** 다음 원칙을 준수하세요:
+
+#### 1. 패키지/라이브러리 정보 검증
+
+- npm 패키지명을 언급할 때는 **반드시 WebSearch로 검증**
+- 공식 문서가 있는지 확인
+- deprecated/archived 여부 확인
+- 보안 취약점 여부 확인
+
+**검증 필수 항목:**
+
+- MCP 서버 패키지 (`@modelcontextprotocol/*`, `mcp-*`)
+- 프레임워크 특화 도구 (Next.js, React, Vite 등)
+- 설정 예시 코드의 정확성
+
+#### 2. 코드 예시 검증
+
+- 문법이 실제로 작동하는지 확인
+- 프레임워크 최신 버전과 호환되는지 확인
+- Breaking changes 정보가 정확한지 검증
+
+#### 3. 설정 파일 예시 검증
+
+- 파일 경로가 정확한지 확인 (예: `.mcp.json` vs `~/.claude/mcp.json`)
+- 환경 변수 접두사 확인 (`REACT_APP_`, `NEXT_PUBLIC_`, `VITE_`)
+- API 엔드포인트 형식 확인
+
+#### 4. 불확실한 정보 처리
+
+- 확신이 없으면 **작성하지 않음**
+- 추측성 정보는 절대 금지
+- 검증 불가능한 내용은 제외
+
+#### 5. 독자를 위한 책임
+
+- 독자가 실제로 따라할 수 있는 정보만 작성
+- 에러를 유발할 수 있는 잘못된 정보는 독자에게 큰 피해
+- "실제 사용 가능한 정보"를 최우선 가치로
+
 ### Frontmatter 필드
 
 ```yaml
@@ -239,8 +280,9 @@ npm run lint
 
 ### 최근 작업
 
-- Effective TypeScript Item 7 작성 중
-- 부제목 및 메타데이터 업데이트
+- Claude Code 에러 디버깅 실전 가이드 완료 (2025-11-17)
+- Claude Code Plan Mode 완벽 활용 가이드 완료 (2025-11-16)
+- 모든 MCP 패키지 정보 검증 완료
 
 ## 문제 해결
 
@@ -269,4 +311,30 @@ npm run lint
 
 ---
 
-**Last Updated**: 2025-11-16
+## 교훈: 거짓 정보 사례 (2025-11-17)
+
+### 발생한 문제
+
+에러 디버깅 가이드 작성 시 **검증되지 않은 MCP 패키지 정보**를 포함:
+
+1. `@modelcontextprotocol/server-postgres` - deprecated + 보안 취약점
+2. `@modelcontextprotocol/server-fetch` - npm에 존재하지 않음
+3. `@modelcontextprotocol/server-puppeteer` - 더 이상 지원 안 됨
+4. `@modelcontextprotocol/server-sqlite` - 잘못된 패키지명
+
+### 올바른 프로세스
+
+```
+정보 작성 전 → WebSearch 검증 → npm 존재 확인 → deprecated 확인 → 보안 취약점 확인 → 작성
+```
+
+### 재발 방지
+
+- **모든 패키지명은 WebSearch로 검증**
+- **공식 문서 링크 확인**
+- **불확실하면 작성하지 않음**
+- **독자가 실제로 사용할 수 있는 정보만 제공**
+
+---
+
+**Last Updated**: 2025-11-17
