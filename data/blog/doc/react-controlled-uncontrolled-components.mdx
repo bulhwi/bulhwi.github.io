@@ -1,0 +1,999 @@
+---
+title: 'React Form 패턴: Controlled vs Uncontrolled Component'
+date: '2025-11-17'
+tags: ['react', 'forms', 'controlled-component', 'uncontrolled-component', 'frontend']
+draft: false
+summary: 'React에서 폼을 다루는 두 가지 패턴인 Controlled Component와 Uncontrolled Component의 차이점, 각각의 사용 시기, 그리고 실전 활용 방법을 정리했습니다.'
+images: []
+layout: PostSimple
+canonicalUrl: https://bulhwi.github.io/blog/react-controlled-uncontrolled-components
+---
+
+## 목차
+
+1. [Controlled Component](#controlled-component)
+2. [Uncontrolled Component](#uncontrolled-component)
+3. [두 방식의 비교](#두-방식의-비교)
+4. [언제 어떤 것을 사용할까](#언제-어떤-것을-사용할까)
+5. [실전 활용 패턴](#실전-활용-패턴)
+6. [폼 라이브러리와의 관계](#폼-라이브러리와의-관계)
+
+---
+
+## Controlled Component
+
+### 개념
+
+React state가 입력 값의 "단일 진실 공급원(Single Source of Truth)"이 되는 방식입니다.
+
+```jsx
+function ControlledInput() {
+  const [value, setValue] = useState('');
+
+  return (
+    <input
+      type="text"
+      value={value} // state가 값을 결정
+      onChange={(e) => setValue(e.target.value)} // 사용자 입력 → state 업데이트
+    />
+  );
+}
+```
+
+**특징:**
+
+- 입력 값이 항상 React state에 저장됨
+- 값의 변경은 `onChange` 핸들러를 통해서만 가능
+- React가 데이터의 흐름을 완전히 제어
+
+### 기본 예시
+
+```jsx
+function LoginForm() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('제출된 데이터:', formData);
+    // API 호출 등...
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="이메일"
+      />
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="비밀번호"
+      />
+      <button type="submit">로그인</button>
+    </form>
+  );
+}
+```
+
+### 실시간 검증
+
+Controlled Component의 강력한 장점 중 하나는 실시간 검증입니다.
+
+```jsx
+function EmailInput() {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+
+    // 실시간 검증
+    if (value && !value.includes('@')) {
+      setError('올바른 이메일 형식이 아닙니다');
+    } else {
+      setError('');
+    }
+  };
+
+  return (
+    <div>
+      <input type="email" value={email} onChange={handleChange} placeholder="이메일을 입력하세요" />
+      {error && <span style={{ color: 'red' }}>{error}</span>}
+    </div>
+  );
+}
+```
+
+### 입력 값 제한
+
+```jsx
+function PhoneInput() {
+  const [phone, setPhone] = useState('');
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+
+    // 숫자와 하이픈만 허용
+    const formatted = value.replace(/[^\d-]/g, '');
+
+    // 최대 13자리 (010-1234-5678)
+    if (formatted.length <= 13) {
+      setPhone(formatted);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      value={phone}
+      onChange={handleChange}
+      placeholder="010-1234-5678"
+      maxLength={13}
+    />
+  );
+}
+```
+
+### 자동 포매팅
+
+```jsx
+function CreditCardInput() {
+  const [cardNumber, setCardNumber] = useState('');
+
+  const handleChange = (e) => {
+    const value = e.target.value.replace(/\s/g, ''); // 공백 제거
+    const digits = value.replace(/\D/g, ''); // 숫자만 추출
+
+    // 4자리마다 공백 추가
+    const formatted = digits.match(/.{1,4}/g)?.join(' ') || digits;
+
+    if (digits.length <= 16) {
+      setCardNumber(formatted);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      value={cardNumber}
+      onChange={handleChange}
+      placeholder="1234 5678 9012 3456"
+      maxLength={19} // 16자리 + 공백 3개
+    />
+  );
+}
+```
+
+### 다중 입력 관리
+
+```jsx
+function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    agreeToTerms: false,
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const isPasswordMatch = formData.password === formData.confirmPassword;
+  const canSubmit =
+    formData.username &&
+    formData.email &&
+    formData.password &&
+    isPasswordMatch &&
+    formData.agreeToTerms;
+
+  return (
+    <form>
+      <input
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+        placeholder="사용자명"
+      />
+
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="이메일"
+      />
+
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="비밀번호"
+      />
+
+      <input
+        type="password"
+        name="confirmPassword"
+        value={formData.confirmPassword}
+        onChange={handleChange}
+        placeholder="비밀번호 확인"
+      />
+      {formData.confirmPassword && !isPasswordMatch && (
+        <span style={{ color: 'red' }}>비밀번호가 일치하지 않습니다</span>
+      )}
+
+      <label>
+        <input
+          type="checkbox"
+          name="agreeToTerms"
+          checked={formData.agreeToTerms}
+          onChange={handleChange}
+        />
+        이용약관에 동의합니다
+      </label>
+
+      <button type="submit" disabled={!canSubmit}>
+        회원가입
+      </button>
+    </form>
+  );
+}
+```
+
+---
+
+## Uncontrolled Component
+
+### 개념
+
+DOM 자체가 입력 값의 진실 공급원이 되는 방식입니다. React ref를 사용해서 필요할 때만 값을 가져옵니다.
+
+```jsx
+function UncontrolledInput() {
+  const inputRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('입력된 값:', inputRef.current.value); // 제출 시점에만 값 읽기
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" ref={inputRef} defaultValue="" />
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+```
+
+**특징:**
+
+- 입력 값이 DOM에 저장됨
+- `defaultValue`로 초기값 설정
+- ref를 통해 필요할 때 값에 접근
+
+### 기본 예시
+
+```jsx
+function SimpleForm() {
+  const nameRef = useRef(null);
+  const emailRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name: nameRef.current.value,
+      email: emailRef.current.value,
+    };
+
+    console.log('제출된 데이터:', formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" ref={nameRef} defaultValue="" placeholder="이름" />
+      <input type="email" ref={emailRef} defaultValue="" placeholder="이메일" />
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+```
+
+### 파일 업로드
+
+파일 입력은 항상 Uncontrolled입니다. (보안상의 이유로 JavaScript에서 파일 입력의 값을 프로그래밍 방식으로 설정할 수 없음)
+
+```jsx
+function FileUpload() {
+  const fileInputRef = useRef(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const file = fileInputRef.current.files[0];
+    if (!file) {
+      alert('파일을 선택해주세요');
+      return;
+    }
+
+    setUploadedFile(file);
+    console.log('선택된 파일:', file.name, file.size);
+
+    // 실제 업로드 로직...
+    const formData = new FormData();
+    formData.append('file', file);
+    // fetch('/upload', { method: 'POST', body: formData })
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="file" ref={fileInputRef} accept="image/*" />
+      <button type="submit">업로드</button>
+      {uploadedFile && <p>선택된 파일: {uploadedFile.name}</p>}
+    </form>
+  );
+}
+```
+
+### 포커스 제어
+
+```jsx
+function SearchForm() {
+  const searchInputRef = useRef(null);
+
+  const handleClear = () => {
+    searchInputRef.current.value = ''; // 값 초기화
+    searchInputRef.current.focus(); // 포커스 이동
+  };
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 자동 포커스
+    searchInputRef.current.focus();
+  }, []);
+
+  return (
+    <div>
+      <input type="text" ref={searchInputRef} placeholder="검색어를 입력하세요" />
+      <button onClick={handleClear}>지우기</button>
+    </div>
+  );
+}
+```
+
+### FormData API 활용
+
+Uncontrolled Component는 `FormData` API와 잘 어울립니다.
+
+```jsx
+function ContactForm() {
+  const formRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(formRef.current);
+
+    // FormData에서 값 추출
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+    };
+
+    console.log('제출된 데이터:', data);
+
+    // 또는 직접 fetch로 전송
+    // fetch('/api/contact', { method: 'POST', body: formData })
+  };
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit}>
+      <input type="text" name="name" defaultValue="" placeholder="이름" />
+      <input type="email" name="email" defaultValue="" placeholder="이메일" />
+      <textarea name="message" defaultValue="" placeholder="메시지" />
+      <button type="submit">보내기</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 두 방식의 비교
+
+### Controlled Component
+
+**장점:**
+
+- 실시간 검증 가능
+- 입력 값 포매팅/제한 쉬움
+- 조건부 렌더링 가능 (입력 값에 따라 UI 변경)
+- 여러 컴포넌트에서 같은 state 공유 가능
+- 디버깅 쉬움 (React DevTools로 state 확인)
+
+**단점:**
+
+- 매 입력마다 리렌더링 발생
+- 보일러플레이트 코드 증가
+- 성능 오버헤드 (큰 폼에서)
+
+**코드 예시:**
+
+```jsx
+// 장점: 실시간 검증 & 조건부 렌더링
+function PasswordInput() {
+  const [password, setPassword] = useState('');
+  const strength = password.length < 6 ? 'weak' : password.length < 12 ? 'medium' : 'strong';
+
+  return (
+    <div>
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <span>강도: {strength}</span>
+      {strength === 'weak' && <p style={{ color: 'red' }}>비밀번호가 너무 짧습니다</p>}
+    </div>
+  );
+}
+```
+
+### Uncontrolled Component
+
+**장점:**
+
+- 간단한 구현 (보일러플레이트 적음)
+- 성능 우수 (리렌더링 없음)
+- 기존 HTML 폼과 통합 쉬움
+- 파일 업로드 등 특정 케이스에 필수
+
+**단점:**
+
+- 실시간 검증 어려움
+- 입력 값 제어 불가
+- 여러 컴포넌트에서 값 공유 어려움
+- 디버깅 어려움 (DOM 직접 확인 필요)
+
+**코드 예시:**
+
+```jsx
+// 장점: 간단한 구현
+function QuickFeedback() {
+  const inputRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const feedback = inputRef.current.value;
+    if (!feedback.trim()) {
+      alert('피드백을 입력해주세요');
+      return;
+    }
+    console.log('피드백:', feedback);
+    inputRef.current.value = ''; // 초기화
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <textarea ref={inputRef} placeholder="피드백을 남겨주세요" />
+      <button type="submit">보내기</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 언제 어떤 것을 사용할까
+
+### Controlled Component를 사용해야 할 때
+
+**1. 실시간 검증이 필요할 때**
+
+```jsx
+function EmailSignup() {
+  const [email, setEmail] = useState('');
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  return (
+    <div>
+      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      {email && !isValid && <span>올바른 이메일을 입력하세요</span>}
+      <button disabled={!isValid}>가입하기</button>
+    </div>
+  );
+}
+```
+
+**2. 입력 값에 따라 UI가 변경될 때**
+
+```jsx
+function DynamicForm() {
+  const [userType, setUserType] = useState('personal');
+
+  return (
+    <div>
+      <select value={userType} onChange={(e) => setUserType(e.target.value)}>
+        <option value="personal">개인</option>
+        <option value="business">기업</option>
+      </select>
+
+      {userType === 'business' && <input type="text" placeholder="사업자등록번호" />}
+    </div>
+  );
+}
+```
+
+**3. 입력 값을 포매팅해야 할 때**
+
+```jsx
+function PriceInput() {
+  const [price, setPrice] = useState('');
+
+  const handleChange = (e) => {
+    const value = e.target.value.replace(/,/g, '');
+    if (/^\d*$/.test(value)) {
+      // 숫자만 허용
+      const formatted = Number(value).toLocaleString();
+      setPrice(formatted);
+    }
+  };
+
+  return <input type="text" value={price} onChange={handleChange} placeholder="가격 입력" />;
+}
+```
+
+**4. 여러 컴포넌트에서 같은 값을 사용할 때**
+
+```jsx
+function SearchPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  return (
+    <div>
+      <SearchInput value={searchQuery} onChange={setSearchQuery} />
+      <SearchResults query={searchQuery} />
+      <SearchSuggestions query={searchQuery} />
+    </div>
+  );
+}
+```
+
+### Uncontrolled Component를 사용해야 할 때
+
+**1. 간단한 폼일 때**
+
+```jsx
+function NewsletterSignup() {
+  const emailRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const email = emailRef.current.value;
+    console.log('구독:', email);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="email" ref={emailRef} placeholder="이메일" />
+      <button type="submit">구독하기</button>
+    </form>
+  );
+}
+```
+
+**2. 파일 업로드**
+
+```jsx
+function ImageUpload() {
+  const fileRef = useRef(null);
+
+  const handleUpload = () => {
+    const file = fileRef.current.files[0];
+    if (!file) return;
+
+    // 업로드 로직...
+    console.log('업로드할 파일:', file.name);
+  };
+
+  return (
+    <div>
+      <input type="file" ref={fileRef} accept="image/*" />
+      <button onClick={handleUpload}>업로드</button>
+    </div>
+  );
+}
+```
+
+**3. 비React 라이브러리와 통합할 때**
+
+```jsx
+function TextEditor() {
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    // 가상의 에디터 라이브러리 초기화
+    const editor = initializeEditor(editorRef.current);
+
+    return () => {
+      editor.destroy();
+    };
+  }, []);
+
+  return <div ref={editorRef} />;
+}
+```
+
+**4. 성능이 중요한 대용량 폼**
+
+```jsx
+function LargeForm() {
+  const formRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(formRef.current);
+
+    // 50개 필드의 값을 한 번에 추출
+    const data = Object.fromEntries(formData);
+    console.log('제출:', data);
+  };
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit}>
+      {Array.from({ length: 50 }, (_, i) => (
+        <input key={i} name={`field${i}`} defaultValue="" />
+      ))}
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 실전 활용 패턴
+
+### 혼합 사용
+
+두 방식을 함께 사용하는 것도 가능합니다.
+
+```jsx
+function MixedForm() {
+  // Controlled: 실시간 검증 필요
+  const [email, setEmail] = useState('');
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Uncontrolled: 제출 시점에만 필요
+  const nameRef = useRef(null);
+  const messageRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const data = {
+      name: nameRef.current.value,
+      email: email,
+      message: messageRef.current.value,
+    };
+
+    console.log('제출:', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" ref={nameRef} placeholder="이름" />
+
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="이메일"
+      />
+      {email && !isEmailValid && <span style={{ color: 'red' }}>올바른 이메일을 입력하세요</span>}
+
+      <textarea ref={messageRef} placeholder="메시지" />
+
+      <button type="submit" disabled={!isEmailValid}>
+        보내기
+      </button>
+    </form>
+  );
+}
+```
+
+### 초기값 설정
+
+**Controlled:**
+
+```jsx
+function EditProfile({ user }) {
+  const [name, setName] = useState(user.name);
+  const [bio, setBio] = useState(user.bio);
+
+  return (
+    <form>
+      <input value={name} onChange={(e) => setName(e.target.value)} />
+      <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+    </form>
+  );
+}
+```
+
+**Uncontrolled:**
+
+```jsx
+function EditProfile({ user }) {
+  const nameRef = useRef(null);
+  const bioRef = useRef(null);
+
+  return (
+    <form>
+      <input ref={nameRef} defaultValue={user.name} />
+      <textarea ref={bioRef} defaultValue={user.bio} />
+    </form>
+  );
+}
+```
+
+### 폼 초기화
+
+**Controlled:**
+
+```jsx
+function ContactForm() {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+
+  const handleReset = () => {
+    setFormData({ name: '', email: '', message: '' });
+  };
+
+  return (
+    <form>
+      {/* inputs... */}
+      <button type="button" onClick={handleReset}>
+        초기화
+      </button>
+    </form>
+  );
+}
+```
+
+**Uncontrolled:**
+
+```jsx
+function ContactForm() {
+  const formRef = useRef(null);
+
+  const handleReset = () => {
+    formRef.current.reset(); // HTML 폼의 reset() 메서드 사용
+  };
+
+  return (
+    <form ref={formRef}>
+      {/* inputs... */}
+      <button type="button" onClick={handleReset}>
+        초기화
+      </button>
+    </form>
+  );
+}
+```
+
+### 동적 필드 추가
+
+**Controlled:**
+
+```jsx
+function DynamicFields() {
+  const [fields, setFields] = useState([{ id: 1, value: '' }]);
+
+  const addField = () => {
+    setFields([...fields, { id: Date.now(), value: '' }]);
+  };
+
+  const handleChange = (id, value) => {
+    setFields(fields.map((field) => (field.id === id ? { ...field, value } : field)));
+  };
+
+  return (
+    <div>
+      {fields.map((field) => (
+        <input
+          key={field.id}
+          value={field.value}
+          onChange={(e) => handleChange(field.id, e.target.value)}
+        />
+      ))}
+      <button onClick={addField}>필드 추가</button>
+    </div>
+  );
+}
+```
+
+**Uncontrolled:**
+
+```jsx
+function DynamicFields() {
+  const [fieldCount, setFieldCount] = useState(1);
+  const formRef = useRef(null);
+
+  const addField = () => {
+    setFieldCount((prev) => prev + 1);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(formRef.current);
+    const values = Array.from(formData.values());
+    console.log('모든 값:', values);
+  };
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit}>
+      {Array.from({ length: fieldCount }, (_, i) => (
+        <input key={i} name={`field${i}`} defaultValue="" />
+      ))}
+      <button type="button" onClick={addField}>
+        필드 추가
+      </button>
+      <button type="submit">제출</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 폼 라이브러리와의 관계
+
+### React Hook Form (Uncontrolled 기반)
+
+React Hook Form은 Uncontrolled 방식을 기반으로 하면서도 편리한 API를 제공합니다.
+
+```jsx
+import { useForm } from 'react-hook-form';
+
+function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email', { required: true, pattern: /^\S+@\S+$/i })} />
+      {errors.email && <span>올바른 이메일을 입력하세요</span>}
+
+      <input type="password" {...register('password', { required: true, minLength: 6 })} />
+      {errors.password && <span>비밀번호는 최소 6자 이상이어야 합니다</span>}
+
+      <button type="submit">로그인</button>
+    </form>
+  );
+}
+```
+
+**장점:**
+
+- Uncontrolled의 성능 + Controlled의 편의성
+- 리렌더링 최소화
+- 내장 검증 기능
+
+### Formik (Controlled 기반)
+
+Formik은 Controlled 방식을 기반으로 합니다.
+
+```jsx
+import { useFormik } from 'formik';
+
+function SignupForm() {
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validate: (values) => {
+      const errors = {};
+      if (!values.email.includes('@')) {
+        errors.email = '올바른 이메일을 입력하세요';
+      }
+      if (values.password.length < 6) {
+        errors.password = '비밀번호는 최소 6자 이상이어야 합니다';
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      <input
+        type="email"
+        name="email"
+        value={formik.values.email}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+      />
+      {formik.touched.email && formik.errors.email && <span>{formik.errors.email}</span>}
+
+      <input
+        type="password"
+        name="password"
+        value={formik.values.password}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+      />
+      {formik.touched.password && formik.errors.password && <span>{formik.errors.password}</span>}
+
+      <button type="submit">회원가입</button>
+    </form>
+  );
+}
+```
+
+**장점:**
+
+- Controlled의 모든 기능
+- 풍부한 검증 옵션
+- Yup 같은 스키마 검증 라이브러리와 통합
+
+---
+
+## 마치며
+
+### 선택 가이드
+
+**Controlled Component를 선택하세요:**
+
+- 실시간 검증이 필요할 때
+- 입력 값에 따라 UI가 변경될 때
+- 입력 값을 포매팅해야 할 때
+- 여러 컴포넌트에서 같은 값을 사용할 때
+
+**Uncontrolled Component를 선택하세요:**
+
+- 간단한 폼일 때
+- 파일 업로드가 필요할 때
+- 제출 시점에만 값이 필요할 때
+- 성능이 중요한 대용량 폼일 때
+
+### 실무 팁
+
+1. **작게 시작**: 간단한 폼은 Uncontrolled로 시작
+2. **필요에 따라 전환**: 요구사항이 복잡해지면 Controlled로 전환
+3. **혼합 사용**: 각 입력마다 적절한 방식 선택
+4. **라이브러리 고려**: 복잡한 폼은 React Hook Form이나 Formik 사용
+
+---
+
+**작성일:** 2025-11-17
+**마지막 수정:** 2025-11-17
