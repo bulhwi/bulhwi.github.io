@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Sun, 16 Nov 2025 22:30:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 17 Nov 2025 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/tags/optimization/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/react-rendering-optimization-guide</guid>
+    <title>React 렌더링 최적화 실전 가이드</title>
+    <link>https://bulhwi.github.io/blog/doc/react-rendering-optimization-guide</link>
+    <description>불필요한 리렌더링을 찾아 제거하고, memo/useMemo/useCallback을 올바르게 사용하며, Context API 성능 이슈를 해결하는 실전 최적화 전략을 정리했습니다.</description>
+    <pubDate>Mon, 17 Nov 2025 00:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>react</category><category>performance</category><category>optimization</category><category>frontend</category><category>rendering</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/claude-code-performance-cost-optimization</guid>
     <title>Claude Code 성능 최적화 및 비용 절약 완벽 가이드</title>
