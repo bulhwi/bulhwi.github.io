@@ -1,0 +1,1103 @@
+---
+title: 'Claude Code 에러 디버깅 실전 가이드'
+date: '2025-11-17'
+tags: ['claude-code', 'debugging', 'error-handling', 'troubleshooting']
+draft: false
+summary: 'Claude Code로 개발하다 만나는 각종 에러를 효과적으로 해결하는 방법과 실전 디버깅 전략을 정리했습니다.'
+images: []
+layout: PostSimple
+canonicalUrl: https://bulhwi.github.io/blog/claude-code-error-debugging-guide
+---
+
+## 목차
+
+1. [디버깅 기본 원칙](#디버깅-기본-원칙)
+2. [자주 만나는 에러 유형](#자주-만나는-에러-유형)
+3. [효과적인 에러 전달 방법](#효과적인-에러-전달-방법)
+4. [실전 디버깅 시나리오](#실전-디버깅-시나리오)
+5. [MCP를 활용한 디버깅](#mcp를-활용한-디버깅)
+6. [디버깅 생산성 팁](#디버깅-생산성-팁)
+
+---
+
+## 디버깅 기본 원칙
+
+### 1. 에러 메시지는 전체를 공유하라
+
+**나쁜 예:**
+
+- "에러 났어"
+- "빌드가 안 돼"
+- "타입 에러 발생"
+
+**좋은 예:**
+
+npm run build 실행했는데 다음 에러가 발생:
+
+```text
+Error: Module not found: Can't resolve '@/components/Button'
+at /Users/project/webpack.config.js:45:12
+
+전체 스택트레이스:
+...
+```
+
+### 2. 컨텍스트를 충분히 제공하라
+
+에러가 발생한 **상황**을 명확히 설명:
+
+- 어떤 작업 중이었는지
+- 어떤 파일을 수정했는지
+- 재현 방법
+
+**예시:**
+
+UserProfile 컴포넌트에 다크모드 추가 후 npm run dev 실행 시:
+
+```text
+TypeError: Cannot read property 'theme' of undefined
+  at UserProfile.jsx:23:15
+```
+
+변경한 파일:
+
+- components/UserProfile.jsx
+- contexts/ThemeContext.js
+
+### 3. 이미 시도한 방법을 알려줘라
+
+**예시:**
+
+CORS 에러 해결 시도:
+
+1. ✗ express cors 미들웨어 추가 → 여전히 발생
+2. ✗ proxy 설정 변경 → 변화 없음
+3. ✗ credentials: include 추가 → 동일 에러
+
+---
+
+## 자주 만나는 에러 유형
+
+### 1. TypeScript 타입 에러
+
+**에러:**
+
+```text
+Type 'string | undefined' is not assignable to type 'string'
+```
+
+**해결:**
+
+```typescript
+// 방법 1: Optional chaining + nullish coalescing
+const userId: string = user.id ?? '';
+
+// 방법 2: Type guard
+if (user.id) {
+  const userId: string = user.id;
+}
+
+// 방법 3: Non-null assertion (확실할 때만)
+const userId: string = user.id!;
+```
+
+---
+
+### 2. 모듈 해석 에러
+
+**에러:**
+
+```text
+Cannot find module '@/utils/helpers'
+```
+
+**원인:** tsconfig.json에는 있지만 webpack/vite 설정 누락
+
+**해결:**
+
+```javascript
+// vite.config.js
+export default {
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+};
+```
+
+---
+
+### 3. Undefined/Null 참조 에러
+
+**에러:**
+
+```text
+Cannot read properties of undefined (reading 'map')
+```
+
+**해결:**
+
+```jsx
+// 방법 1: 기본값 설정
+function ProductList({ products = [] }) {
+  return (
+    <div>
+      {products.map((p) => (
+        <Product key={p.id} {...p} />
+      ))}
+    </div>
+  );
+}
+
+// 방법 2: 조건부 렌더링
+function ProductList({ products }) {
+  if (!products?.length) return <div>Loading...</div>;
+
+  return (
+    <div>
+      {products.map((p) => (
+        <Product key={p.id} {...p} />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+### 4. 비동기 처리 에러
+
+**에러:**
+
+```text
+UnhandledPromiseRejectionWarning: Error: Request failed with status code 500
+```
+
+**해결:**
+
+```javascript
+async function fetchUser(id) {
+  try {
+    const response = await axios.get(`/api/users/${id}`);
+    return { data: response.data, error: null };
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    return {
+      data: null,
+      error: error.response?.data?.message || 'Failed to fetch user',
+    };
+  }
+}
+
+// React에서 사용
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadUser() {
+      const { data, error } = await fetchUser(userId);
+      if (error) {
+        setError(error);
+        toast.error(error);
+      } else {
+        setUser(data);
+      }
+    }
+    loadUser();
+  }, [userId]);
+
+  if (error) return <ErrorMessage message={error} />;
+  return <div>{user?.name}</div>;
+}
+```
+
+---
+
+### 5. 패키지 버전 충돌
+
+**에러:**
+
+```text
+npm ERR! peer dep missing: react@^18.0.0
+```
+
+**해결:**
+
+옵션 1: React 업그레이드
+
+```bash
+npm install react@^18.0.0 react-dom@^18.0.0
+```
+
+옵션 2: 호환되는 버전 사용
+
+```bash
+npm install react-router-dom@^5.3.0
+```
+
+---
+
+### 6. 환경 변수 인식 안 됨
+
+**에러:**
+
+```javascript
+process.env.REACT_APP_API_URL is undefined
+```
+
+**해결:**
+
+1. .env 파일이 프로젝트 루트에 있는지 확인
+2. 변수명이 REACT*APP*으로 시작하는지 확인 (CRA)
+3. **개발 서버 재시작** (매우 중요!)
+
+```bash
+# 서버 중지 후 재시작
+npm start
+```
+
+**프레임워크별 접두사:**
+
+- Create React App: `REACT_APP_`
+- Next.js (클라이언트): `NEXT_PUBLIC_`
+- Vite: `VITE_`
+
+---
+
+## 효과적인 에러 전달 방법
+
+### 스크린샷보다 텍스트로
+
+**나쁜 예:** 이런 에러가 나는데... [스크린샷 첨부]
+
+**좋은 예:**
+
+다음 에러가 발생:
+
+```text
+SyntaxError: Unexpected token '<' in JSON at position 0
+  at JSON.parse (<anonymous>)
+  at parseJSON (utils.js:45:12)
+```
+
+API 응답:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>404 Not Found</title>
+  </head>
+</html>
+```
+
+JSON을 기대했는데 HTML이 옴. API 엔드포인트 확인 필요할까?
+
+---
+
+### 관련 코드는 충분히, 하지만 간결하게
+
+**너무 적음:** fetchData() 함수에서 에러 나
+
+**너무 많음:** 에러가 나는데 전체 파일 800줄...
+
+**적당함:**
+
+fetchData() 함수 실행 시 에러 발생:
+
+```javascript
+// api.js
+async function fetchData() {
+  const response = await fetch('/api/data');
+  const data = await response.json(); // 여기서 에러
+  return data;
+}
+```
+
+에러: `SyntaxError: Unexpected token '<' in JSON`
+
+/api/data 엔드포인트:
+
+```javascript
+app.get('/api/data', (req, res) => {
+  res.send('<html>...</html>'); // 문제인 것 같은데
+});
+```
+
+---
+
+## 실전 디버깅 시나리오
+
+### 시나리오 1: "작동하던 게 갑자기 안 돼요"
+
+**상황:** 어제까지 잘 되던 로그인 기능이 갑자기 안 됨
+
+**Claude에게 전달:**
+
+로그인 기능이 갑자기 작동하지 않음. 코드는 변경 안 했음.
+
+에러:
+
+```text
+Network Error
+  at createError (createError.js:16)
+```
+
+최근 변경사항:
+
+- git log 확인: 로그인 관련 코드 변경 없음
+- package.json: 어제 npm update 실행
+- axios: 0.27.2 → 1.1.3
+
+관련 있을까?
+
+**Claude의 답변:**
+
+axios 1.x breaking changes 확인 필요
+
+주요 변경사항:
+
+- baseURL 처리 방식 변경
+- timeout 기본값 변경
+
+디버깅 단계:
+
+1. axios 버전 롤백 테스트:
+
+```bash
+npm install axios@0.27.2
+```
+
+2. Network 탭에서 실제 요청 URL 확인
+3. CORS 설정 확인
+
+---
+
+### 시나리오 2: "로컬은 되는데 배포하면 안 돼요"
+
+**상황:** 로컬에서는 완벽하게 작동하는데 Vercel 배포 후 API 호출 실패
+
+**Claude에게 전달:**
+
+로컬은 정상인데 Vercel 배포 후 API 호출 실패:
+
+로컬 환경:
+
+- localhost:3000 (프론트)
+- localhost:4000 (API 서버)
+- 정상 작동 ✓
+
+Vercel 환경:
+
+- https://myapp.vercel.app
+- API: https://api.myapp.com
+- 에러:
+
+```text
+Access to fetch blocked by CORS policy
+```
+
+로컬에서는 CORS 문제 없었는데?
+
+**Claude의 해결:**
+
+문제: 로컬 vs 프로덕션 환경 차이
+
+로컬: 같은 도메인 (localhost) → CORS 문제 없음
+프로덕션: 다른 도메인 → CORS 필수
+
+해결:
+
+```javascript
+// Express 백엔드
+const cors = require('cors');
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'https://myapp.vercel.app'],
+    credentials: true,
+  })
+);
+```
+
+또는 Next.js API 프록시:
+
+```javascript
+// next.config.js
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://api.myapp.com/:path*',
+      },
+    ];
+  },
+};
+```
+
+---
+
+### 시나리오 3: "간헐적으로 발생하는 버그"
+
+**상황:** 사용자 프로필 이미지가 가끔 안 뜸
+
+**Claude에게 전달:**
+
+사용자 프로필 이미지가 간헐적으로 표시 안 됨:
+
+증상:
+
+- 10번 중 2-3번 발생
+- 페이지 새로고침하면 보이기도 함
+- 브라우저 콘솔에 에러 없음
+
+코드:
+
+```jsx
+function UserAvatar({ user }) {
+  const [imageUrl, setImageUrl] = useState(null);
+
+  useEffect(() => {
+    async function loadImage() {
+      const url = await fetchUserImage(user.id);
+      setImageUrl(url);
+    }
+    loadImage();
+  }, [user.id]);
+
+  return <img src={imageUrl} alt={user.name} />;
+}
+```
+
+race condition 문제일까?
+
+**Claude의 답변:**
+
+문제: Race Condition
+
+user.id가 빠르게 변경되면 이전 요청 완료 전에 새 요청 시작
+→ 먼저 완료된 응답이 적용됨 (순서 보장 안 됨)
+
+해결:
+
+```jsx
+function UserAvatar({ user }) {
+  const [imageUrl, setImageUrl] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false; // cleanup flag
+
+    async function loadImage() {
+      try {
+        const url = await fetchUserImage(user.id);
+
+        if (!cancelled) {
+          setImageUrl(url);
+        } else {
+          URL.revokeObjectURL(url); // 메모리 해제
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to load image:', error);
+        }
+      }
+    }
+
+    loadImage();
+
+    return () => {
+      cancelled = true;
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [user.id]);
+
+  return (
+    <img
+      src={imageUrl || '/default-avatar.png'}
+      alt={user.name}
+      onError={(e) => (e.target.src = '/default-avatar.png')}
+    />
+  );
+}
+```
+
+---
+
+## MCP를 활용한 디버깅
+
+### MCP란?
+
+**Model Context Protocol (MCP)**는 Claude Code가 외부 도구와 통합할 수 있게 해주는 프로토콜입니다.
+
+디버깅에 유용한 MCP 서버들:
+
+- **파일 시스템 접근**: 로그 파일 자동 분석
+- **데이터베이스 연결**: 실시간 DB 쿼리로 데이터 검증
+- **API 테스트**: 엔드포인트 자동 테스트 및 응답 분석
+- **브라우저 자동화**: Puppeteer 연동으로 UI 버그 재현
+
+---
+
+### 실전 예제: 로그 파일 자동 분석
+
+**MCP 서버 설정:**
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/var/log"]
+    }
+  }
+}
+```
+
+**디버깅 시나리오:**
+
+"프로덕션에서 간헐적으로 500 에러 발생"
+
+**Claude Code에게 요청:**
+
+```text
+/var/log/app.log 파일을 분석해서 최근 24시간 동안의 500 에러를 찾아줘.
+에러 패턴과 발생 빈도, 관련 스택트레이스를 정리해줘.
+```
+
+**Claude의 분석:**
+
+```text
+분석 결과:
+
+1. 총 23건의 500 에러 발견
+2. 모두 오후 2-3시 사이 발생 (피크 타임)
+3. 공통 패턴:
+
+Error: Connection pool exhausted
+  at Database.query (db.js:45)
+  at UserService.getProfile (user.js:123)
+
+원인: DB 커넥션 풀 부족
+해결책:
+- 커넥션 풀 크기 증가 (현재: 10 → 권장: 50)
+- 또는 쿼리 최적화로 응답 시간 단축
+```
+
+---
+
+### 실전 예제: SQLite 디버깅
+
+**MCP 서버 설정:**
+
+```json
+{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-sqlite-npx", "/path/to/database.db"]
+    }
+  }
+}
+```
+
+**디버깅 시나리오:**
+
+"사용자가 주문 내역이 안 보인다고 함"
+
+**Claude Code에게 요청:**
+
+```text
+사용자 ID 12345의 주문 데이터를 확인해줘.
+
+1. orders 테이블에서 이 사용자의 모든 주문 조회
+2. 주문 상태가 이상한 게 있는지 확인
+3. 관련 트랜잭션 로그 확인
+```
+
+**Claude의 분석:**
+
+```sql
+-- 실행한 쿼리
+SELECT * FROM orders WHERE user_id = 12345;
+
+-- 결과: 주문 3건 존재하지만 status = 'pending_payment'
+-- 문제: 결제 완료 웹훅이 처리 안 됨
+
+SELECT * FROM payment_webhooks
+WHERE order_id IN (101, 102, 103);
+
+-- 발견: webhook_status = 'failed' (3건 모두)
+-- 원인: webhook 엔드포인트 변경 후 업데이트 안 됨
+```
+
+해결책:
+
+1. webhook 엔드포인트 수정
+2. 실패한 webhook 재처리 스크립트 실행
+
+---
+
+### MCP 디버깅 팁
+
+**1. 로그 파일 실시간 모니터링**
+
+```text
+"app.log 파일을 실시간으로 모니터링하면서
+ERROR 키워드가 나오면 바로 알려줘.
+발견되면 해당 에러의 전후 10줄도 같이 보여줘."
+```
+
+**2. 여러 환경 비교**
+
+```text
+"개발, 스테이징, 프로덕션 DB에서 같은 쿼리를 실행해서
+결과를 비교해줘. 데이터 불일치가 있는지 확인."
+```
+
+**3. 데이터 검증**
+
+```text
+"users 테이블에서 email 중복이 있는지 확인해줘.
+있다면 어떻게 발생했는지 분석."
+```
+
+---
+
+### 실전 예제: Next.js 디버깅 (Next.js DevTools MCP)
+
+**Next.js MCP 서버 설정 (Next.js 16+):**
+
+프로젝트 루트에 `.mcp.json` 생성:
+
+```json
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    }
+  }
+}
+```
+
+개발 서버 실행:
+
+```bash
+npm run dev
+# MCP 자동 연결됨
+```
+
+**디버깅 시나리오 1: 런타임 에러 분석**
+
+**Claude Code에게 요청:**
+
+```text
+현재 Next.js 앱의 에러를 확인해줘.
+빌드 에러와 런타임 에러를 분석하고 해결 방법을 알려줘.
+```
+
+**Claude의 분석 (MCP를 통해 실시간 확인):**
+
+```text
+감지된 에러:
+
+1. 런타임 에러 (/app/users/page.tsx):
+   Error: Cannot read property 'map' of undefined
+   - 발생 위치: line 23
+   - 원인: API 응답 전 렌더링 시도
+
+2. 빌드 경고:
+   - Fast Refresh 경고 (useState in server component)
+
+해결 방법:
+```
+
+```typescript
+// Before
+export default function UsersPage() {
+  const [users, setUsers] = useState([]); // ❌ 서버 컴포넌트에서 useState
+
+  return <div>{users.map(...)}</div>;
+}
+
+// After
+export default async function UsersPage() {
+  const users = await fetchUsers();
+
+  if (!users) {
+    return <div>Loading...</div>;
+  }
+
+  return <div>{users.map(...)}</div>;
+}
+```
+
+**디버깅 시나리오 2: 페이지 메타데이터 확인**
+
+**Claude Code에게 요청:**
+
+```text
+모든 페이지의 라우트 정보와 메타데이터를 보여줘.
+어떤 페이지가 동적이고 어떤 게 정적인지 확인.
+```
+
+**Claude의 답변 (MCP를 통해 실시간 조회):**
+
+```text
+페이지 라우트 분석:
+
+1. / (app/page.tsx)
+   - Type: Static
+   - Metadata: { title: 'Home', description: '...' }
+
+2. /users (app/users/page.tsx)
+   - Type: Dynamic (SSR)
+   - 원인: fetch with cache: 'no-store'
+
+3. /blog/[slug] (app/blog/[slug]/page.tsx)
+   - Type: Static (generateStaticParams 사용)
+   - 생성된 경로: 15개
+
+권장사항: /users를 ISR로 변경하여 성능 개선
+```
+
+**디버깅 시나리오 3: 서버 액션 검사**
+
+**Claude Code에게 요청:**
+
+```text
+프로젝트의 모든 서버 액션을 찾아줘.
+각 액션이 올바르게 구현되었는지 검증.
+```
+
+**Claude의 분석:**
+
+```text
+서버 액션 목록:
+
+1. app/actions.ts
+   - createUser() ✓
+   - updateUser() ✓
+   - deleteUser() ✓
+
+2. app/comments/actions.ts
+   - addComment() ⚠️ 문제 발견!
+
+문제:
+```
+
+```typescript
+// app/comments/actions.ts
+export async function addComment(formData: FormData) {
+  // ❌ 'use server' 지시문 누락!
+  const text = formData.get('text');
+  // ...
+}
+```
+
+해결:
+
+```typescript
+export async function addComment(formData: FormData) {
+  'use server'; // ✓ 추가
+  const text = formData.get('text');
+  // ...
+}
+```
+
+---
+
+### 실전 예제: Chrome DevTools 연동 (Chrome DevTools MCP)
+
+Chrome DevTools MCP는 AI 코딩 어시스턴트에게 실행 중인 Chrome 브라우저를 제어하고 검사할 수 있는 능력을 제공합니다.
+
+**설치:**
+
+```bash
+npm install -g chrome-devtools-mcp@latest
+```
+
+**설정 (`~/.claude/mcp.json`):**
+
+```json
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
+    }
+  }
+}
+```
+
+**Performance Trace 분석:**
+
+```text
+"현재 페이지의 성능 프로파일을 기록하고
+로딩 병목 지점을 찾아줘"
+```
+
+Claude가 Chrome DevTools MCP를 통해:
+
+- Performance trace 시작
+- 페이지 로드 이벤트 기록
+- 주요 메트릭 분석 (FCP, LCP, TTI)
+- 긴 작업(Long Tasks) 식별
+
+**Network 요청 검사:**
+
+```text
+"실패한 API 요청들을 찾고,
+응답 상태 코드와 에러 메시지를 확인해줘"
+```
+
+Claude가 다음을 실행:
+
+- Network 탭에서 failed 요청 필터링
+- 각 요청의 Headers, Response 확인
+- CORS 에러, 타임아웃 등 분류
+
+**Console 로그 분석:**
+
+```text
+"브라우저 콘솔에 찍힌 에러 메시지들을
+확인하고 소스 코드 위치를 찾아줘"
+```
+
+Chrome DevTools MCP를 통해:
+
+- Console 메시지 읽기 (errors, warnings, logs)
+- Stack trace 분석
+- 에러 발생 파일:라인 번호 식별
+
+**Screenshot 캡처:**
+
+```text
+"현재 UI 상태를 캡처해서
+레이아웃 깨짐 여부를 확인해줘"
+```
+
+**실전 예시: API 에러 디버깅**
+
+```text
+"localhost:3000 열어서
+/api/posts 요청이 왜 실패하는지 확인해줘"
+```
+
+Claude의 분석:
+
+```text
+Chrome DevTools 분석 결과:
+
+Network 탭:
+- Request: GET /api/posts
+- Status: 500 Internal Server Error
+- Response Headers:
+  Content-Type: application/json
+
+Response Body:
+{
+  "error": "Database connection failed",
+  "code": "ECONNREFUSED"
+}
+
+Console 에러:
+Error: connect ECONNREFUSED 127.0.0.1:5432
+  at TCPConnectWrap.afterConnect [as oncomplete]
+  at lib/db.js:45:12
+
+원인: PostgreSQL 서버가 실행되지 않음
+```
+
+해결:
+
+```bash
+# PostgreSQL 상태 확인
+pg_ctl status
+
+# 서버 시작
+pg_ctl start -D /usr/local/var/postgres
+```
+
+**Puppeteer 자동화 예시:**
+
+Chrome DevTools MCP는 Puppeteer 스크립트 실행도 지원합니다.
+
+```text
+"사용자 로그인 플로우를 자동으로 테스트하고
+각 단계에서 콘솔 에러가 있는지 확인해줘"
+```
+
+Claude가 Puppeteer를 통해:
+
+- 브라우저 자동 실행
+- 로그인 폼 입력
+- 제출 후 각 단계별 Console 로그 수집
+- 네트워크 요청 성공/실패 모니터링
+
+---
+
+### MCP 활용 시 주의사항
+
+⚠️ **보안**
+
+- 프로덕션 DB 접근 시 읽기 전용 권한 사용
+- API 키는 환경 변수로 관리
+- 민감한 로그는 필터링
+
+⚠️ **성능**
+
+- 대용량 로그 파일은 부분적으로 분석
+- DB 쿼리는 LIMIT 사용
+- 브라우저 자동화는 headless 모드 권장
+
+⚠️ **비용**
+
+- 외부 API 호출 시 요금 확인
+- 무한 루프 방지
+- 타임아웃 설정
+
+---
+
+## 디버깅 생산성 팁
+
+### 1. 에러 로그 자동 수집
+
+```javascript
+// 전역 에러 핸들러
+window.addEventListener('error', (event) => {
+  const errorInfo = `
+Error: ${event.message}
+File: ${event.filename}:${event.lineno}:${event.colno}
+Stack: ${event.error?.stack}
+  `.trim();
+
+  // 클립보드에 복사 (Claude에게 바로 붙여넣기)
+  navigator.clipboard?.writeText(errorInfo);
+});
+```
+
+---
+
+### 2. 디버깅 체크리스트
+
+Claude에게 전달할 때:
+
+```markdown
+## 에러 리포트
+
+### 환경
+
+- OS: macOS 13.0
+- Node: v18.12.0
+- 브라우저: Chrome 110
+
+### 에러 메시지
+
+[전체 에러 메시지]
+
+### 재현 방법
+
+1.
+2.
+3.
+
+### 관련 코드
+
+// 파일명:
+
+### 시도한 해결 방법
+
+- [ ]
+- [ ]
+```
+
+---
+
+### 3. Console 트릭
+
+```javascript
+// JSON으로 출력 (복사하기 쉬움)
+console.log(JSON.stringify(data, null, 2));
+
+// Stack trace
+console.trace('User data:', user);
+
+// 조건부 로그
+console.assert(user.id, 'User ID is missing!');
+
+// 성능 측정
+console.time('API Call');
+await fetchData();
+console.timeEnd('API Call');
+```
+
+---
+
+### 4. 빠른 디버깅 명령어
+
+```bash
+# 에러 로그를 파일로 저장
+npm run build 2>&1 | tee build-error.log
+```
+
+---
+
+## 실전 디버깅 워크플로우
+
+최적의 프로세스:
+
+1. 에러 발생
+2. 전체 에러 메시지 복사
+3. Claude 실행
+4. 체계적으로 정보 제공:
+   - 에러 메시지
+   - 관련 코드
+   - 환경 정보
+   - 재현 방법
+5. Claude의 분석 확인
+6. 제안된 해결책 적용
+7. 테스트
+8. 여전히 에러 발생?
+   → 추가 정보와 함께 다시 질문
+9. 해결 완료!
+
+---
+
+## 마치며
+
+### 디버깅 황금률
+
+✅ **전체 에러 메시지를 공유하라**
+✅ **컨텍스트를 충분히 제공하라**
+✅ **재현 방법을 명확히 하라**
+✅ **이미 시도한 방법을 알려줘라**
+✅ **관련 코드만 간결하게 공유하라**
+
+### Claude Code로 디버깅할 때
+
+1. **구체적으로 질문**: "에러 났어" ❌ → "다음 에러가 발생: [전체 로그]" ✅
+2. **단계적으로 접근**: 한 번에 하나씩 해결
+3. **Git 활용**: 언제든 되돌릴 수 있게
+4. **인내심**: Claude도 모든 걸 한 번에 해결 못 함
+
+**Claude Code는 강력한 디버깅 파트너입니다.**
+**정확한 정보를 제공하면 놀라운 해결책을 제시합니다!**
+
+---
+
+## 관련 글
+
+- [Claude Code 바이브코딩 꿀팁](/blog/claude-code-vibe-coding-tips)
+- [Claude Code Plan Mode 완벽 활용 가이드](/blog/claude-code-plan-mode-guide)
+- [Claude Code Settings 완벽 가이드](/blog/claude-code-settings-guide)
+- [Claude Code Git 워크플로우](/blog/claude-code-git-workflow)
+
+---
+
+**작성일:** 2025-11-17
+**마지막 수정:** 2025-11-17
