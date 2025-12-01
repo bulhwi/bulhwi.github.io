@@ -7,9 +7,19 @@
       <language>en-us</language>
       <managingEditor>address@yoursite.com (bulhwi)</managingEditor>
       <webMaster>address@yoursite.com (bulhwi)</webMaster>
-      <lastBuildDate>Mon, 17 Nov 2025 00:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 01 Dec 2025 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://bulhwi.github.io/feed.xml" rel="self" type="application/rss+xml"/>
       
+  <item>
+    <guid>https://bulhwi.github.io/blog/doc/react-19-new-features-guide</guid>
+    <title>React 19 완전 정복: 새로운 Hooks와 기능 총정리</title>
+    <link>https://bulhwi.github.io/blog/doc/react-19-new-features-guide</link>
+    <description>React 19에서 추가된 use(), useActionState, useOptimistic 등 새로운 Hooks와 Server Components, Actions API 등 주요 기능을 실전 코드 예시와 함께 완벽 정리</description>
+    <pubDate>Mon, 01 Dec 2025 00:00:00 GMT</pubDate>
+    <author>address@yoursite.com (bulhwi)</author>
+    <category>react</category><category>react19</category><category>frontend</category><category>javascript</category><category>typescript</category>
+  </item>
+
   <item>
     <guid>https://bulhwi.github.io/blog/doc/claude-code-error-debugging-guide</guid>
     <title>Claude Code 에러 디버깅 실전 가이드</title>
