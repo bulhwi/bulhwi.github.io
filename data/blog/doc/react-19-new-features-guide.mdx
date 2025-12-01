@@ -1,0 +1,1226 @@
+---
+title: 'React 19 완전 정복: 새로운 Hooks와 기능 총정리'
+date: '2025-12-01'
+tags: ['react', 'react19', 'frontend', 'javascript', 'typescript']
+draft: false
+summary: 'React 19에서 추가된 use(), useActionState, useOptimistic 등 새로운 Hooks와 Server Components, Actions API 등 주요 기능을 실전 코드 예시와 함께 완벽 정리'
+images: []
+layout: PostLayout
+canonicalUrl: https://bulhwi.github.io/blog/doc/react-19-new-features-guide
+---
+
+# React 19 Hooks와 기능 정리
+
+## 목차
+
+1. [새로운 Hooks](#새로운-hooks)
+   - [use()](#use-api)
+   - [useActionState](#useactionstate)
+   - [useOptimistic](#useoptimistic)
+   - [useFormStatus](#useformstatus)
+2. [Actions API](#actions-api)
+3. [ref as Props](#ref-as-props)
+4. [Document Metadata](#document-metadata)
+5. [Server Components & Server Actions](#server-components--server-actions)
+6. [성능 최적화 API](#성능-최적화-api)
+
+---
+
+## 새로운 Hooks
+
+### use() API
+
+**가장 혁신적인 변화**: 조건문과 반복문 내에서 호출 가능한 새로운 리소스 읽기 API.
+
+#### 기존 useContext의 한계
+
+```tsx
+function MyComponent({ isLoggedIn }) {
+  // ❌ 에러: Hooks는 조건문 안에서 호출 불가
+  if (isLoggedIn) {
+    const theme = useContext(ThemeContext);
+  }
+
+  // 모든 경로에서 호출해야 함
+  const theme = useContext(ThemeContext);
+
+  if (!isLoggedIn) return null;
+  // ...
+}
+```
+
+#### use()로 해결
+
+```tsx
+import { use } from 'react';
+
+function MyComponent({ isLoggedIn }) {
+  if (!isLoggedIn) return null;
+
+  // ✅ 조건문 이후에도 호출 가능!
+  const theme = use(ThemeContext);
+
+  return <div style={{ color: theme.primary }}>Welcome!</div>;
+}
+```
+
+#### Promise와 함께 사용하기
+
+```tsx
+import { use, Suspense } from 'react';
+
+// Server Component에서 전달받은 Promise
+function UserProfile({ userPromise }) {
+  // Promise가 resolve될 때까지 Suspend
+  const user = use(userPromise);
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// 사용 예시
+function App() {
+  const userPromise = fetch('/api/user').then((res) => res.json());
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserProfile userPromise={userPromise} />
+    </Suspense>
+  );
+}
+```
+
+#### 조건부 데이터 로딩
+
+```tsx
+function Comments({ postId, shouldLoad }) {
+  if (!shouldLoad) {
+    return <p>댓글을 보려면 로그인하세요</p>;
+  }
+
+  // 조건이 true일 때만 데이터 로드
+  const comments = use(fetchComments(postId));
+
+  return (
+    <ul>
+      {comments.map((comment) => (
+        <li key={comment.id}>{comment.text}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 조건문/반복문 내에서 호출 가능
+- Promise와 Context 모두 지원
+- Suspense와 자동 통합
+- Error Boundary로 에러 처리
+
+---
+
+### useActionState
+
+폼 상태 관리를 위한 새로운 Hook입니다. 기존 `useFormState`를 대체합니다.
+
+#### 기본 사용법
+
+```tsx
+import { useActionState } from 'react';
+
+async function updateName(previousState, formData) {
+  const name = formData.get('name');
+
+  // 서버에 전송
+  try {
+    await fetch('/api/update-name', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+
+    return { success: true, message: '이름이 업데이트되었습니다!' };
+  } catch (error) {
+    return { success: false, message: '오류가 발생했습니다.' };
+  }
+}
+
+function NameForm() {
+  const [state, formAction, isPending] = useActionState(
+    updateName,
+    { success: false, message: '' } // 초기 상태
+  );
+
+  return (
+    <form action={formAction}>
+      <input type="text" name="name" required />
+      <button disabled={isPending}>{isPending ? '저장 중...' : '저장'}</button>
+
+      {state.message && <p className={state.success ? 'success' : 'error'}>{state.message}</p>}
+    </form>
+  );
+}
+```
+
+#### 이전 상태 활용하기
+
+```tsx
+async function addTodo(previousState, formData) {
+  const todo = formData.get('todo');
+
+  return {
+    todos: [...previousState.todos, { id: Date.now(), text: todo }],
+    lastAdded: todo,
+  };
+}
+
+function TodoList() {
+  const [state, formAction, isPending] = useActionState(addTodo, { todos: [], lastAdded: null });
+
+  return (
+    <div>
+      <form action={formAction}>
+        <input type="text" name="todo" required />
+        <button disabled={isPending}>추가</button>
+      </form>
+
+      <ul>
+        {state.todos.map((todo) => (
+          <li key={todo.id}>{todo.text}</li>
+        ))}
+      </ul>
+
+      {state.lastAdded && <p>마지막 추가: {state.lastAdded}</p>}
+    </div>
+  );
+}
+```
+
+#### Server Actions와 함께 사용
+
+```tsx
+// app/actions.ts
+'use server';
+
+export async function createPost(previousState, formData) {
+  const title = formData.get('title');
+  const content = formData.get('content');
+
+  const validation = validatePost({ title, content });
+  if (!validation.success) {
+    return { errors: validation.errors };
+  }
+
+  const post = await db.post.create({
+    data: { title, content },
+  });
+
+  return { success: true, postId: post.id };
+}
+```
+
+```tsx
+// app/components/PostForm.tsx
+'use client';
+
+import { useActionState } from 'react';
+import { createPost } from '../actions';
+
+export function PostForm() {
+  const [state, formAction, isPending] = useActionState(createPost, {
+    errors: null,
+    success: false,
+  });
+
+  return (
+    <form action={formAction}>
+      <input type="text" name="title" />
+      {state.errors?.title && <span>{state.errors.title}</span>}
+
+      <textarea name="content" />
+      {state.errors?.content && <span>{state.errors.content}</span>}
+
+      <button disabled={isPending}>{isPending ? '작성 중...' : '작성'}</button>
+
+      {state.success && <p>포스트가 작성되었습니다!</p>}
+    </form>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 이전 상태를 action 함수의 첫 번째 인자로 받음
+- 자동 pending 상태 관리
+- Server Actions와 완벽한 통합
+
+---
+
+### useOptimistic
+
+비동기 작업이 완료되기 전에 UI를 낙관적으로 업데이트한다.
+
+#### 기본 개념
+
+```tsx
+import { useOptimistic, useState } from 'react';
+
+function LikeButton({ postId, initialLikes }) {
+  const [likes, setLikes] = useState(initialLikes);
+  const [optimisticLikes, addOptimisticLike] = useOptimistic(
+    likes,
+    (currentLikes, amount) => currentLikes + amount
+  );
+
+  async function handleLike() {
+    // 즉시 UI 업데이트 (낙관적)
+    addOptimisticLike(1);
+
+    // 서버 요청
+    const newLikes = await fetch(`/api/like/${postId}`, {
+      method: 'POST',
+    }).then((res) => res.json());
+
+    // 실제 값으로 업데이트
+    setLikes(newLikes);
+  }
+
+  return <button onClick={handleLike}>👍 {optimisticLikes}</button>;
+}
+```
+
+#### 채팅 메시지 전송 예시
+
+```tsx
+import { useOptimistic, useRef } from 'react';
+
+function ChatRoom({ messages, sendMessage }) {
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    messages,
+    (currentMessages, newMessage) => [...currentMessages, { ...newMessage, sending: true }]
+  );
+
+  const formRef = useRef();
+
+  async function handleSubmit(formData) {
+    const message = formData.get('message');
+
+    // 즉시 UI에 메시지 추가
+    addOptimisticMessage({
+      id: Date.now(),
+      text: message,
+      timestamp: new Date(),
+    });
+
+    // 폼 초기화
+    formRef.current?.reset();
+
+    // 서버로 전송
+    await sendMessage(message);
+  }
+
+  return (
+    <div>
+      <div className="messages">
+        {optimisticMessages.map((msg) => (
+          <div key={msg.id} className={msg.sending ? 'sending' : ''}>
+            {msg.text}
+            {msg.sending && <span> (전송 중...)</span>}
+          </div>
+        ))}
+      </div>
+
+      <form ref={formRef} action={handleSubmit}>
+        <input type="text" name="message" required />
+        <button>전송</button>
+      </form>
+    </div>
+  );
+}
+```
+
+#### Todo 아이템 완료 처리
+
+```tsx
+function TodoList({ todos }) {
+  const [optimisticTodos, toggleOptimisticTodo] = useOptimistic(todos, (currentTodos, todoId) =>
+    currentTodos.map((todo) =>
+      todo.id === todoId ? { ...todo, completed: !todo.completed } : todo
+    )
+  );
+
+  async function handleToggle(todoId) {
+    // 즉시 완료 상태 토글
+    toggleOptimisticTodo(todoId);
+
+    // 서버 동기화
+    await fetch(`/api/todos/${todoId}/toggle`, {
+      method: 'PATCH',
+    });
+  }
+
+  return (
+    <ul>
+      {optimisticTodos.map((todo) => (
+        <li
+          key={todo.id}
+          onClick={() => handleToggle(todo.id)}
+          style={{
+            textDecoration: todo.completed ? 'line-through' : 'none',
+            opacity: todo.completed ? 0.6 : 1,
+          }}
+        >
+          {todo.text}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 즉각적인 사용자 피드백
+- 자동 롤백 (실패 시)
+- 부드러운 UX 제공
+
+---
+
+### useFormStatus
+
+폼 컴포넌트의 제출 상태를 자식 컴포넌트에서 읽을 수 있다.
+
+#### 제출 버튼 컴포넌트
+
+```tsx
+import { useFormStatus } from 'react-dom';
+
+function SubmitButton() {
+  const { pending, data, method, action } = useFormStatus();
+
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? '제출 중...' : '제출'}
+    </button>
+  );
+}
+```
+
+#### 실전 활용: 폼 로딩 인디케이터
+
+```tsx
+function FormLoadingIndicator() {
+  const { pending } = useFormStatus();
+
+  if (!pending) return null;
+
+  return (
+    <div className="loading-overlay">
+      <div className="spinner" />
+      <p>처리 중입니다...</p>
+    </div>
+  );
+}
+
+function ContactForm() {
+  async function handleSubmit(formData) {
+    await fetch('/api/contact', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input type="text" name="name" required />
+      <input type="email" name="email" required />
+      <textarea name="message" required />
+
+      <SubmitButton />
+      <FormLoadingIndicator />
+    </form>
+  );
+}
+```
+
+#### 제출 데이터 기반 UI
+
+```tsx
+function SaveButton() {
+  const { pending, data } = useFormStatus();
+
+  const fileName = data?.get('filename');
+
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? `${fileName} 저장 중...` : '저장'}
+    </button>
+  );
+}
+
+function FileUploadForm() {
+  return (
+    <form action="/api/upload">
+      <input type="file" name="file" />
+      <input type="text" name="filename" />
+      <SaveButton />
+    </form>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 부모 폼의 상태를 Context처럼 읽음
+- Prop drilling 없이 상태 공유
+- 재사용 가능한 폼 컴포넌트 제작
+
+---
+
+## Actions API
+
+비동기 전환(Async Transitions)을 관리하는 새로운 패턴이다.
+
+### 기본 개념
+
+```tsx
+function UpdateNameForm() {
+  const [name, setName] = useState('');
+  const [error, setError] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    startTransition(async () => {
+      const error = await updateName(name);
+      if (error) {
+        setError(error);
+        return;
+      }
+      // 성공 처리
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={name} onChange={(e) => setName(e.target.value)} />
+      <button disabled={isPending}>업데이트</button>
+      {error && <p>{error}</p>}
+    </form>
+  );
+}
+```
+
+### form action과 통합
+
+```tsx
+function SearchForm() {
+  const [isPending, startTransition] = useTransition();
+  const [results, setResults] = useState([]);
+
+  async function search(formData) {
+    const query = formData.get('query');
+
+    startTransition(async () => {
+      const data = await fetch(`/api/search?q=${query}`).then((res) => res.json());
+      setResults(data);
+    });
+  }
+
+  return (
+    <div>
+      <form action={search}>
+        <input type="text" name="query" />
+        <button>검색</button>
+      </form>
+
+      {isPending && <div>검색 중...</div>}
+
+      <ul>
+        {results.map((item) => (
+          <li key={item.id}>{item.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 자동 pending 상태 관리
+- 에러 처리 내장
+- 낙관적 업데이트 지원
+- 폼 자동 리셋
+
+---
+
+## ref as Props
+
+`forwardRef` 없이 함수 컴포넌트에서 직접 ref를 받을 수 있다.
+
+### Before (React 18)
+
+```tsx
+import { forwardRef } from 'react';
+
+const MyInput = forwardRef(function MyInput(props, ref) {
+  return <input {...props} ref={ref} />;
+});
+
+function Form() {
+  const inputRef = useRef(null);
+
+  return <MyInput ref={inputRef} />;
+}
+```
+
+### After (React 19)
+
+```tsx
+function MyInput({ ref, ...props }) {
+  return <input {...props} ref={ref} />;
+}
+
+function Form() {
+  const inputRef = useRef(null);
+
+  return <MyInput ref={inputRef} />;
+}
+```
+
+### ref cleanup 함수
+
+```tsx
+function VideoPlayer({ src, ref }) {
+  return (
+    <video
+      src={src}
+      ref={(node) => {
+        if (node) {
+          // 마운트 시
+          node.play();
+        }
+
+        // 클린업 함수 반환
+        return () => {
+          node.pause();
+        };
+      }}
+    />
+  );
+}
+```
+
+### 실전 활용: 포커스 관리
+
+```tsx
+function AutoFocusInput({ ref, ...props }) {
+  return (
+    <input
+      {...props}
+      ref={(node) => {
+        if (node) {
+          node.focus();
+        }
+
+        // 외부 ref도 설정
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+
+        return () => {
+          node.blur();
+        };
+      }}
+    />
+  );
+}
+```
+
+**핵심 특징:**
+
+- `forwardRef` 불필요
+- 클린업 함수 지원
+- 코드 간소화
+
+---
+
+## Document Metadata
+
+컴포넌트 내에서 직접 `<title>`, `<meta>`, `<link>` 태그를 렌더링할 수 있다.
+
+### 기본 사용법
+
+```tsx
+function BlogPost({ post }) {
+  return (
+    <article>
+      <title>{post.title} - My Blog</title>
+      <meta name="description" content={post.excerpt} />
+      <meta property="og:title" content={post.title} />
+      <meta property="og:image" content={post.coverImage} />
+
+      <h1>{post.title}</h1>
+      <p>{post.content}</p>
+    </article>
+  );
+}
+```
+
+### 동적 메타데이터
+
+```tsx
+function ProductPage({ product }) {
+  return (
+    <div>
+      <title>{product.name} - 온라인 쇼핑몰</title>
+      <meta name="description" content={product.description} />
+      <meta property="og:type" content="product" />
+      <meta property="og:price:amount" content={product.price} />
+      <meta property="og:price:currency" content="KRW" />
+
+      <link rel="canonical" href={`https://example.com/products/${product.id}`} />
+
+      <div className="product">
+        <h1>{product.name}</h1>
+        <p>{product.price}원</p>
+      </div>
+    </div>
+  );
+}
+```
+
+### 리소스 프리로딩
+
+```tsx
+function ArticlePage({ article }) {
+  return (
+    <article>
+      <title>{article.title}</title>
+
+      {/* 폰트 프리로드 */}
+      <link
+        rel="preload"
+        href="/fonts/custom-font.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+
+      {/* 이미지 프리로드 */}
+      <link rel="preload" href={article.heroImage} as="image" />
+
+      <h1>{article.title}</h1>
+      <img src={article.heroImage} alt={article.title} />
+    </article>
+  );
+}
+```
+
+**핵심 특징:**
+
+- 자동으로 `<head>`에 호이스팅
+- 컴포넌트와 메타데이터 함께 관리
+- SSR 완벽 지원
+
+---
+
+## Server Components & Server Actions
+
+React 19에서 Server Components와 Server Actions가 정식으로 안정화되었다.
+
+### Server Component 기본
+
+```tsx
+// app/posts/page.tsx (Server Component)
+async function PostsPage() {
+  // 서버에서만 실행
+  const posts = await db.post.findMany();
+
+  return (
+    <div>
+      <h1>게시글 목록</h1>
+      <ul>
+        {posts.map((post) => (
+          <li key={post.id}>{post.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Server Actions
+
+```tsx
+// app/actions.ts
+'use server';
+
+import { revalidatePath } from 'next/cache';
+
+export async function createComment(formData) {
+  const postId = formData.get('postId');
+  const content = formData.get('content');
+
+  await db.comment.create({
+    data: {
+      postId: Number(postId),
+      content: String(content),
+    },
+  });
+
+  revalidatePath(`/posts/${postId}`);
+
+  return { success: true };
+}
+```
+
+```tsx
+// app/components/CommentForm.tsx
+'use client';
+
+import { createComment } from '../actions';
+
+export function CommentForm({ postId }) {
+  return (
+    <form action={createComment}>
+      <input type="hidden" name="postId" value={postId} />
+      <textarea name="content" required />
+      <button>댓글 작성</button>
+    </form>
+  );
+}
+```
+
+### 복합 예시: 낙관적 업데이트 + Server Actions
+
+```tsx
+// app/actions.ts
+'use server';
+
+export async function deletePost(postId) {
+  await db.post.delete({
+    where: { id: postId },
+  });
+
+  revalidatePath('/posts');
+
+  return { success: true };
+}
+```
+
+```tsx
+// app/components/PostList.tsx
+'use client';
+
+import { useOptimistic } from 'react';
+import { deletePost } from '../actions';
+
+export function PostList({ posts }) {
+  const [optimisticPosts, removeOptimisticPost] = useOptimistic(posts, (currentPosts, postId) =>
+    currentPosts.filter((post) => post.id !== postId)
+  );
+
+  async function handleDelete(postId) {
+    // 즉시 UI에서 제거
+    removeOptimisticPost(postId);
+
+    // 서버에서 삭제
+    await deletePost(postId);
+  }
+
+  return (
+    <ul>
+      {optimisticPosts.map((post) => (
+        <li key={post.id}>
+          {post.title}
+          <button onClick={() => handleDelete(post.id)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**핵심 특징:**
+
+- `'use server'` 디렉티브로 서버 함수 정의
+- 클라이언트에서 직접 호출 가능
+- TypeScript 완벽 지원
+- 자동 직렬화/역직렬화
+
+---
+
+## 성능 최적화 API
+
+### 리소스 프리로딩 함수
+
+React 19는 `react-dom`에서 새로운 리소스 최적화 함수들을 제공한다.
+
+```tsx
+import { prefetchDNS, preconnect, preload, preinit } from 'react-dom';
+
+function MyApp() {
+  // DNS 프리페치
+  prefetchDNS('https://api.example.com');
+
+  // 연결 미리 생성
+  preconnect('https://cdn.example.com');
+
+  // 리소스 프리로드
+  preload('/fonts/custom-font.woff2', { as: 'font' });
+
+  // 스크립트/스타일 미리 로드 및 실행
+  preinit('/scripts/analytics.js', { as: 'script' });
+
+  return <div>My App</div>;
+}
+```
+
+### 조건부 프리로딩
+
+```tsx
+function ProductPage({ product }) {
+  // 관련 제품 이미지 미리 로드
+  if (product.relatedProducts.length > 0) {
+    product.relatedProducts.forEach((related) => {
+      preload(related.image, { as: 'image' });
+    });
+  }
+
+  return (
+    <div>
+      <h1>{product.name}</h1>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+---
+
+## 마이그레이션 가이드
+
+### React 18 → React 19 체크리스트
+
+**1. 의존성 업데이트**
+
+```bash
+npm install react@19 react-dom@19
+```
+
+**2. 타입 정의 업데이트 (TypeScript)**
+
+```bash
+npm install --save-dev @types/react@19 @types/react-dom@19
+```
+
+**3. Deprecated API 교체**
+
+```tsx
+// ❌ React 18
+import { useFormState } from 'react-dom';
+
+// ✅ React 19
+import { useActionState } from 'react';
+```
+
+```tsx
+// ❌ React 18
+const MyInput = forwardRef((props, ref) => {
+  return <input {...props} ref={ref} />;
+});
+
+// ✅ React 19
+function MyInput({ ref, ...props }) {
+  return <input {...props} ref={ref} />;
+}
+```
+
+**4. Context Provider 간소화**
+
+```tsx
+// ❌ React 18
+<ThemeContext.Provider value={theme}>
+  <App />
+</ThemeContext.Provider>
+
+// ✅ React 19 (둘 다 가능)
+<ThemeContext value={theme}>
+  <App />
+</ThemeContext>
+```
+
+---
+
+## 실전 활용 시나리오
+
+### 시나리오 1: 실시간 검색 with Debounce
+
+```tsx
+'use client';
+
+import { use, useState, useTransition } from 'react';
+
+function SearchResults({ searchPromise }) {
+  const results = use(searchPromise);
+
+  return (
+    <ul>
+      {results.map((item) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
+    </ul>
+  );
+}
+
+export function SearchPage() {
+  const [query, setQuery] = useState('');
+  const [searchPromise, setSearchPromise] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSearch(e) {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value.length < 2) {
+      setSearchPromise(null);
+      return;
+    }
+
+    startTransition(() => {
+      setSearchPromise(fetch(`/api/search?q=${value}`).then((res) => res.json()));
+    });
+  }
+
+  return (
+    <div>
+      <input type="text" value={query} onChange={handleSearch} placeholder="검색..." />
+
+      {isPending && <div>검색 중...</div>}
+
+      {searchPromise && (
+        <Suspense fallback={<div>결과 로딩 중...</div>}>
+          <SearchResults searchPromise={searchPromise} />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+```
+
+### 시나리오 2: 다단계 폼 with 상태 관리
+
+```tsx
+'use client';
+
+import { useActionState } from 'react';
+import { submitMultiStepForm } from './actions';
+
+export function MultiStepForm() {
+  const [state, formAction, isPending] = useActionState(submitMultiStepForm, {
+    step: 1,
+    data: {},
+    errors: null,
+  });
+
+  return (
+    <form action={formAction}>
+      {state.step === 1 && (
+        <div>
+          <h2>1단계: 개인정보</h2>
+          <input type="text" name="name" required />
+          <input type="email" name="email" required />
+          {state.errors?.name && <span>{state.errors.name}</span>}
+          <button name="action" value="next">
+            다음
+          </button>
+        </div>
+      )}
+
+      {state.step === 2 && (
+        <div>
+          <h2>2단계: 주소</h2>
+          <input type="text" name="address" required />
+          <input type="text" name="city" required />
+          <button name="action" value="prev">
+            이전
+          </button>
+          <button name="action" value="next">
+            다음
+          </button>
+        </div>
+      )}
+
+      {state.step === 3 && (
+        <div>
+          <h2>3단계: 확인</h2>
+          <pre>{JSON.stringify(state.data, null, 2)}</pre>
+          <button name="action" value="prev">
+            이전
+          </button>
+          <button name="action" value="submit" disabled={isPending}>
+            {isPending ? '제출 중...' : '제출'}
+          </button>
+        </div>
+      )}
+    </form>
+  );
+}
+```
+
+### 시나리오 3: 무한 스크롤 with use()
+
+```tsx
+'use client';
+
+import { use, useState, Suspense } from 'react';
+
+function PostList({ postsPromise }) {
+  const posts = use(postsPromise);
+
+  return (
+    <>
+      {posts.map((post) => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+        </article>
+      ))}
+    </>
+  );
+}
+
+export function InfiniteScrollPosts() {
+  const [pages, setPages] = useState([fetch('/api/posts?page=1').then((res) => res.json())]);
+
+  function loadMore() {
+    setPages((prev) => [
+      ...prev,
+      fetch(`/api/posts?page=${prev.length + 1}`).then((res) => res.json()),
+    ]);
+  }
+
+  return (
+    <div>
+      {pages.map((pagePromise, index) => (
+        <Suspense key={index} fallback={<div>Loading...</div>}>
+          <PostList postsPromise={pagePromise} />
+        </Suspense>
+      ))}
+
+      <button onClick={loadMore}>더 보기</button>
+    </div>
+  );
+}
+```
+
+---
+
+## 주의사항 및 Best Practices
+
+### 1. use()는 Suspense와 함께 사용
+
+```tsx
+// ❌ Suspense 없이 사용 시 에러
+function MyComponent({ dataPromise }) {
+  const data = use(dataPromise);
+  return <div>{data}</div>;
+}
+
+// ✅ Suspense로 감싸기
+function App() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <MyComponent dataPromise={fetchData()} />
+    </Suspense>
+  );
+}
+```
+
+### 2. Server Actions는 보안에 주의
+
+```tsx
+// ❌ 클라이언트 입력을 그대로 사용
+'use server';
+export async function deleteUser(userId) {
+  await db.user.delete({ where: { id: userId } });
+}
+
+// ✅ 권한 검증 추가
+('use server');
+export async function deleteUser(userId) {
+  const session = await getSession();
+
+  if (!session || session.userId !== userId) {
+    throw new Error('Unauthorized');
+  }
+
+  await db.user.delete({ where: { id: userId } });
+}
+```
+
+### 3. useOptimistic은 실패 처리 고려
+
+```tsx
+function TodoItem({ todo, onToggle }) {
+  const [optimisticTodo, setOptimisticTodo] = useOptimistic(todo, (current) => ({
+    ...current,
+    completed: !current.completed,
+  }));
+
+  async function handleToggle() {
+    setOptimisticTodo();
+
+    try {
+      await onToggle(todo.id);
+    } catch (error) {
+      // 실패 시 사용자에게 알림
+      alert('처리에 실패했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  return <li onClick={handleToggle}>{optimisticTodo.text}</li>;
+}
+```
+
+---
+
+## 정리
+
+**🎣 새로운 Hooks**
+
+- `use()`: 조건부 리소스 읽기
+- `useActionState`: 폼 상태 관리
+- `useOptimistic`: 낙관적 업데이트
+- `useFormStatus`: 폼 상태 공유
+
+**⚡️ 성능 개선**
+
+- Server Components 안정화
+- Actions API로 간편한 비동기 처리
+- 리소스 프리로딩 함수들
+
+**🔧 개발자 경험**
+
+- `ref` Props 직접 전달
+- Context 간소화
+- Document Metadata 통합
+
+React 19의 새로운 기능들을 활용하면 더 간결하고, 빠르고, 사용자 친화적인 애플리케이션을 만들 수 있다.
+
+---
+
+**참고 자료**
+
+- [React 19 공식 발표](https://react.dev/blog/2024/12/05/react-19)
+- [React Hooks Reference](https://react.dev/reference/react/hooks)
+- [Server Actions 가이드](https://react.dev/reference/rsc/server-actions)
